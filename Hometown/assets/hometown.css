@@ -1,0 +1,14 @@
+
+#complexHometown {
+    width:49%;
+    height:500px;
+}
+#simpleHometown {
+    float: left;
+    vertical-align:top;
+    width: 49%;
+    height: 500px;
+    margin-right: 10px;
+}
+#lessonsLearned{
+}

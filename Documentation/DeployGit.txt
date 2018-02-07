@@ -1,0 +1,3 @@
+Command to deploy:
+
+c:\git\GIS> git push -u GEOG863 master
