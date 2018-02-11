@@ -2,18 +2,31 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
-    <title></title>
+    <title>Global Earthquakes from 1970 to 2009</title>
 
+    <link rel="stylesheet" href="assets/global.css">
     <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/css/main.css">
     <script src="https://js.arcgis.com/4.3/"></script>
 </head>
 
 <body>
     <div id="viewDiv"></div>
-    <script src="assets/production.js"></script>
+    <div id="infoDiv">
+        Select Year:
+        <input id="years" type="range" min="1970" max="2009" step="1" value="1970">
+        <span id="year-value">1970</span><br>
+    </div>
+    <div id="summary">
+        <p>
+            This was a tough assignment for me to accomplish based on my limited understanding
+            of the ESRI world. Once my dataset was known to me the tools seemed rather
+            intuitive. There was never a time, outside of getting the right data for
+            the assignment, that I felt lost on what to do next. I was excited to be able to
+            go back into the Require.js documentation to see how to remove my code for the
+            UniqueValueRenderer and place it into a module. This allowed my code to be more
+            clear upon initial reading. If I were to further break the code into modules
+            I would also place the popup template code into its own module.
+        </p>
+    </div>
+    <script src="assets/global.js"></script>
 </body>
-</html>
-
-
-
-
