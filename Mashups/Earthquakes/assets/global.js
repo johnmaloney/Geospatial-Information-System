@@ -13,6 +13,7 @@ require([
 ], function (Map, MapView, FeatureLayer, GraphicsLayer, Graphic, SimpleMarkerSymbol, Query, Search, on, dom) {
 
     var yearsSlider = dom.byId("years");
+    var queryQuakes = dom.byId("query-quakes");
     var query = "YYYYMMDD like "   
 
     var map = new Map({
@@ -27,7 +28,7 @@ require([
     });
 
     view.ui.add("infoDiv", "top-right");
-    
+
     var layer = new FeatureLayer({
         url: "http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Earthquakes/Since_1970/MapServer/0"
     });
@@ -54,25 +55,25 @@ require([
 
             if (magnitude < 7) {
                 graphic.symbol = new SimpleMarkerSymbol({
-                    color: "green",
+                    color: "#1a9641",
                     size: "10px"
                 });
             }
             else if (magnitude >= 7 && magnitude <= 8) {
                 graphic.symbol = new SimpleMarkerSymbol({
-                    color: "yellow",
+                    color: "#a6d96a",
                     size: "20px"
                 });
             }
             else if (magnitude > 8 && magnitude < 9) {
                 graphic.symbol = new SimpleMarkerSymbol({
-                    color: "orange",
+                    color: "#fdae61",
                     size: "30px"
                 });
             }
             else {
                 graphic.symbol = new SimpleMarkerSymbol({
-                    color: "red",
+                    color: "#d7191c",
                     size: "50px"
                 });
             }
@@ -87,11 +88,20 @@ require([
         resultsLayer.addMany(quakeFeatures);
 
         map.add(resultsLayer);
-    }
 
+        alert("There were " + quakeFeatures.length + " in the year " + yearsSlider.value);
+    }
+    
     on(yearsSlider, "input", function () {
 
         dom.byId("year-value").innerText = yearsSlider.value;
+
+        layer.then(queryingFeatures).then(displayingFeatures); 
+    });
+
+    on(queryQuakes, "click", function () {
+
+        yearsSlider.value = prompt("Enter the a year value between 1970 and 2009", "2004");
 
         layer.then(queryingFeatures).then(displayingFeatures); 
     });

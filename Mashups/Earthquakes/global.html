@@ -12,21 +12,29 @@
 <body>
     <div id="viewDiv"></div>
     <div id="infoDiv">
+        <br />
         Select Year:
-        <input id="years" type="range" min="1970" max="2009" step="1" value="1970">
-        <span id="year-value">1970</span><br>
+        <input id="years" type="range" min="1970" max="2009" step="1" value="2004">
+        <span id="year-value">2004</span>
+        <br /><br />
+        <button id="query-quakes">Enter Year Value Manually</button>
+        <br /><br />
+        <p>
+            This map initially displays all the earthquakes from the ESRI test layer <a href="http://sampleserver3.arcgisonline.com/ArcGIS/rest/services/Earthquakes/Since_1970/MapServer">here</a>.
+            To change the layers that are on the map the user can use either browser prompts
+            or the year slider to see the earthquakes from that year.
+        </p>
+        <p>
+            This was a good lesson into using the query expressions to filter the data.
+            I also learned the methods for removing layers from the Map object (i.e. Map.removeAll()).
+            I have experience working with Javascript Promises, so it was pretty natural
+            to be working with the asynchronous nature of those functions.
+            I was impressed with the speed of the ArcGIS JS API when I added the slider
+            to the page and reacted to each time the value was changed.
+        </p>
     </div>
     <div id="summary">
-        <p>
-            This was a tough assignment for me to accomplish based on my limited understanding
-            of the ESRI world. Once my dataset was known to me the tools seemed rather
-            intuitive. There was never a time, outside of getting the right data for
-            the assignment, that I felt lost on what to do next. I was excited to be able to
-            go back into the Require.js documentation to see how to remove my code for the
-            UniqueValueRenderer and place it into a module. This allowed my code to be more
-            clear upon initial reading. If I were to further break the code into modules
-            I would also place the popup template code into its own module.
-        </p>
+
     </div>
     <script src="assets/global.js"></script>
 </body>
