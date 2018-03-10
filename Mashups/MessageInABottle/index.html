@@ -1,0 +1,59 @@
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Global Earthquakes 1970 to 2009</title>
+    <link rel="stylesheet" href="assets/index.css" media="screen">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.3/esri/css/main.css">
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.10.4/dijit/themes/claro/claro.css" media="screen" />
+    <link rel="stylesheet" href="https://geog863.azurewebsites.net/Mashups/EarthQuakesII/assets/dgrid.css">
+    <script>
+        var dojoConfig = {
+            async: true,
+            packages: [{ name: 'dgrid', location: 'https://geog863.azurewebsites.net/Mashups/EarthQuakesII/assets/dgrid' }]
+        };
+    </script>
+    <script src="https://js.arcgis.com/4.6/"></script>
+    <script src="assets/messageManager.js"></script>
+    <script>
+        require(["dojo/parser", "dijit/layout/BorderContainer", "dijit/layout/ContentPane", "dojo/domReady!"],
+            function (parser, ) {
+                loadingState = "Loading";
+                errorState = "ERROR";
+                parser.parse();
+            });
+    </script>
+
+    <script src="assets/index.js"></script>
+</head>
+<body class="claro">
+    <div id="appLayout" class="demoLayout" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design: 'headline'">
+
+        <div class="edgePanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'top'">
+            Message in a Bottle
+        </div>
+
+        <div class="centerPanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'center'">
+
+            <div id="viewDiv">
+            </div>
+
+        </div>
+
+        <div id="sidePanel" class="edgePanel" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region: 'right', splitter: true">
+            <div>
+                <br />
+                Set the amount of days the message will travel:
+                <input id="days" type="range" min="1" max="365" step="1" value="1">
+                <span id="day-value">1</span><span> day(s)</span>
+                <br /><br />
+            </div>
+
+            <div id="grid"></div>
+        </div>
+
+    </div>
+
+</body>
+</html>
