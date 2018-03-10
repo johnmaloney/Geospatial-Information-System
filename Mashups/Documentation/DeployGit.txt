@@ -1,3 +1,7 @@
+Git Clone URL
+
+https://maloney1@geog863.scm.azurewebsites.net:443/GEOG863.git
+
 Command to deploy:
 
 c:\git\GIS> git push -u GEOG863 master
