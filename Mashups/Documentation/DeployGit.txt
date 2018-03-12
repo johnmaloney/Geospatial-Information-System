@@ -1,3 +1,6 @@
+Instructions
+https://docs.microsoft.com/en-us/azure/app-service/app-service-deploy-local-git
+
 Git Clone URL
 
 https://maloney1@geog863.scm.azurewebsites.net:443/GEOG863.git

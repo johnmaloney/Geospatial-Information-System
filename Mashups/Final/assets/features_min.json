@@ -1,0 +1,122 @@
+{
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "Reporting District": "1371",
+        "Victim Descent": "H",
+        "Cross Street": "",
+        "Date Reported": "43044",
+        "Victim Age": "31",
+        "MO Codes": "1100 0906 0302 0334 0430 1402 1407",
+        "Location ": "(33.9906, -118.2761)",
+        "Crime Code 1": "110",
+        "Weapon Used Code": "102",
+        "Premise Description": "YARD (RESIDENTIAL/BUSINESS)",
+        "Crime Code 2": "998",
+        "Status Description": "Invest Cont",
+        "Area ID": "13",
+        "Crime Code 3": "",
+        "Victim Sex": "M",
+        "Crime Code 4": "",
+        "Address": "200 W  57TH                         ST",
+        "Date Occurred": "43044",
+        "Crime Code Description": "CRIMINAL HOMICIDE",
+        "Time Occurred": "1822",
+        "Weapon Description": "HAND GUN",
+        "Crime Code": "110",
+        "Status Code": "IC",
+        "DR Number": "171323653",
+        "Premise Code": "121",
+        "Area Name": "Newton"
+      },
+      "geometry": {
+        "coordinates": [
+          -118.2761,
+          33.9906
+        ],
+        "type": "Point"
+      },
+      "id": "00b6a0a2b14cf842bac6ec26eed26b56"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Reporting District": "147",
+        "Victim Descent": "H",
+        "Cross Street": "SAN PEDRO                    ST",
+        "Date Reported": "42764",
+        "Victim Age": "42",
+        "MO Codes": "1100 0430 1218 2004",
+        "Location ": "(34.0442, -118.2439)",
+        "Crime Code 1": "110",
+        "Weapon Used Code": "102",
+        "Premise Description": "SIDEWALK",
+        "Crime Code 2": "",
+        "Status Description": "Adult Arrest",
+        "Area ID": "1",
+        "Crime Code 3": "",
+        "Victim Sex": "M",
+        "Crime Code 4": "",
+        "Address": "5TH",
+        "Date Occurred": "42764",
+        "Crime Code Description": "CRIMINAL HOMICIDE",
+        "Time Occurred": "850",
+        "Weapon Description": "HAND GUN",
+        "Crime Code": "110",
+        "Status Code": "AA",
+        "DR Number": "170105663",
+        "Premise Code": "102",
+        "Area Name": "Central"
+      },
+      "geometry": {
+        "coordinates": [
+          -118.2439,
+          34.0442
+        ],
+        "type": "Point"
+      },
+      "id": "00b7b1ca57ecb7cc858a451d5193bf12"
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Reporting District": "479",
+        "Victim Descent": "H",
+        "Cross Street": "",
+        "Date Reported": "43074",
+        "Victim Age": "25",
+        "MO Codes": "1218 1100 0906 1309 0302 0334 0430 1407 1402 1419",
+        "Location ": "(34.0296, -118.1961)",
+        "Crime Code 1": "110",
+        "Weapon Used Code": "102",
+        "Premise Description": "ALLEY",
+        "Crime Code 2": "998",
+        "Status Description": "Adult Arrest",
+        "Area ID": "4",
+        "Crime Code 3": "",
+        "Victim Sex": "M",
+        "Crime Code 4": "",
+        "Address": "3500 E  6TH                          ST",
+        "Date Occurred": "43074",
+        "Crime Code Description": "CRIMINAL HOMICIDE",
+        "Time Occurred": "1250",
+        "Weapon Description": "HAND GUN",
+        "Crime Code": "110",
+        "Status Code": "AA",
+        "DR Number": "170419097",
+        "Premise Code": "103",
+        "Area Name": "Hollenbeck"
+      },
+      "geometry": {
+        "coordinates": [
+          -118.1961,
+          34.0296
+        ],
+        "type": "Point"
+      },
+      "id": "fec861836e35da595821c9608a70a9e2"
+    }
+  ],
+  "type": "FeatureCollection"
+}
