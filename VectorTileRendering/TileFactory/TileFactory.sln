@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TileFactory", "TileFactory\TileFactory.csproj", "{AF7727EC-BF1D-4680-A92F-0C39936FCA3D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TileFactory.Tests", "TileFactory.Tests\TileFactory.Tests.csproj", "{FE7B25B9-D713-4FAA-92F5-A97BF456BBDC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AF7727EC-BF1D-4680-A92F-0C39936FCA3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF7727EC-BF1D-4680-A92F-0C39936FCA3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF7727EC-BF1D-4680-A92F-0C39936FCA3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF7727EC-BF1D-4680-A92F-0C39936FCA3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE7B25B9-D713-4FAA-92F5-A97BF456BBDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE7B25B9-D713-4FAA-92F5-A97BF456BBDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE7B25B9-D713-4FAA-92F5-A97BF456BBDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE7B25B9-D713-4FAA-92F5-A97BF456BBDC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B0DA688F-818A-4485-8CEC-22E6F500EAC1}
+	EndGlobalSection
+EndGlobal
