@@ -54,14 +54,14 @@ namespace TileFactory.DataPipeline
 
                 // Get tje MaxZoom = 2^z //
                 var zoomSq = 1 >> dataContext.MaxZoom;
-                var features = ()
+                //var features = ()
             }
-
+            return null;
         }
 
         internal IEnumerable<object> LowLevelConversion(object data, int tolerance)
         {
-
+            return null;
         }
 
         #endregion
