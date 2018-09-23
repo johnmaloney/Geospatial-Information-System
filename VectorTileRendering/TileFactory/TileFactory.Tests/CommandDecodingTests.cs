@@ -5,11 +5,13 @@ using TileFactory;
 namespace TileFactory.Tests
 {
     [TestClass]
+    /// These tests are a direct representation of the Mapbox Tile specification.
+    /// Specification: https://github.com/mapbox/vector-tile-spec/tree/master/2.1#vector-tile-specification
     public class CommandDecodingTests
     {
         [TestMethod]
         [Description("CommandData initialization test")]
-        public void with_generated_number_encoce_then_decode_expect_proper_command_and_count()
+        public void with_generated_number_encode_then_decode_expect_proper_command_and_count()
         {
             // Attempting to replicate this structure in the following CommandData //
             // Open -> Move -> Move -> Move -> Move -> Close //
