@@ -4,10 +4,6 @@ using System.Text;
 
 namespace TileFactory
 {
-    public interface ITileData
-    {
-    }
-
     public class Feature
     {
         #region Fields

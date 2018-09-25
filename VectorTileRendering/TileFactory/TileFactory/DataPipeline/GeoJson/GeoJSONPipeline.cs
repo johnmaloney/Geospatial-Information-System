@@ -12,25 +12,59 @@ using TileFactory.Interfaces;
 namespace TileFactory.DataPipeline.GeoJson
 {
     /// <summary>
+    /// Determine is the GeoJson file contains a Feature or a FeatureCollection
+    /// </summary>
+    public class DetermineCollectionsTypePipeline : APipe, IPipe
+    {
+        public override async Task Process(IPipeContext context)
+        {
+            var dataContext = context as GeoJsonContext;
+
+            if (dataContext == null)
+                throw new NotSupportedException("The pipeline context must be of type DataPipelineContext");
+
+            // Save time and space only read the first line to determine if this is a Feature or a //
+            // Feature collection //
+            string capture = "";
+            using (var reader = new StringReader(dataContext.OriginalData))
+            {
+                bool finishedSearch = false;
+                while (!finishedSearch)
+                {
+                    var character = reader.ReadLine();
+                    if (capture.IndexOf(',') < 0)
+                        capture += character;
+                    else
+                        finishedSearch = true;
+                }
+
+                if (capture.Contains("FeatureCollection"))
+                {
+                    dataContext.Features = JsonConvert.DeserializeObject<GeoJSON.Net.Feature.FeatureCollection>(dataContext.OriginalData);
+
+                }
+                else if (capture.Contains("Feature"))
+                {
+                    var feature = JsonConvert.DeserializeObject<GeoJSON.Net.Feature.Feature>(dataContext.OriginalData);
+                    dataContext.Features = new GeoJSON.Net.Feature.FeatureCollection(new List<GeoJSON.Net.Feature.Feature> { feature });
+                }
+                else
+                {
+                    throw new NotSupportedException("Type of GeoJson data could not be determined.");
+                }
+            }
+
+            while (this.HasNextPipe)
+                await this.NextPipe.Process(context);
+        }
+    }
+
+    /// <summary>
     /// This a C# implementation of the following Javascript file:
     /// https://github.com/mapbox/geojson-vt
     /// </summary>
     public class ParseGeoJsonToFeatures : APipe, IPipe
     {
-        #region Fields
-
-
-
-        #endregion
-
-        #region Properties
-
-
-
-        #endregion
-
-        #region Methods
-
         public override async Task Process(IPipeContext context)
         {
             var dataContext = context as GeoJsonContext;
@@ -104,11 +138,9 @@ namespace TileFactory.DataPipeline.GeoJson
                 : y2 > 1 ? 1 
                 : y2; 
         }
-
-        #endregion
     }
 
-    public class DetermineCollectionsTypePipeline : APipe, IPipe
+    public class WrapTileFeatures : APipe, IPipe
     {
         public override async Task Process(IPipeContext context)
         {
@@ -117,39 +149,21 @@ namespace TileFactory.DataPipeline.GeoJson
             if (dataContext == null)
                 throw new NotSupportedException("The pipeline context must be of type DataPipelineContext");
 
-            // Save time and space only read the first line to determine if this is a Feature or a //
-            // Feature collection //
-            string capture = "";
-            using (var reader = new StringReader(dataContext.OriginalData))
-            {
-                bool finishedSearch = false;
-                while (!finishedSearch)
-                {
-                    var character = reader.ReadLine();
-                    if (capture.IndexOf(',') < 0)
-                        capture += character;
-                    else
-                        finishedSearch = true;
-                }
+            if (dataContext.Features == null)
+                throw new NotSupportedException("The Features of the context must have a value for the data to be processed.");
 
-                if (capture.Contains("FeatureCollection"))
-                {
-                    dataContext.Features = JsonConvert.DeserializeObject<GeoJSON.Net.Feature.FeatureCollection>(dataContext.OriginalData);
+            var wrappedFeatures = WrapFeatures(dataContext.TileFeatures, dataContext.Buffer / dataContext.Extent);
 
-                }
-                else if(capture.Contains("Feature"))
-                {
-                    var feature = JsonConvert.DeserializeObject<GeoJSON.Net.Feature.Feature>(dataContext.OriginalData);
-                    dataContext.Features = new GeoJSON.Net.Feature.FeatureCollection(new List<GeoJSON.Net.Feature.Feature> { feature });
-                }
-                else
-                {
-                    throw new NotSupportedException("Type of GeoJson data could not be determined.");
-                }                
-            }
-                      
             while (this.HasNextPipe)
                 await this.NextPipe.Process(context);
         }
+
+        private IEnumerable<Feature> WrapFeatures(IEnumerable<Feature> unwrappedFeatures, double buffer)
+        {
+            var left = Clip(unwrappedFeatures, 1, -1, -buffer, 1 + buffer, 0, -1, 2);
+        }
+
+        private object Clip(IEnumerable<Feature> features, int scale, int k1, double k2, double axis, )
     }
+
 }
