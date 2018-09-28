@@ -75,15 +75,18 @@ namespace TileFactory.DataPipeline.GeoJson
             if (dataContext.Features == null)
                 throw new NotSupportedException("The Features of the context must have a value for the data to be processed.");
 
-            // Get tje MaxZoom = 2^z //
-            var zoomSq = 1 << dataContext.MaxZoom;
-            dataContext.TileFeatures = ConvertFeatures(dataContext.Features, dataContext.Tolerance);
+            // var z2 = 1 << options.maxZoom, // 2^z
+            // features = convert(data, options.tolerance / (z2 * options.extent));
+
+            double zoomSq = 1 << dataContext.MaxZoom;
+            double tolerance = dataContext.Tolerance / (zoomSq * dataContext.Extent);
+            dataContext.TileFeatures = ConvertFeatures(dataContext.Features, tolerance);
             
             while (this.HasNextPipe)
                 await this.NextPipe.Process(context);
         }
 
-        internal IEnumerable<Feature> ConvertFeatures(FeatureCollection featureCollection, int tolerance)
+        internal IEnumerable<Feature> ConvertFeatures(FeatureCollection featureCollection, double tolerance)
         {
             var processedFeatures = new List<Feature>();
             foreach (var feature in featureCollection.Features)
@@ -93,7 +96,7 @@ namespace TileFactory.DataPipeline.GeoJson
             return processedFeatures;
         }
 
-        internal Feature ConvertFeature(GeoJSON.Net.Feature.Feature geoJsonFeature, int tolerance)
+        internal Feature ConvertFeature(GeoJSON.Net.Feature.Feature geoJsonFeature, double tolerance)
         {
             
             if (geoJsonFeature.Geometry == null)
@@ -120,19 +123,25 @@ namespace TileFactory.DataPipeline.GeoJson
             return tileFeature;
         }
 
+        /// <summary>
+        /// X is the Horizontal value or Longitude
+        /// Y is the Vertical value or Latitude
+        /// </summary>
+        /// <param name="point"></param>
+        /// <returns></returns>
         private double[] processPoint(Point point)
         {
-            return new double[] { projectX(point.Coordinates.Latitude), projectY(point.Coordinates.Longitude) };
+            return new double[] { projectX(point.Coordinates.Longitude), projectY(point.Coordinates.Latitude) };
         }
 
-        private double projectX(double latitude)
+        private double projectX(double longitude)
         {
-            return latitude / 360 + 0.5;
+            return longitude / 360 + 0.5;
         }
 
-        private double projectY(double longitude)
+        private double projectY(double latitude)
         {
-            var sin = Math.Sin(longitude * Math.PI / 180);
+            var sin = Math.Sin(latitude * Math.PI / 180);
             var y2 = 0.5 - 0.25 * Math.Log((1+ sin) / (1-sin)) / Math.PI;
             return y2 < 0 ? 0 
                 : y2 > 1 ? 1 
@@ -160,10 +169,15 @@ namespace TileFactory.DataPipeline.GeoJson
 
         private IEnumerable<Feature> WrapFeatures(IEnumerable<Feature> unwrappedFeatures, double buffer)
         {
-            var left = Clip(unwrappedFeatures, 1, -1, -buffer, 1 + buffer, 0, -1, 2);
+            var left = Clip(unwrappedFeatures, 1, (-1 -buffer), 1 + buffer, 0, -1, 2);
+
+            return null;
         }
 
-        private object Clip(IEnumerable<Feature> features, int scale, int k1, double k2, double axis, )
+        private object Clip(IEnumerable<Feature> features, int scale, double k1, double k2, double axis, double minAll, double maxAll)
+        {
+            return null;
+        }
     }
 
 }

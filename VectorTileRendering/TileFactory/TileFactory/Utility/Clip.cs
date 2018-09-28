@@ -46,6 +46,7 @@ namespace TileFactory.Utility
 
         public ClipContext(ClipType clipType, double buffer)
         {
+            Type = clipType;
             if (clipType == ClipType.Left)
             {
                 Scale = 1;
@@ -85,9 +86,6 @@ namespace TileFactory.Utility
     internal class Clip
     {
         #region Fields
-
-
-
         #endregion
 
         #region Properties
@@ -103,6 +101,11 @@ namespace TileFactory.Utility
         public Clip(IEnumerable<Feature> features, IClipContext clipContext)
         {
             var clipped = new List<Feature>();
+
+            foreach(var feature in features)
+            {
+               // var min = feature.
+            }
         }
 
         #endregion 

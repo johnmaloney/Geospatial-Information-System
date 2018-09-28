@@ -9,8 +9,8 @@ namespace TileFactory.DataPipeline
         public int MaxZoom { get; set; }
         public int MaxZoomIndex { get; set; }
         public bool SolidChildren { get; set; }
-        public int Tolerance { get; set; }
-        public int Extent { get; set; }
+        public double Tolerance { get; set; }
+        public double Extent { get; set; }
         public int Buffer { get; set; }
         public int LogLevel { get; set; }
 
