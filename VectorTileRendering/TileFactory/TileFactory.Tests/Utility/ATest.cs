@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TileFactory.Tests.Utility;
+using TileFactory.Utility;
 
 namespace TileFactory.Tests
 {
@@ -19,6 +20,13 @@ namespace TileFactory.Tests
         {
             Registrations = new ServiceCollection();
             Registrations.AddSingleton<IConfigurationStrategy>(new ConfigurationStrategy());
+
+            // This processing factory needs a delegate that will dictate //
+            // a process to instantiate a processing item foreach individual //
+            // goemetry item (e.g. Point, Linestring, etc) that is being processed //
+            Registrations.AddSingleton<ProjectionProcessingFactory>(
+                new ProjectionProcessingFactory(
+                    (geoItem)=> new WebMercatorProcessor(geoItem)));
 
             Container = Registrations.BuildServiceProvider();
         }

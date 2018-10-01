@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TileFactory.Interfaces;
 using static TileFactory.Constants;
 
 namespace TileFactory.Utility
@@ -10,11 +11,9 @@ namespace TileFactory.Utility
         double Scale { get; }
         double K1 { get; }
         double K2 { get; }
-        double Axis { get; }
+        int Axis { get; }
         Int16 MinAll { get; }
-
         Int16 MaxAll { get; }
-
         ClipType Type { get; }
     }
 
@@ -30,7 +29,7 @@ namespace TileFactory.Utility
 
         public double K2 { get; private set; }
 
-        public double Axis { get; private set; }
+        public int Axis { get; private set; }
 
         public short MinAll { get; private set; }
 
@@ -81,31 +80,29 @@ namespace TileFactory.Utility
 
         #endregion
     }
-
-
+    
     internal class Clip
     {
         #region Fields
+
+
+
         #endregion
 
         #region Properties
 
         public ClipType Type { get; private set; }
 
-        public IEnumerable<Feature> ClippedFeatures { get; private set; }
+        public Feature ClippedFeature { get; private set; }
 
         #endregion
 
         #region Methods
 
-        public Clip(IEnumerable<Feature> features, IClipContext clipContext)
+        public Clip(IGeometryItem feature, IClipContext clipContext)
         {
-            var clipped = new List<Feature>();
-
-            foreach(var feature in features)
-            {
-               // var min = feature.
-            }
+            //var min = feature.MinGeometry[clipContext.Axis];
+            //var max = feature.MaxGeometry[clipContext.Axis];
         }
 
         #endregion 
