@@ -208,12 +208,15 @@ namespace TileFactory.DataPipeline.GeoJson
         private IEnumerable<Feature> WrapFeatures(IGeometryItem unwrappedFeature, double buffer)
         {
             var left = Clip(unwrappedFeature, 1, (-1 -buffer), 1 + buffer, 0, -1, 2);
+            //var right = Clip()
 
             return null;
         }
 
         private object Clip(IGeometryItem feature, int scale, double k1, double k2, double axis, double minAll, double maxAll)
         {
+            
+
             return null;
         }
     }

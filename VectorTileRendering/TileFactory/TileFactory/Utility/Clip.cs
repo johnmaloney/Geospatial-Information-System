@@ -4,7 +4,7 @@ using System.Text;
 using TileFactory.Interfaces;
 using static TileFactory.Constants;
 
-namespace TileFactory.Utility
+namespace TileFactory.Utility.Obsolete
 {
     internal interface IClipContext
     {
@@ -93,7 +93,7 @@ namespace TileFactory.Utility
 
         public ClipType Type { get; private set; }
 
-        public Feature ClippedFeature { get; private set; }
+        public IGeometryItem ClippedFeature { get; private set; }
 
         #endregion
 
@@ -101,8 +101,41 @@ namespace TileFactory.Utility
 
         public Clip(IGeometryItem feature, IClipContext clipContext)
         {
-            //var min = feature.MinGeometry[clipContext.Axis];
-            //var max = feature.MaxGeometry[clipContext.Axis];
+            var min = feature.MinGeometry.X;
+            var max = feature.MaxGeometry.X;
+
+            // clip would be trivial accept the feature //
+            if (min >= clipContext.K1 && max <= clipContext.K2)
+            {
+                ClippedFeature = feature;
+                return;
+            }
+            else if (min > clipContext.K2 || max < clipContext.K1)
+                return;
+
+            // This is a rare occurrance //
+            if (feature.Type == GeometryType.Point)
+            {
+                //ClippedFeature = ClipPoints(feature, clipContext.K1, clipContext.K2, clipContext.Axis);
+            }
+            else // Covers all the other types //
+            {
+
+            }
+        }
+
+        public void ClipPoints(IGeometryItem feature, double k1, double k2)
+        {
+            var slice = new List<(double X, double Y, double Z)>();
+
+            for (int i = 0; i < feature.Geometry.Length; i++)
+            {
+                var a = feature.Geometry[i][0];
+                
+                if (a.X >= k1 && a.X <= k2)
+                {
+                }
+            }
         }
 
         #endregion 
