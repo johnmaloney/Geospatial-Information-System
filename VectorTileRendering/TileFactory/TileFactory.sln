@@ -13,6 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TileSandbox", "TileSandbox\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{4A180566-73DD-4A75-ACC0-EC3DE451EC51}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{E2F0663D-20EC-4622-9EA0-59BF94B2C824}"
+	ProjectSection(SolutionItems) = preProject
+		code_coverage.runsettings = code_coverage.runsettings
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

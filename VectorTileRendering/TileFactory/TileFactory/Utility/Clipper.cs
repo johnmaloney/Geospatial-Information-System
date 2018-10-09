@@ -82,7 +82,7 @@ namespace TileFactory.Utility
 
                 if (a.X >= k1 && a.X <= k2)
                 {
-                    }
+                }
             }
             throw new NotImplementedException("Multi points are not yet supported");
         }

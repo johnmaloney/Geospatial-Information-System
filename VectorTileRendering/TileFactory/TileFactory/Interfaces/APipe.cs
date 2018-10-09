@@ -11,7 +11,7 @@ namespace TileFactory.Interfaces
         #region Fields
         
         private Queue<IPipe> pipes = new Queue<IPipe>();
-        private Queue<IPipe> iterativePipes = new Queue<IPipe>();
+        private IList<IPipe> iterationPipeline = new List<IPipe>();
 
         #endregion
 
@@ -36,24 +36,6 @@ namespace TileFactory.Interfaces
             }
         }
 
-        protected bool HasNextIterativePipe
-        {
-            get
-            {
-                return this.iterativePipes.Count > 0;
-            }
-        }
-
-        public virtual IPipe NextIterative
-        {
-            get
-            {
-                if (iterativePipes.Count > 0)
-                    return iterativePipes.Dequeue();
-                else
-                    return null;
-            }
-        }
         #endregion
 
         #region Methods
@@ -67,11 +49,21 @@ namespace TileFactory.Interfaces
 
         public virtual IPipe IterateWith(IPipe pipe)
         {
-            this.iterativePipes.Enqueue(pipe);
+            // This collection is used iterate an item within the parent pipeline //
+            this.iterationPipeline.Add(pipe);
+
             return this;
         }
 
         public abstract Task Process(IPipeContext context);
+
+        public async Task Iterate(IPipeContext context)
+        {
+            foreach(var iteration in iterationPipeline)
+            {
+               await  iteration.Process(context);
+            }
+        }
 
         #endregion
     }

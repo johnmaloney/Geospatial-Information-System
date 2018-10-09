@@ -10,6 +10,8 @@ namespace TileFactory
         #region Fields
 
         private (double X, double Y, double Z)[][] geometry;
+        private double? totalArea;
+        private double? totalDistance;
 
         #endregion
 
@@ -34,6 +36,30 @@ namespace TileFactory
         public (double X, double Y, double Z) MaxGeometry { get; private set; }
 
         public (double X, double Y, double Z) MinGeometry { get; private set; }
+
+        public double Area
+        {
+            get
+            {
+                if (!totalArea.HasValue || !totalDistance.HasValue)
+                {
+                    calculateAreaAndDistance();
+                }
+                return totalArea.Value;
+            }
+        }
+
+        public double Distance
+        {
+            get
+            {
+                if (!totalArea.HasValue || !totalDistance.HasValue)
+                {
+                    calculateAreaAndDistance();
+                }
+                return totalDistance.Value;
+            }
+        }
 
         #endregion
 
@@ -81,6 +107,29 @@ namespace TileFactory
 
             MinGeometry = minGeometry;
             MaxGeometry = maxGeometry;
+        }
+
+        private void calculateAreaAndDistance()
+        {
+            if (this.geometry.Length == 0)
+                throw new NotSupportedException("The Geometry of the feature must have value to calculate Area and Distance");
+
+            double area = 0, distance = 0;
+
+            for (int i = 0; i < geometry.Length - 1; i++)
+            {
+                var a = geometry[i][0];
+                var b = geometry[i + 1][0];
+
+                area += a.X * b.Y - b.X * a.Y;
+
+                // Use the Manhattan distance instead of the Euclidian one to avoid //
+                // the expensive square root computation //
+                distance += Math.Abs(b.X - a.X) + Math.Abs(b.Y - a.Y);
+            }
+
+            totalArea = Math.Abs(area / 2);
+            totalDistance = distance;
         }
 
         #endregion

@@ -21,16 +21,18 @@ namespace TileFactory.Utility
 
         #region Methods
 
-        public WebMercatorProcessor(IGeospatialItem geometryItem, double? tolerance = null)
+        public WebMercatorProcessor(IGeospatialItem geospatialItem, double? tolerance = null)
         {
             /// X is the Horizontal value or Longitude
             /// Y is the Vertical value or Latitude
-            if (geometryItem.Type == GeometryType.Point)
-            {
-                var point = geometryItem as IPoint;
-                this.ProjectedX = projectX(point.Coordinates.Longitude);
-                this.ProjectedY = projectY(point.Coordinates.Latitude);
-            }
+            this.ProjectedX = projectX(geospatialItem.Longitude);
+            this.ProjectedY = projectY(geospatialItem.Latitude);
+        }
+
+        public WebMercatorProcessor(double latitude, double longitude)
+        {
+            ProjectedX = projectX(longitude);
+            ProjectedY = projectY(latitude);
         }
 
         private double projectX(double longitude)

@@ -67,12 +67,6 @@ namespace TileFactory.DataPipeline.GeoJson
     public class ParseGeoJsonToFeatures : APipe, IPipe
     {
         private GeoJsonContext dataContext;
-        private readonly Func<IGeospatialItem, IProjectionProcessor> projectionProcessor;
-
-        public ParseGeoJsonToFeatures(Func<IGeospatialItem, IProjectionProcessor> projectionFactory)
-        {
-            this.projectionProcessor = projectionFactory;
-        }
 
         public override async Task Process(IPipeContext context)
         {
@@ -87,25 +81,25 @@ namespace TileFactory.DataPipeline.GeoJson
             // var z2 = 1 << options.maxZoom, // 2^z
             // features = convert(data, options.tolerance / (z2 * options.extent));
 
-            double zoomSq = 1 << dataContext.MaxZoom;
-            double tolerance = dataContext.Tolerance / (zoomSq * dataContext.Extent);
-            dataContext.TileFeatures = await ConvertFeatures(dataContext.Features, tolerance);
+            dataContext.TileFeatures = await ConvertFeatures(dataContext.Features);
             
             while (this.HasNextPipe)
                 await this.NextPipe.Process(context);
         }
 
-        internal async Task<IEnumerable<Feature>> ConvertFeatures(FeatureCollection featureCollection, double tolerance)
+        internal async Task<IEnumerable<Feature>> ConvertFeatures(FeatureCollection featureCollection)
         {
             var processedFeatures = new List<Feature>();
             //Parallel.ForEach(featureCollection.Features, feature=>
-            foreach (var geosptialFeature in featureCollection.Features)
+            foreach (var geospatialFeature in featureCollection.Features)
             {
-                var geometricFeature = CreateFeature(geosptialFeature);
-                geometricFeature.Geometry = projectToGeometry(geosptialFeature);
+                var geometricFeature = CreateFeature(geospatialFeature);
 
-                while (this.HasNextIterativePipe)
-                    await this.NextIterative.Process(new IterativeFeatureContext(geometricFeature, dataContext.Buffer / dataContext.Extent));
+                await this.Iterate(
+                        new GeoJSONIterativeContext(
+                            geospatialFeature,
+                            geometricFeature, 
+                            dataContext.Buffer / dataContext.Extent));
 
                 processedFeatures.Add(geometricFeature);
 
@@ -119,7 +113,7 @@ namespace TileFactory.DataPipeline.GeoJson
             if (geoJsonFeature.Geometry == null)
                 throw new NotSupportedException("The Feature must contain Geometry data to be converted");
 
-            var tileFeature = new TileFactory.Feature(convertToGeometryType(geoJsonFeature.Type))
+            var tileFeature = new TileFactory.Feature(convertToGeometryType(geoJsonFeature.Geometry.Type))
             {
                 Id = geoJsonFeature.Id, 
                 Tags = geoJsonFeature.Properties
@@ -141,7 +135,7 @@ namespace TileFactory.DataPipeline.GeoJson
                 case GeoJSON.Net.GeoJSONObjectType.MultiLineString:
                     break;
                 case GeoJSON.Net.GeoJSONObjectType.Polygon:
-                    break;
+                    return GeometryType.Polygon;
                 case GeoJSON.Net.GeoJSONObjectType.MultiPolygon:
                     break;
                 case GeoJSON.Net.GeoJSONObjectType.GeometryCollection:
@@ -152,6 +146,34 @@ namespace TileFactory.DataPipeline.GeoJson
                     break;                
             }
             throw new NotSupportedException($"Converting the GeoJSON geospatial type of {geospatialType} to a known geometry type is not supported.");
+        }      
+    }
+
+    //
+    public class ProjectGeoJSONToGeometric : APipe, IPipe
+    {
+        private GeoJSONIterativeContext dataContext;
+        private readonly Func<IGeospatialItem, IProjectionProcessor> projectionProcessor;
+
+        public ProjectGeoJSONToGeometric(Func<IGeospatialItem, IProjectionProcessor> projectionFactory)
+        {
+            this.projectionProcessor = projectionFactory;
+        }
+
+        public override async Task Process(IPipeContext context)
+        {
+            dataContext = context as GeoJSONIterativeContext;
+
+            if (dataContext == null)
+                throw new NotSupportedException($"The pipeline context must be of type IterativeContext");
+
+            if (dataContext.Feature == null)
+                throw new NotSupportedException("The Feature of the context must have a value for the data to be processed.");
+
+            dataContext.Feature.Geometry = projectToGeometry(dataContext.OriginalFeature);
+            
+            while (this.HasNextPipe)
+                await this.NextPipe.Process(context);
         }
 
         private (double X, double Y, double Z)[][] projectToGeometry(GeoJSON.Net.Feature.Feature geoJsonFeature)
@@ -162,15 +184,8 @@ namespace TileFactory.DataPipeline.GeoJson
                     {
                         var geometry = geoJsonFeature.Geometry as GeoJSON.Net.Geometry.Point;
                         // Convert the GeoJSON data to a local DTO //
-                        var point = new PointData
-                        {
-                            Coordinates = new PositionData
-                            {
-                                Altitude = geometry.Coordinates.Altitude,
-                                Latitude = geometry.Coordinates.Latitude,
-                                Longitude = geometry.Coordinates.Longitude
-                            }
-                        };
+                        var point = new PointData(GeometryType.Point, geometry.Coordinates.Latitude, geometry.Coordinates.Longitude, geometry.Coordinates.Altitude ?? 0);
+
                         var processor = projectionProcessor(point);
 
                         return new(double X, double Y, double Z)[][]
@@ -179,19 +194,42 @@ namespace TileFactory.DataPipeline.GeoJson
                             {
                                 (X:processor.ProjectedX, Y:processor.ProjectedY, Z:0d)
                             }
-                        };                                                
+                        };
+                    }
+                case GeoJSON.Net.GeoJSONObjectType.Polygon:
+                    {
+                        var geometry = geoJsonFeature.Geometry as GeoJSON.Net.Geometry.Polygon;
+                        (double X, double Y, double Z)[][] shapeData = null;
+
+                        foreach (var polygonGroup in geometry.Coordinates)
+                        {
+                            var linestring = polygonGroup as GeoJSON.Net.Geometry.LineString;
+                            shapeData = new(double X, double Y, double Z)[linestring.Coordinates.Count][];
+
+                            for (int i = 0; i < linestring.Coordinates.Count; i++)
+                            {
+                                var coordinates = linestring.Coordinates[i];
+                                var point = new PointData(GeometryType.Point, coordinates.Latitude, coordinates.Longitude, coordinates.Altitude ?? 0);
+                                var projected = projectionProcessor(point);
+                                shapeData[i] = new(double X, double Y, double Z)[]
+                                {
+                                    (X:projected.ProjectedX, Y:projected.ProjectedY, Z:0d)
+                                };
+                            }
+                        }
+                        return shapeData;
                     }
                 default:
                     throw new NotSupportedException($"The Geometry type of {geoJsonFeature.Geometry.Type} is not supported.");
             }
         }
     }
-
+    
     public class WrapTileFeatures : APipe, IPipe
     {
         public override async Task Process(IPipeContext context)
         {
-            var dataContext = context as IterativeFeatureContext;
+            var dataContext = context as GeoJSONIterativeContext;
 
             if (dataContext == null)
                 throw new NotSupportedException("The pipeline context must be of type DataPipelineContext");
@@ -207,7 +245,7 @@ namespace TileFactory.DataPipeline.GeoJson
 
         private IEnumerable<Feature> WrapFeatures(IGeometryItem unwrappedFeature, double buffer)
         {
-            var left = Clip(unwrappedFeature, 1, (-1 -buffer), 1 + buffer, 0, -1, 2);
+            var left = Clip(unwrappedFeature, 1, (-1 - buffer), 1 + buffer, 0, -1, 2);
             //var right = Clip()
 
             return null;
@@ -215,10 +253,9 @@ namespace TileFactory.DataPipeline.GeoJson
 
         private object Clip(IGeometryItem feature, int scale, double k1, double k2, double axis, double minAll, double maxAll)
         {
-            
+
 
             return null;
         }
     }
-
 }

@@ -14,23 +14,29 @@ namespace TileFactory.Tests
         [TestMethod]
         public void process_point_into_web_mercator_projection_expect_x_and_y()
         {
-            var point = new MockPoint { Coordinates = new MockPosition { Latitude = 40.73064d, Longitude = -73.99044d } };
+            var point = new MockPoint(GeometryType.Point,40.73064d, -73.99044d, 0d);
             var webMercatorProcessor = new WebMercatorProcessor(point);
             Assert.AreEqual(0.294471d, webMercatorProcessor.ProjectedX);
             Assert.AreEqual(0.375915411794357d, webMercatorProcessor.ProjectedY);
         }
 
-        public class MockPoint : IPoint
+        public class MockPoint : IGeospatialItem
         {
-            public GeometryType Type { get { return GeometryType.Point;} }
-            public IPosition Coordinates { get; set; }
-        }
+            public GeometryType Type { get; private set; }
 
-        public class MockPosition : IPosition
-        {
-            public double? Altitude { get; set; }
-            public double Latitude { get; set; }
-            public double Longitude { get; set; }
+            public double? Altitude { get; private set; }
+
+            public double Latitude { get; private set; }
+
+            public double Longitude { get; private set; }
+
+            public MockPoint(GeometryType type, double latitude, double longitude, double altitude)
+            {
+                Type = type;
+                Latitude = latitude;
+                Longitude = longitude;
+                Altitude = altitude;
+            }
         }
     }
 }

@@ -5,16 +5,23 @@ using TileFactory.Interfaces;
 
 namespace TileFactory.DataPipeline
 {
-    internal class PointData : IPoint
+    public struct PointData : IGeospatialItem
     {
-        public GeometryType Type { get { return GeometryType.Point; } }
-        public IPosition Coordinates { get; set; }
+        public GeometryType Type { get; private set; }
+
+        public double? Altitude { get; private set; }
+
+        public double Latitude { get; private set; }
+
+        public double Longitude { get; private set; }
+
+        public PointData(GeometryType type, double latitude, double longitude, double altitude)
+        {
+            Type = type;
+            Latitude = latitude;
+            Longitude = longitude;
+            Altitude = altitude;
+        }
     }
 
-    internal class PositionData : IPosition
-    {
-        public double? Altitude { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
-    }
 }

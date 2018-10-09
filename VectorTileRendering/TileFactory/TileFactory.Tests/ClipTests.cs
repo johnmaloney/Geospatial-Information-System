@@ -28,7 +28,7 @@ namespace TileFactory.Tests
         [TestMethod]
         public void process_left_clip_of_feature_expect_clipped_feature()
         {
-            var features = this.getFeatures();
+            var features = this.getSimplePointFeatures();
             var context = new ClipContext(Constants.ClipType.Left, 64d / 4096d);
             foreach (var feature in features)
             {
@@ -40,7 +40,7 @@ namespace TileFactory.Tests
         [TestMethod]
         public void process_points_clip_of_feature_expect_no_clipped_feature()
         {
-            var features = this.getFeatures();
+            var features = this.getSimplePointFeatures();
             var clipper = new Clipper();
             double buffer = 0.015625d;
 
@@ -54,7 +54,7 @@ namespace TileFactory.Tests
         [TestMethod]
         public void process_points_clip_of_feature_expect_clipped_feature()
         {
-            var features = this.getFeatures();
+            var features = this.getSimplePointFeatures();
             var clipper = new Clipper();
             double buffer = 0.015625d;
             double z2 = 8192;
@@ -78,7 +78,7 @@ namespace TileFactory.Tests
             Assert.AreEqual("777", single.Id);
         }
 
-        private IEnumerable<Feature> getFeatures()
+        private IEnumerable<Feature> getSimplePointFeatures()
         {
             var feature1 = new Feature(Interfaces.GeometryType.Point)
             {

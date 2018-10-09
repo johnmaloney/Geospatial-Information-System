@@ -25,7 +25,7 @@ namespace TileFactory.Tests
 
             var geoJSON = JObject.Parse(rawGeoJSON);
             var type = geoJSON["type"].Value<string>();
-            Assert.AreEqual("FeaturesCollection", type);
+            Assert.AreEqual("FeatureCollection", type);
         }
 
         [TestMethod]
@@ -56,7 +56,9 @@ namespace TileFactory.Tests
             };
 
             var pipeline = new DetermineCollectionsTypePipeline()
-                .ExtendWith(new ParseGeoJsonToFeatures((geoItem) => new WebMercatorProcessor(geoItem)));
+                .ExtendWith(new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem))));
 
             pipeline.Process(context);
 
@@ -66,18 +68,18 @@ namespace TileFactory.Tests
             Assert.AreEqual("400001", feature1.Id);
             Assert.AreEqual("400001", feature1.Tags["stop_id"].ToString());
             Assert.AreEqual("4 AV/E 9 ST", feature1.Tags["stop_name"].ToString());
-            Assert.AreEqual(0.294471d, feature1.Geometry[0]);
-            Assert.AreEqual(0.375915411794357d, feature1.Geometry[1]);
-            Assert.AreEqual(0, feature1.Geometry[2]);
+            Assert.AreEqual(0.294471d, feature1.Geometry[0][0].X);
+            Assert.AreEqual(0.375915411794357d, feature1.Geometry[0][0].Y);
+            Assert.AreEqual(0, feature1.Geometry[0][0].Z);
 
 
             var feature2 = context.TileFeatures.FirstOrDefault(f => f.Id == "400002");
             Assert.AreEqual("400002", feature2.Id);
             Assert.AreEqual("400002", feature2.Tags["stop_id"].ToString());
             Assert.AreEqual("4 AV/E 12 ST", feature2.Tags["stop_name"].ToString());
-            Assert.AreEqual(0.29447233333333334d, feature2.Geometry[0]);
-            Assert.AreEqual(0.37590819401923736d, feature2.Geometry[1]);
-            Assert.AreEqual(0, feature2.Geometry[2]);
+            Assert.AreEqual(0.29447233333333334d, feature2.Geometry[0][0].X);
+            Assert.AreEqual(0.37590819401923736d, feature2.Geometry[0][0].Y);
+            Assert.AreEqual(0, feature2.Geometry[0][0].Z);
         }
 
         [TestMethod]
@@ -94,12 +96,46 @@ namespace TileFactory.Tests
             };
 
             var pipeline = new DetermineCollectionsTypePipeline()
-                .ExtendWith(new ParseGeoJsonToFeatures(
-                    (geoItem) => new WebMercatorProcessor(geoItem))
-                        .IterateWith(new WrapTileFeatures())
-                );
+                .ExtendWith(new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem))));
 
             pipeline.Process(context);
+        }
+
+        [TestMethod]
+        public void parse_polygon_through_pipeline_expect_translation_to_geometric_object()
+        {
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("colorado_outline");
+
+            var context = new GeoJsonContext(geoJSON)
+            {
+                MaxZoom = 14,
+                Buffer = 64,
+                Extent = 4096,
+                Tolerance = 3
+            };
+
+            var pipeline = new DetermineCollectionsTypePipeline().ExtendWith(
+                new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem)))
+                .ExtendWith(new GeometricSimplification()));
+
+            pipeline.Process(context);
+
+            var feature = context.TileFeatures.Single();
+            Assert.IsNotNull(feature);
+
+            Assert.AreEqual(386, feature.Geometry.Length);
+            Assert.AreEqual(0.00027851809900100721d, feature.Area);
+            Assert.AreEqual(0.067996893428153737d, feature.Distance);
+            Assert.AreEqual(0.21655132222222223d, feature.MaxGeometry.X);
+            Assert.AreEqual(0.38925641237479158d, feature.MaxGeometry.Y);
+            Assert.AreEqual(0.19705485277777779d, feature.MinGeometry.X);
+            Assert.AreEqual(0.374913347992747d, feature.MinGeometry.Y);
+            Assert.AreEqual(Interfaces.GeometryType.Polygon, feature.Type);
+            Assert.AreEqual(5, feature.Tags.Count);
         }
     }
 }
