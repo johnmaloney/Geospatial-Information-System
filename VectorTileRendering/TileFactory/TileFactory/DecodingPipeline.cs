@@ -21,8 +21,7 @@ namespace TileFactory
         #endregion
 
         #region Methods
-
-
+        
         /// <summary>
         /// Given an array of unsigned integers
         /// </summary>
@@ -36,29 +35,33 @@ namespace TileFactory
         {
             var parsedItems = new List<CommandData>();
 
+            // Commands are structured to contain the Type and instances of that CommandType i.e. MoveTo //
+            // as dictated from the CommandData's CommandTotal value e.g. CommandTotal = 100 neans //
+            // the command is to occur 100 times before the next group of commands is defined.
+            // The first data value will generate a CommandData object, which will fill in the //
+            // parameters of that individual command until a new command type is discovered. //
             do
             {
-                var processedCommand = ProcessCommandStructure();
+                var currentCommand = new CommandData(this.commandDataSource[structureIndex]);
+                var processedCommand = ProcessCommandsParameters(currentCommand);
                 parsedItems.Add(processedCommand);
 
             } while (structureIndex < commandDataSource.Length);
 
-
             return parsedItems;
         }
 
-        private CommandData ProcessCommandStructure()
+        private CommandData ProcessCommandsParameters(CommandData command)
         {
-            var commandData = new CommandData(commandDataSource[structureIndex]);
             Increment();
-            for (int p = 0; p < commandData.ParameterCount; p++)
+            for (int p = 0; p < command.ParameterCount; p++)
             {
                 var parameter = new ParameterData(commandDataSource[structureIndex]);
-                commandData[p] = parameter;
+                command[p] = parameter;
                 Increment();
             }
 
-            return commandData;
+            return command;
         }
 
         private int Increment()
@@ -67,6 +70,5 @@ namespace TileFactory
         }
 
         #endregion
-
     }
 }

@@ -36,7 +36,7 @@ namespace TileFactory
 
         public CommandType Command { get; set; }
 
-        public int Count { get; private set; }
+        public int CommandTotal { get; private set; }
 
         /// <summary>
         /// 4.3.2. Parameter Integers
@@ -46,19 +46,33 @@ namespace TileFactory
         /// a CommandInteger with a MoveTo command with a command count of 3 will be followed 
         /// by 6 ParameterIntegers.
         /// </summary>
-        public int ParameterCount { get { return parametersPerCommand[Command] * this.Count; } }
+        public int ParameterCount { get { return parametersPerCommand[Command] * this.CommandTotal; } }
+
+        /// <summary>
+        /// 4.3.2. Parameter Integers
+        /// Indicates the amount of parameters per Command within this object. 
+        /// Takes the rules that the Command Type (e.g. MoveTo) times the amount of
+        /// commands in this object is the parameter count and reverses it by dividing the
+        /// Parameters Total by the Commands Total.
+        /// </summary>
+        public int ParameterPerCommand { get { return ParameterCount / CommandTotal; } }
 
         public ParameterData this[int indexer]
         {
             get
-            { return parameterData[indexer]; }
+            {
+                if (parameterData.Length <= indexer)
+                    throw new NotSupportedException($"The command of type {this.Command} does not have a parameter at index {indexer}");
+                
+                return parameterData[indexer];
+            }
             set
             {
                 parameterData[indexer] = value;
             }
         }
 
-        public int EncodedValue { get { return ((int)Command & 0x7) | (Count << 3); } }
+        public int EncodedValue { get { return ((int)Command & 0x7) | (CommandTotal << 3); } }
 
         #endregion
 
@@ -71,9 +85,9 @@ namespace TileFactory
         public CommandData(uint encodedCommand)
         {
             Command = (CommandType)(encodedCommand & 0x7);
-            Count = (int)encodedCommand >> 3;
+            CommandTotal = (int)encodedCommand >> 3;
 
-            parameterData = new ParameterData[parametersPerCommand[Command] * this.Count];
+            parameterData = new ParameterData[parametersPerCommand[Command] * this.CommandTotal];
         }
 
         /// <summary>
@@ -84,9 +98,9 @@ namespace TileFactory
         public CommandData(CommandType command, int commandCount = 0)
         {
             Command = command;
-            Count = commandCount;
+            CommandTotal = commandCount;
 
-            parameterData = new ParameterData[parametersPerCommand[Command] * this.Count];
+            parameterData = new ParameterData[parametersPerCommand[Command] * this.CommandTotal];
         }
 
         #endregion

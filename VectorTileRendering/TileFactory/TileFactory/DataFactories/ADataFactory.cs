@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TileFactory
+namespace TileFactory.Factories
 {
-    public interface ITileData
+    public abstract class ADataFactory
     {
+
     }
 }

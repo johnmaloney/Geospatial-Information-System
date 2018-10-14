@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "400001",
+      "properties": {
+        "stop_id": "400001",
+        "stop_name": "4 AV/E 9 ST"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.99044,
+          40.73064
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "400002",
+      "properties": {
+        "stop_id": "400002",
+        "stop_name": "4 AV/E 12 ST"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -73.98996,
+          40.732609
+        ]
+      }
+    }
+  ]
+}
