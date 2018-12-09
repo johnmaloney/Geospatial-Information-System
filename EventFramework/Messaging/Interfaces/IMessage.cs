@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Messaging.Interfaces
 {
-    public interface IQueueClient
+    public interface IMessage
     {
-        Task Send(IMessage message);
+        int CorrellationId { get; }
     }
 }

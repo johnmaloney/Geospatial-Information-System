@@ -6,6 +6,9 @@ using TileFactory.Interfaces;
 
 namespace TileFactory.DataPipeline
 {
+    /// <summary>
+    /// Simplifies the features points.
+    /// </summary>
     public class GeometricSimplification : APipe, IPipe
     {
         public override async Task Process(IPipeContext context)
@@ -71,6 +74,17 @@ namespace TileFactory.DataPipeline
                 await this.NextPipe.Process(context);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// Replicates this: https://github.com/mapbox/geojson-vt/blob/master/src/simplify.js
+        /// </remarks>
+        /// <param name="current"></param>
+        /// <param name="first"></param>
+        /// <param name="last"></param>
+        /// <returns></returns>
         private double getSqSegDistance((double X, double Y, double Z)[] current, (double X, double Y, double Z)[] first, (double X, double Y, double Z)[] last)
         {
             double x = first[0].X;

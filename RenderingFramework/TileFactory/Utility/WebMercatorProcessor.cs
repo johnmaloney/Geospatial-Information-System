@@ -35,11 +35,27 @@ namespace TileFactory.Utility
             ProjectedY = projectY(latitude);
         }
 
+        /// <summary>
+        /// Projects the longitude to the geometric coordinates.
+        /// </summary>
+        /// <remarks>Replicates convert.js -> projectPoint, uses the index of 0 which is the longitude.
+        /// https://github.com/mapbox/geojson-vt/blob/master/src/convert.js
+        /// </remarks>
+        /// <param name="longitude"></param>
+        /// <returns></returns>
         private double projectX(double longitude)
         {
             return longitude / 360 + 0.5;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>Replicates convert.js -> projectPoint, uses the index of 0 which is the longitude.
+        /// https://github.com/mapbox/geojson-vt/blob/master/src/convert.js
+        /// </remarks>
+        /// <param name="latitude"></param>
+        /// <returns></returns>
         private double projectY(double latitude)
         {
             var sin = Math.Sin(latitude * Math.PI / 180);

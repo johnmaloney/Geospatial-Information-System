@@ -116,8 +116,8 @@ namespace TileFactory.Tests
                 Tolerance = 3
             };
 
-            var pipeline = new DetermineCollectionsTypePipeline().ExtendWith(
-                new ParseGeoJsonToFeatures()
+            var pipeline = new DetermineCollectionsTypePipeline()
+                .ExtendWith(new ParseGeoJsonToFeatures()
                     .IterateWith(new ProjectGeoJSONToGeometric(
                         (geoItem) => new WebMercatorProcessor(geoItem)))
                 .ExtendWith(new GeometricSimplification()));

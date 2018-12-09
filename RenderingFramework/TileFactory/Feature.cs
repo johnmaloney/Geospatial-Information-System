@@ -109,6 +109,12 @@ namespace TileFactory
             MaxGeometry = maxGeometry;
         }
 
+        /// <summary>
+        /// Calculate the area and the length of the polygon.
+        /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
         private void calculateAreaAndDistance()
         {
             if (this.geometry.Length == 0)
