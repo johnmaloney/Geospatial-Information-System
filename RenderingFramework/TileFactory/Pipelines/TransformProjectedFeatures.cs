@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TileFactory.Factories
+namespace TileFactory.Pipelines
 {
-    public abstract class ADataFactory
+    class TransformProjectedFeatures
     {
-
     }
 }
