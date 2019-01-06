@@ -22,10 +22,13 @@ namespace TileFactory.Tests
         [TestMethod]
         public void given_feature_in_projected_coords_process_into_basic_tile()
         {
-            var projectedData = Container.GetService<IConfigurationStrategy>().Into<TileContextMock>("colorado_outline_projected");
+            Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
+
+            var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
+            context.TileFeatures = coloradoFeature;
 
             var retriever = new Retriever();
-            var tile = retriever.GetTile(projectedData, 0, 0, 0);
+            var tile = retriever.GetTile(context, 0, 0, 0);
         }
     }
 }

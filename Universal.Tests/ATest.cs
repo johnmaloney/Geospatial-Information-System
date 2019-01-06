@@ -8,14 +8,14 @@ namespace Universal.Tests
     public abstract class ATest
     {
         private IServiceCollection Registrations;
-        protected ServiceProvider IsolatedContainer;
+        protected ServiceProvider Container;
 
         [TestInitialize]
         public void EachTestInitialization()
         {
             Registrations = new ServiceCollection();
             Registrations.AddSingleton<IConfigurationStrategy>(new ConfigurationStrategy());
-            IsolatedContainer = Registrations.BuildServiceProvider();
+            Container = Registrations.BuildServiceProvider();
         }
     }
 }

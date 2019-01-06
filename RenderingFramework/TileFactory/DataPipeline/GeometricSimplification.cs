@@ -13,7 +13,7 @@ namespace TileFactory.DataPipeline
     {
         public override async Task Process(IPipeContext context)
         {
-            var dataContext = context as ADataPipelineContext;
+            var dataContext = context as AContext;
 
             if (dataContext == null)
                 throw new NotSupportedException("The pipeline context must be of type DataPipelineContext");

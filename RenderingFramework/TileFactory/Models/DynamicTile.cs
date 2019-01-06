@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TileFactory.Interfaces;
 
 namespace TileFactory.Models
 {
     /// <summary>
     ///
     /// </summary>
-    public class DynamicTile
+    public class DynamicTile : ITile
     {
         #region Fields
 
@@ -17,7 +18,7 @@ namespace TileFactory.Models
 
         #region Properties
 
-        public IEnumerable<Feature> Features { get; set; }
+        public IList<Feature> Features { get; set; }
 
         public int NumberOfPoints { get; set; }
 

@@ -4,10 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace TileFactory.Tests.Utility
+namespace Universal.Contracts.Serial
 {
-    [Obsolete("Replaced by the Universal.Contracts.Serial namespace.", false)]
-    public static class SerializationExtensions
+    public static class Extensions
     {
         private static JsonSerializerSettings jsonSettings;
 

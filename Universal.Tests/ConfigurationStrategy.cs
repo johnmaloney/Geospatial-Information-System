@@ -1,15 +1,22 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Universal.Contracts.Serial;
 
 namespace Universal.Tests
 {
     public interface IConfigurationStrategy
     {
         string GetJson(string identifier);
+        T Into<T>(string identifier, params Func<JObject, string>[] jsonAlterations) where T : class;
+        T Into<T>(string identifier) where T : class;
+        T FromInto<T>(string jsonData) where T : class;
+
     }
 
     public class ConfigurationStrategy : IConfigurationStrategy
@@ -68,6 +75,27 @@ namespace Universal.Tests
                 }
             }
             return mockJson[identifier];
+        }
+
+        public T Into<T>(string identifier, params Func<JObject, string>[] jsonAlterations) where T : class
+        {
+            var json = GetJson(identifier);
+            foreach (var jsonAlteration in jsonAlterations)
+            {
+                json = jsonAlteration((JObject)JsonConvert.DeserializeObject(json));
+            }
+            return json.DeserializeJson<T>();
+        }
+
+        public T Into<T>(string identifier) where T : class
+        {
+            var json = GetJson(identifier);
+            return json.DeserializeJson<T>();
+        }
+
+        public T FromInto<T>(string jsonData) where T : class
+        {
+            return jsonData.DeserializeJson<T>();
         }
 
         #endregion

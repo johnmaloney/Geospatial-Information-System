@@ -61,6 +61,8 @@ namespace TileFactory
             }
         }
 
+        public bool IsOuter { get { return true;} }
+
         #endregion
 
         #region Methods
@@ -98,11 +100,11 @@ namespace TileFactory
             for (int i = 0; i < points.Length; i++)
             {
                 var current = points[i];
-                minGeometry.X = Math.Min(current.X, MinGeometry.X);
-                maxGeometry.X = Math.Max(current.X, MaxGeometry.X);
+                min.X = Math.Min(current.X, min.X);
+                max.X = Math.Max(current.X, max.X);
 
-                minGeometry.Y = Math.Min(current.Y, MinGeometry.Y);
-                maxGeometry.Y = Math.Max(current.Y, MaxGeometry.Y);
+                min.Y = Math.Min(current.Y, min.Y);
+                max.Y = Math.Max(current.Y, max.Y);
             }
 
             MinGeometry = minGeometry;

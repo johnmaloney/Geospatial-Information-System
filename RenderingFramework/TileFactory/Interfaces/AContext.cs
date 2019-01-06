@@ -4,7 +4,20 @@ using System.Text;
 
 namespace TileFactory.DataPipeline
 {
-    public abstract class ADataPipelineContext
+    public interface IContext
+    {
+        int MaxZoom { get; }
+        int MaxZoomIndex { get; }
+        bool SolidChildren { get; }
+        double Extent { get; }
+        double Buffer { get; }
+        int LogLevel { get; }
+
+        double Tolerance { get; }
+        double ExtentTolerance { get; }
+    }
+
+    public abstract class AContext : IContext
     {
         private double? zoomSq;
 
