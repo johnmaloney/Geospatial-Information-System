@@ -104,7 +104,7 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void parse_polygon_through_pipeline_expect_translation_to_geometric_object()
+        public void parse_colorado_polygon_through_pipeline_expect_translation_to_geometric_object()
         {
             var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("colorado_outline");
 
@@ -127,7 +127,7 @@ namespace TileFactory.Tests
             var feature = context.TileFeatures.Single();
             Assert.IsNotNull(feature);
 
-            Assert.AreEqual(386, feature.Geometry.Length);
+            Assert.AreEqual(386, feature.Geometry[0].Length);
             Assert.AreEqual(0.00027851809900100721d, feature.Area);
             Assert.AreEqual(0.067996893428153737d, feature.Distance);
             Assert.AreEqual(0.21655132222222223d, feature.MaxGeometry.X);
@@ -136,6 +136,31 @@ namespace TileFactory.Tests
             Assert.AreEqual(0.374913347992747d, feature.MinGeometry.Y);
             Assert.AreEqual(Interfaces.GeometryType.Polygon, feature.Type);
             Assert.AreEqual(5, feature.Tags.Count);
+        }
+
+        [TestMethod]
+        public void parse_alabama_polygon_through_pipeline_expect_translation_to_geometric_object()
+        {
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("alabama_outline");
+
+            var context = new GeoJsonContext(geoJSON)
+            {
+                MaxZoom = 14,
+                Buffer = 64,
+                Extent = 4096,
+                Tolerance = 3
+            };
+
+            var pipeline = new DetermineCollectionsTypePipeline()
+                .ExtendWith(new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem)))
+                .ExtendWith(new GeometricSimplification()));
+
+            pipeline.Process(context);
+
+            var feature = context.TileFeatures.Single();
+            Assert.IsNotNull(feature);
         }
     }
 }

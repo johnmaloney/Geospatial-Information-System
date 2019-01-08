@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Universal.Contracts.Logging
 {
-    public interface ILogEntry
+    public interface ILogEntry : IVersion
     {
         string Type { get; }
 

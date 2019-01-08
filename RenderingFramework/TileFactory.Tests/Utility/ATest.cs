@@ -28,6 +28,8 @@ namespace TileFactory.Tests
                 new ProjectionProcessingFactory(
                     (geoItem)=> new WebMercatorProcessor(geoItem)));
 
+            Registrations.AddSingleton<MockContextRepository>(new MockContextRepository());
+
             Container = Registrations.BuildServiceProvider();
         }
     }

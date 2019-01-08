@@ -6,7 +6,7 @@ using TileFactory.Interfaces;
 
 namespace TileFactory.DataPipeline.GeoJson
 {
-    public class GeoJsonContext : ADataPipelineContext, IPipeContext
+    public class GeoJsonContext : AContext, IPipeContext, ITileContext
     {
         public string OriginalData { get; }
 

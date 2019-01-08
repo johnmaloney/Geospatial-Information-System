@@ -137,7 +137,7 @@ namespace TileFactory.DataPipeline.GeoJson
                 case GeoJSON.Net.GeoJSONObjectType.Polygon:
                     return GeometryType.Polygon;
                 case GeoJSON.Net.GeoJSONObjectType.MultiPolygon:
-                    break;
+                    return GeometryType.MultiPolygon;
                 case GeoJSON.Net.GeoJSONObjectType.GeometryCollection:
                     break;
                 case GeoJSON.Net.GeoJSONObjectType.Feature:
@@ -176,6 +176,12 @@ namespace TileFactory.DataPipeline.GeoJson
                 await this.NextPipe.Process(context);
         }
 
+        /// <summary>
+        /// Replicates the behavior seen in the method named "convertFeature(features, feature, tolerance)"
+        /// in convert.js in geojsonVT.js
+        /// </summary>
+        /// <param name="geoJsonFeature"></param>
+        /// <returns></returns>
         private (double X, double Y, double Z)[][] projectToGeometry(GeoJSON.Net.Feature.Feature geoJsonFeature)
         {
             switch (geoJsonFeature.Geometry.Type)
@@ -198,23 +204,49 @@ namespace TileFactory.DataPipeline.GeoJson
                     }
                 case GeoJSON.Net.GeoJSONObjectType.Polygon:
                     {
-                        var geometry = geoJsonFeature.Geometry as GeoJSON.Net.Geometry.Polygon;
-                        (double X, double Y, double Z)[][] shapeData = null;
+                        var polygon = geoJsonFeature.Geometry as GeoJSON.Net.Geometry.Polygon;
 
-                        foreach (var polygonGroup in geometry.Coordinates)
+                        var shapeData = new (double X, double Y, double Z)[polygon.Coordinates.Count][];
+
+                        for (int i = 0; i < polygon.Coordinates.Count; i++)
                         {
+                            var polygonGroup = polygon.Coordinates[i];
                             var linestring = polygonGroup as GeoJSON.Net.Geometry.LineString;
-                            shapeData = new(double X, double Y, double Z)[linestring.Coordinates.Count][];
-
-                            for (int i = 0; i < linestring.Coordinates.Count; i++)
+                            shapeData[i] = new (double X, double Y, double Z)[linestring.Coordinates.Count];
+                             
+                            for (int j = 0; j < linestring.Coordinates.Count; j++)
                             {
-                                var coordinates = linestring.Coordinates[i];
+                                var coordinates = linestring.Coordinates[j];
                                 var point = new PointData(GeometryType.Point, coordinates.Latitude, coordinates.Longitude, coordinates.Altitude ?? 0);
                                 var projected = projectionProcessor(point);
-                                shapeData[i] = new(double X, double Y, double Z)[]
+
+                                shapeData[i][j] = (X: projected.ProjectedX, Y: projected.ProjectedY, Z: 0d);
+                            }
+                        }
+                        return shapeData;
+                    }
+                case GeoJSON.Net.GeoJSONObjectType.MultiPolygon:
+                    {
+                        var geometry = geoJsonFeature.Geometry as GeoJSON.Net.Geometry.MultiPolygon;
+
+                        var shapeData = new (double X, double Y, double Z)[geometry.Coordinates.Count][];
+
+                        for (int geoIndex = 0; geoIndex < geometry.Coordinates.Count; geoIndex++)
+                        {
+                            GeoJSON.Net.Geometry.Polygon polygon = geometry.Coordinates[geoIndex];
+                            foreach (var polygonGroup in polygon.Coordinates)
+                            {
+                                var linestring = polygonGroup as GeoJSON.Net.Geometry.LineString;
+
+                                shapeData[geoIndex] = new (double X, double Y, double Z)[linestring.Coordinates.Count];
+                                for (int i = 0; i < linestring.Coordinates.Count; i++)
                                 {
-                                    (X:projected.ProjectedX, Y:projected.ProjectedY, Z:0d)
-                                };
+                                    var coordinates = linestring.Coordinates[i];
+                                    var point = new PointData(GeometryType.Point, coordinates.Latitude, coordinates.Longitude, coordinates.Altitude ?? 0);
+                                    var projected = projectionProcessor(point);
+
+                                    shapeData[geoIndex][i] = (X: projected.ProjectedX, Y: projected.ProjectedY, Z: 0d);
+                                }
                             }
                         }
                         return shapeData;
@@ -222,6 +254,25 @@ namespace TileFactory.DataPipeline.GeoJson
                 default:
                     throw new NotSupportedException($"The Geometry type of {geoJsonFeature.Geometry.Type} is not supported.");
             }
+        }
+
+        private (double X, double Y, double Z) processPolygon(GeoJSON.Net.Geometry.Polygon polygon)
+        {
+            //var processedData = new (double X, double Y, double Z)[linestring.Coordinates.Count];
+            foreach (var polygonGroup in polygon.Coordinates)
+            {
+                var linestring = polygonGroup as GeoJSON.Net.Geometry.LineString;
+                
+                for (int i = 0; i < linestring.Coordinates.Count; i++)
+                {
+                    var coordinates = linestring.Coordinates[i];
+                    var point = new PointData(GeometryType.Point, coordinates.Latitude, coordinates.Longitude, coordinates.Altitude ?? 0);
+                    var projected = projectionProcessor(point);
+
+                    return (X: projected.ProjectedX, Y: projected.ProjectedY, Z: 0d);
+                }
+            }
+            return (X: 0d, Y: 0d, Z: 0d);
         }
     }
     

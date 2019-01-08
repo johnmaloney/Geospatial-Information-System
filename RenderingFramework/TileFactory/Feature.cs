@@ -61,6 +61,8 @@ namespace TileFactory
             }
         }
 
+        public bool IsOuter { get { return true;} }
+
         #endregion
 
         #region Methods
@@ -98,11 +100,11 @@ namespace TileFactory
             for (int i = 0; i < points.Length; i++)
             {
                 var current = points[i];
-                minGeometry.X = Math.Min(current.X, MinGeometry.X);
-                maxGeometry.X = Math.Max(current.X, MaxGeometry.X);
+                min.X = Math.Min(current.X, min.X);
+                max.X = Math.Max(current.X, max.X);
 
-                minGeometry.Y = Math.Min(current.Y, MinGeometry.Y);
-                maxGeometry.Y = Math.Max(current.Y, MaxGeometry.Y);
+                min.Y = Math.Min(current.Y, min.Y);
+                max.Y = Math.Max(current.Y, max.Y);
             }
 
             MinGeometry = minGeometry;
@@ -120,18 +122,24 @@ namespace TileFactory
             if (this.geometry.Length == 0)
                 throw new NotSupportedException("The Geometry of the feature must have value to calculate Area and Distance");
 
+            if (totalArea != null && totalDistance != null)
+                return;
+
             double area = 0, distance = 0;
 
-            for (int i = 0; i < geometry.Length - 1; i++)
+            for (int i = 0; i < geometry.Length; i++)
             {
-                var a = geometry[i][0];
-                var b = geometry[i + 1][0];
+                for (int j = 0; j < geometry[i].Length-1; j++)
+                {
+                    var a = geometry[i][j];
+                    var b = geometry[i][j + 1];
 
-                area += a.X * b.Y - b.X * a.Y;
+                    area += a.X * b.Y - b.X * a.Y;
 
-                // Use the Manhattan distance instead of the Euclidian one to avoid //
-                // the expensive square root computation //
-                distance += Math.Abs(b.X - a.X) + Math.Abs(b.Y - a.Y);
+                    // Use the Manhattan distance instead of the Euclidian one to avoid //
+                    // the expensive square root computation //
+                    distance += Math.Abs(b.X - a.X) + Math.Abs(b.Y - a.Y);
+                }
             }
 
             totalArea = Math.Abs(area / 2);
