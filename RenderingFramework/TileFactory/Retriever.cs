@@ -114,7 +114,7 @@ namespace TileFactory
                     {
                         var point = ring[j];
                         
-                        if (!shouldSimplify || point.Z > sqTolerance)
+                        if (!shouldSimplify || (point.Z) > (sqTolerance))
                         {
                             simplifiedRing.Add(point);
                             tile.NumberOfSimplifiedPoints++;

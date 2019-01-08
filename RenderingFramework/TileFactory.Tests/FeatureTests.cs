@@ -36,7 +36,20 @@ namespace TileFactory.Tests
                 Tags = new Dictionary<string, object>()
             };
 
-            Assert.AreEqual(0.20630438611111107d, feature.Area);
+            Assert.AreEqual(5.6323187919149476E-09d, feature.Area);
+        }
+
+        [TestMethod]
+        public void initialize_single_geometric_feature_expect_distance()
+        {
+            var feature = new Feature(Interfaces.GeometryType.Point)
+            {
+                Geometry = Container.GetService<IConfigurationStrategy>().FromInto<(double X, double Y, double Z)[][]>(simplifiedPointData()),
+                Id = "777",
+                Tags = new Dictionary<string, object>()
+            };
+
+            Assert.AreEqual(0.0050840068211578382, feature.Distance);
         }
 
         private string simplifiedPointData()
