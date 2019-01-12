@@ -11,5 +11,7 @@ namespace Logging.Tests
             var uri = ATest.Config["ElasticConfiguration:Uri"];
             Assert.AreEqual("http://40.118.239.120:9200/", uri);
         }
+
+        
     }
 }
