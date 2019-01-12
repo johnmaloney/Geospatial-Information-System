@@ -1,29 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
   <metadata>
-    <!-- The identifier that must be unique within the hosting gallery -->
     <id>Universal.Contracts</id>
-
-    <!-- The package version number that is used when resolving dependencies -->
-    <version>1.0-beta</version>
-
-    <!-- Authors contain text that appears directly on the gallery -->
+    <version>$version$</version>
     <authors>John Maloney</authors>
-
-    <!-- 
-            Owners are typically nuget.org identities that allow gallery
-            users to easily find other packages by the same owners.  
-        -->
     <owners>maloney</owners>
 
-    <!-- Project URL provides a link for the gallery -->
     <projectUrl>https://github.com/johnmaloney/PSU/tree/master/Universal.Contracts</projectUrl>
-
-    <!-- License information is displayed on the gallery -->
-    <license type="expression">Apache-2.0</license>
-
-
-    <!-- The icon is used in Visual Studio's package manager UI -->
+    <license>Apache-2.0</license>
     <iconUrl></iconUrl>
 
     <!-- 
@@ -31,8 +15,6 @@
             installing the package. 
         -->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-
-    <!-- Any details about this particular release -->
     <releaseNotes></releaseNotes>
 
     <!-- 
