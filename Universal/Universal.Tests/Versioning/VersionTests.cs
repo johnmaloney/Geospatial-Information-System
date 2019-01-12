@@ -14,6 +14,7 @@ namespace Universal.Tests.Versioning
         public void with_version_one_fail_to_convert_expect_error()
         {
             var data = Container.GetService<IConfigurationStrategy>().Into<Data>("data");
+            Assert.AreEqual(1.2d, data.Id);
         }
     }
 
