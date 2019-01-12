@@ -7,14 +7,11 @@
     <owners>maloney</owners>
 
     <projectUrl>https://github.com/johnmaloney/PSU/tree/master/Universal.Contracts</projectUrl>
-    <iconUrl></iconUrl>
-
     <!-- 
             If true, this value prompts the user to accept the license when
             installing the package. 
         -->
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes></releaseNotes>
 
     <!-- 
             The description can be used in package manager UI. Note that the
