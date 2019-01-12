@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2041
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Universal.Tests", "Universal.Tests\Universal.Tests.csproj", "{B097BE51-61B8-4A33-BDB5-55F2C279C3CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Universal.Tests", "Universal.Tests\Universal.Tests.csproj", "{B097BE51-61B8-4A33-BDB5-55F2C279C3CF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Universal.Contracts", "Universal.Contracts\Universal.Contracts.csproj", "{56CC9071-7601-48A8-AEE1-F6F70A044022}"
 EndProject
