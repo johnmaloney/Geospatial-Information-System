@@ -31,8 +31,8 @@
     </dependencies>
   </metadata>
 
-  <!-- A readme.txt to display when the package is installed -->
+  <!-- A readme.txt to display when the package is installed 
   <files>
     <file src="readme.txt" target="" />
-  </files>
+  </files>-->
   </package>
