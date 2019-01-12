@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Logging.Tests
@@ -5,10 +6,16 @@ namespace Logging.Tests
     [TestClass]
     public abstract class ATest
     {
-        [AssemblyInitialize]
-        public void Initialize()
-        {
+        protected static IConfigurationRoot Config;
 
+        [AssemblyInitialize]
+        public static void Initialize(TestContext context)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location))
+                .AddJsonFile("appsettings.json");
+
+            Config = builder.Build();
         }
     }
 }
