@@ -1,4 +1,5 @@
 ﻿using GeoJSON.Net.Feature;
+using GeoJSON.Net.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +12,8 @@ namespace TileFactory.DataPipeline.GeoJson
         public string OriginalData { get; }
 
         public FeatureCollection Features { get; set; }
+
+        public IGeometryObject Geometry { get; set; }
 
         public GeoJsonContext(string rawData)
         {

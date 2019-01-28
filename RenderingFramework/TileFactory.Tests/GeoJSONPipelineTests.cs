@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using TileFactory.DataPipeline.GeoJson;
 using System.Linq;
 using TileFactory.Utility;
+using TileFactory.Interfaces;
 
 namespace TileFactory.Tests
 {
@@ -161,6 +162,53 @@ namespace TileFactory.Tests
 
             var feature = context.TileFeatures.Single();
             Assert.IsNotNull(feature);
+        }
+
+        [TestMethod]
+        public async Task parse_multi_linestring_through_pipeline_expect_features()
+        {
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("multi_linestring_sample");
+
+            var context = new GeoJsonContext(geoJSON)
+            {
+                MaxZoom = 14,
+                Buffer = 64,
+                Extent = 4096,
+                Tolerance = 3
+            };
+
+            var pipeline = new DetermineCollectionsTypePipeline()
+                .ExtendWith(new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem)))
+                .ExtendWith(new GeometricSimplification()));
+
+            await pipeline.Process(context);
+
+            var feature = context.TileFeatures.First();
+            var geometry = feature.Geometry.First();
+            Assert.AreEqual(5.2325351872911652E-07, feature.Area[0]);
+            Assert.AreEqual(5.066394805852692E-06, feature.Distance[0]);
+            Assert.AreEqual(GeometryType.MultiLineString, feature.Type);
+            Assert.AreEqual(6, geometry.Length);
+
+            geometry = feature.Geometry.Skip(1).First();
+            Assert.AreEqual(3.6111155667095662E-07, feature.Area[1]);
+            Assert.AreEqual(3.0994415283758237E-06, feature.Distance[1]);
+            Assert.AreEqual(GeometryType.MultiLineString, feature.Type);
+            Assert.AreEqual(3, geometry.Length);
+
+            geometry = feature.Geometry.Skip(2).First();
+            Assert.AreEqual(5.9605864598938352E-07, feature.Area[2]);
+            Assert.AreEqual(3.993511200006683E-06, feature.Distance[2]);
+            Assert.AreEqual(GeometryType.MultiLineString, feature.Type);
+            Assert.AreEqual(5, geometry.Length);
+
+            geometry = feature.Geometry.Skip(3).First();
+            Assert.AreEqual(6.8980112467170729E-07, feature.Area[3]);
+            Assert.AreEqual(4.4107437134344174E-06, feature.Distance[3]);
+            Assert.AreEqual(GeometryType.MultiLineString, feature.Type);
+            Assert.AreEqual(4, geometry.Length);
         }
     }
 }

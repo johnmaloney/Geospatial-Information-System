@@ -10,8 +10,8 @@ namespace TileFactory
         #region Fields
 
         private (double X, double Y, double Z)[][] geometry;
-        private double? totalArea;
-        private double? totalDistance;
+        private double[] totalAreaCalculations;
+        private double[] totalDistanceCalculations;
 
         #endregion
 
@@ -37,27 +37,27 @@ namespace TileFactory
 
         public (double X, double Y, double Z) MinGeometry { get; private set; }
 
-        public double Area
+        public double[] Area
         {
             get
             {
-                if (!totalArea.HasValue || !totalDistance.HasValue)
+                if (totalAreaCalculations==null || totalDistanceCalculations == null)
                 {
                     calculateAreaAndDistance();
                 }
-                return totalArea.Value;
+                return totalAreaCalculations;
             }
         }
 
-        public double Distance
+        public double[] Distance
         {
             get
             {
-                if (!totalArea.HasValue || !totalDistance.HasValue)
+                if (totalAreaCalculations == null || totalDistanceCalculations == null)
                 {
                     calculateAreaAndDistance();
                 }
-                return totalDistance.Value;
+                return totalDistanceCalculations;
             }
         }
 
@@ -122,14 +122,17 @@ namespace TileFactory
             if (this.geometry.Length == 0)
                 throw new NotSupportedException("The Geometry of the feature must have value to calculate Area and Distance");
 
-            if (totalArea != null && totalDistance != null)
+            if (totalAreaCalculations != null && totalDistanceCalculations != null)
                 return;
 
-            double area = 0, distance = 0;
+            totalAreaCalculations = new double[this.geometry.Length];
+            totalDistanceCalculations = new double[this.geometry.Length];
 
-            for (int i = 0; i < geometry.Length; i++)
+            for (int i = 0; i < this.geometry.Length; i++)
             {
-                for (int j = 0; j < geometry[i].Length-1; j++)
+                double area = 0, distance = 0;
+
+                for (int j = 0; j < geometry[i].Length - 1; j++)
                 {
                     var a = geometry[i][j];
                     var b = geometry[i][j + 1];
@@ -140,12 +143,21 @@ namespace TileFactory
                     // the expensive square root computation //
                     distance += Math.Abs(b.X - a.X) + Math.Abs(b.Y - a.Y);
                 }
-            }
 
-            totalArea = Math.Abs(area / 2);
-            totalDistance = distance;
+                totalAreaCalculations[i] = Math.Abs(area / 2);
+                totalDistanceCalculations[i] = distance;
+            }
         }
 
         #endregion
+    }
+
+    public struct GeometricItem
+    {
+        public double X { get; private set; }
+        public double Y { get; private set; }
+        public double Z { get; private set; }
+        public double Area { get; private set; }
+        public double Distance { get; private set; }
     }
 }

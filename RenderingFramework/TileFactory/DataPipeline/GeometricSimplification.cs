@@ -31,7 +31,7 @@ namespace TileFactory.DataPipeline
                     var pointsLength = feature.Geometry[i].Length;
 
                     var firstIndex = 0;
-                    var lastIndex = pointsLength - 1;
+                     var lastIndex = pointsLength - 1;
                     var index = 0;
                     double maxSqDist, sqDist = 0d;
 
@@ -44,7 +44,7 @@ namespace TileFactory.DataPipeline
                     {
                         maxSqDist = 0;
 
-                        for (int j = firstIndex; j < lastIndex; j++)
+                        for (int j = firstIndex + 1; j < lastIndex; j++)
                         {
                             sqDist = getSqSegDistance(feature.Geometry[i][j], feature.Geometry[i][firstIndex], feature.Geometry[i][lastIndex]);
 

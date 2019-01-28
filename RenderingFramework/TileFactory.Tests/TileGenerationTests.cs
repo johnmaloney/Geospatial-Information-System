@@ -28,7 +28,18 @@ namespace TileFactory.Tests
             context.TileFeatures = coloradoFeature;
 
             var retriever = new Retriever();
-            var tile = retriever.GetTile(context, 0, 0, 0);
+            var tile = retriever.GetTile(context);
+        }
+
+        [TestMethod]
+        public void using_multilinestring_to_add_feature_expect_rewind()
+        {
+            var multiLinestring = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("multi_linestring_sample_projected");
+            Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
+
+            context.TileFeatures = multiLinestring;
+            var retriever = new Retriever();
+            var tile = retriever.GetTile(context);
         }
     }
 }

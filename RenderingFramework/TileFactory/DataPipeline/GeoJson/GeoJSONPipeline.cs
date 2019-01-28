@@ -49,6 +49,12 @@ namespace TileFactory.DataPipeline.GeoJson
                     var feature = JsonConvert.DeserializeObject<GeoJSON.Net.Feature.Feature>(dataContext.OriginalData);
                     dataContext.Features = new GeoJSON.Net.Feature.FeatureCollection(new List<GeoJSON.Net.Feature.Feature> { feature });
                 }
+                else if (capture.Contains("MultiLineString"))
+                {
+                    var multiline = JsonConvert.DeserializeObject<GeoJSON.Net.Geometry.MultiLineString>(dataContext.OriginalData);
+                    var feature = new GeoJSON.Net.Feature.Feature(multiline);
+                    dataContext.Features = new GeoJSON.Net.Feature.FeatureCollection(new List<GeoJSON.Net.Feature.Feature> { feature });
+                }
                 else
                 {
                     throw new NotSupportedException("Type of GeoJson data could not be determined.");
@@ -131,9 +137,9 @@ namespace TileFactory.DataPipeline.GeoJson
                 case GeoJSON.Net.GeoJSONObjectType.MultiPoint:
                     break;
                 case GeoJSON.Net.GeoJSONObjectType.LineString:
-                    break;
+                    return GeometryType.LineString;
                 case GeoJSON.Net.GeoJSONObjectType.MultiLineString:
-                    break;
+                    return GeometryType.MultiLineString;
                 case GeoJSON.Net.GeoJSONObjectType.Polygon:
                     return GeometryType.Polygon;
                 case GeoJSON.Net.GeoJSONObjectType.MultiPolygon:
@@ -224,6 +230,47 @@ namespace TileFactory.DataPipeline.GeoJson
                             }
                         }
                         return shapeData;
+                    }
+                case GeoJSON.Net.GeoJSONObjectType.MultiLineString:
+                    {
+                        var multiLine = geoJsonFeature.Geometry as GeoJSON.Net.Geometry.MultiLineString;
+
+                        var shapeData = new (double X, double Y, double Z)[multiLine.Coordinates.Count][];
+
+                        for (int i = 0; i < multiLine.Coordinates.Count; i++)
+                        {
+                            var lineGroup = multiLine.Coordinates[i];
+                            var linestring = lineGroup as GeoJSON.Net.Geometry.LineString;
+                            shapeData[i] = new (double X, double Y, double Z)[linestring.Coordinates.Count];
+
+                            for (int j = 0; j < linestring.Coordinates.Count; j++)
+                            {
+                                var coordinates = linestring.Coordinates[j];
+                                var point = new PointData(GeometryType.Point, coordinates.Latitude, coordinates.Longitude, coordinates.Altitude ?? 0);
+                                var projected = projectionProcessor(point);
+
+                                shapeData[i][j] = (X: projected.ProjectedX, Y: projected.ProjectedY, Z: 0d);
+                            }
+                        }
+                        return shapeData;
+                    }
+                case GeoJSON.Net.GeoJSONObjectType.LineString:
+                    {
+                        var lineString = geoJsonFeature.Geometry as GeoJSON.Net.Geometry.LineString;
+                        var shapeData = new (double X, double Y, double Z)[1][];
+                        shapeData[0] = new (double X, double Y, double Z)[lineString.Coordinates.Count];
+
+                        for (int i = 0; i < lineString.Coordinates.Count; i++)
+                        {
+                            var coordinates = lineString.Coordinates[i];
+                            var point = new PointData(GeometryType.Point, coordinates.Latitude, coordinates.Longitude, coordinates.Altitude ?? 0);
+                            var projected = projectionProcessor(point);
+
+                            shapeData[0][i] = (X:projected.ProjectedX, Y:projected.ProjectedY, Z:0d);
+
+                        }
+                        return shapeData;
+
                     }
                 case GeoJSON.Net.GeoJSONObjectType.MultiPolygon:
                     {

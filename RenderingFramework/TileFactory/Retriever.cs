@@ -18,12 +18,11 @@ namespace TileFactory
 
         #region Properties
 
-
-
         #endregion
 
         #region Methods
-        public object GetTile(ITileContext tileContext, int zoomLevel, int x, int y)
+
+        public object GetTile(ITileContext tileContext, int zoomLevel=0, int x=0, int y=0)
         {
             SplitTile(tileContext, zoomLevel, x, y);
             return null;
@@ -43,7 +42,7 @@ namespace TileFactory
         internal object SplitTile(ITileContext context, int zoom, int x, int y)
         {
             var zoomSqr = 1 << zoom;
-            var id = toIdentifier(zoom, x, y);
+            var id = ToIdentifier(zoom, x, y);
 
             tiles.TryGetValue(id,out object currentTile);
             var tileTolerance = zoom == context.MaxZoom ? 0 : context.Tolerance / (zoomSqr * context.Extent);
@@ -51,13 +50,13 @@ namespace TileFactory
             // If the tile is null then this is a creation of a tile //
             if (currentTile == null)
             {
-                currentTile = createTile(context.TileFeatures, zoomSqr, x, y, tileTolerance, zoom != context.MaxZoom);
+                currentTile = CreateTile(context.TileFeatures, zoomSqr, x, y, tileTolerance, zoom != context.MaxZoom);
             }
 
             return null;
         }
 
-        internal ITile createTile(IEnumerable<Feature> features, int zoomSquared, int x, int y, double tileTolerance, bool shouldSimplify)
+        internal ITile CreateTile(IEnumerable<Feature> features, int zoomSquared, int x, int y, double tileTolerance, bool shouldSimplify)
         {
             var tile = new DynamicTile
             {
@@ -72,13 +71,13 @@ namespace TileFactory
             foreach(var feature in features)
             {
                 tile.NumberOfFeatures++;
-                addFeature(tile, feature, tileTolerance, shouldSimplify);
+                AddFeature(tile, feature, tileTolerance, shouldSimplify);
             }
 
             return tile;
         }
 
-        private void addFeature(ITile tile, Feature feature, double tileTolerance, bool shouldSimplify)
+        internal void AddFeature(ITile tile, Feature feature, double tileTolerance, bool shouldSimplify)
         {
             var simplified = new List<(double X, double Y, double Z)[]>();
             var sqTolerance = (tileTolerance * tileTolerance);
@@ -99,8 +98,8 @@ namespace TileFactory
                 {                    
                     // filter out tiny polylines & polygons //
                     if (shouldSimplify 
-                        && (feature.Type == GeometryType.LineString && feature.Distance < tileTolerance)
-                        || (feature.Type == GeometryType.MultiLineString && feature.Area < sqTolerance))
+                        && (feature.Type == GeometryType.LineString && feature.Distance[i] < tileTolerance)
+                        || (feature.Type == GeometryType.MultiLineString && feature.Area[i] < sqTolerance))
                     {
                         tile.NumberOfPoints += feature.Geometry.Length;
                         continue;
@@ -144,10 +143,13 @@ namespace TileFactory
             }
         }
 
-        private int toIdentifier(int zoom, int x, int y)
+        internal int ToIdentifier(int zoom, int x, int y)
         {
             return ((1 << zoom) * y + x) * 32 + zoom;
         }
+
+        //internal 
+
         #endregion
     }
 }
