@@ -10,6 +10,14 @@ namespace TileFactory.Interfaces
         Y = 1
     }
 
+    /// <summary>
+    /// Maps the Geo Types. The relationship between these types and 
+    /// the leaflet types is not one to one:
+    /// Point & Multipoint = 1
+    /// LineString & MultiLineString = 2
+    /// Polygon & Multipolygon = 3
+    /// 
+    /// </summary>
     public enum GeometryType
     {
         Point = 0,

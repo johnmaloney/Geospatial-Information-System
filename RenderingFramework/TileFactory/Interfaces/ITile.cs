@@ -8,6 +8,8 @@ namespace TileFactory.Interfaces
     {
         IList<Feature> Features { get; }
 
+        IList<Feature> Source { get; set; }
+
         int NumberOfPoints { get; set; }
 
         int NumberOfSimplifiedPoints { get; set; }

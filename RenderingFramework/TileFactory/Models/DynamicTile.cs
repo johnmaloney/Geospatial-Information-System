@@ -20,6 +20,8 @@ namespace TileFactory.Models
 
         public IList<Feature> Features { get; set; }
 
+        public IList<Feature> Source { get; set; }
+
         public int NumberOfPoints { get; set; }
 
         public int NumberOfSimplifiedPoints { get; set; }

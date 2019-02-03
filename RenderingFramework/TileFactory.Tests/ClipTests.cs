@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,12 @@ using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Utility;
 using TileFactory.Utility.Obsolete;
+using TileFactory.Tests.Utility;
 
 namespace TileFactory.Tests
 {
     [TestClass]
-    public class ClipTests
+    public class ClipTests : ATest
     {
         [TestMethod]
         public void generate_clip_expect_proper_type_discernment()
@@ -44,8 +46,8 @@ namespace TileFactory.Tests
             var clipper = new Clipper();
             double buffer = 0.015625d;
 
-            var left = clipper.Clip(features, 1, -1 - buffer, buffer, -1, 2, Axis.X);
-            var right = clipper.Clip(features, 1, 1 - buffer, 2 + buffer, -1, 2, Axis.X);
+            var left = clipper.Clip(features, scale:1, k1:(-1 - buffer), k2:buffer, minAll:-1, maxAll:2, axis:Axis.X);
+            var right = clipper.Clip(features, scale:1, k1:(1 - buffer), k2:(2 + buffer), minAll:-1, maxAll:2, axis:Axis.X);
 
             Assert.AreEqual(0, left.Count());
             Assert.AreEqual(0, right.Count());
@@ -66,8 +68,8 @@ namespace TileFactory.Tests
             double minY = 0.37590819401923736d;
             double maxY = 0.375915411794357d;
 
-            var topLeft = clipper.Clip(features, z2, y-k1, y+ k3, minY, maxY, Axis.Y);
-            var bottomLeft = clipper.Clip(features, z2,y + k2, y + k4, minY, maxY, Axis.Y);
+            var topLeft = clipper.Clip(features, z2, y-k1, y+ k3, Axis.Y, minY, maxY);
+            var bottomLeft = clipper.Clip(features, z2,y + k2, y + k4, Axis.Y, minY, maxY);
 
             // The Top Left will have both points //
             Assert.AreEqual(2, topLeft.Count());
@@ -105,6 +107,15 @@ namespace TileFactory.Tests
             };
 
             return new List<Feature> { feature1, feature2 };
+        }
+
+        [TestMethod]
+        public void process_geometry_for_colorado_expect_clippng()
+        {
+            var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
+
+            var clipper = new Clipper();
+            clipper.Clip(coloradoFeature, 32, 5.9921875d, 6.5078125d, Axis.X, 0.1970548527777778d, 0.21655132222222223d);
         }
     }
 }

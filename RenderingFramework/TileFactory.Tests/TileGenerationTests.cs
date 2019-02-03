@@ -27,7 +27,7 @@ namespace TileFactory.Tests
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
 
-            var retriever = new Retriever();
+            var retriever = new Retriever(new MockTileCacheStorage());
             var tile = retriever.GetTile(context);
         }
 
@@ -38,8 +38,49 @@ namespace TileFactory.Tests
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
 
             context.TileFeatures = multiLinestring;
-            var retriever = new Retriever();
+            var retriever = new Retriever(new MockTileCacheStorage());
             var tile = retriever.GetTile(context);
+        }
+
+        [TestMethod]
+        public void given_feature_ring_polygon_expect_rewind()
+        {
+            var ringJSON = @"[
+                { 'item1' : 0.20502623888888888, 'item2' : 0.3749348317775085,  'item3' : 1},
+                { 'item1' : 0.21652329444444446, 'item2' : 0.3749172753574649,  'item3' : 0.00008042533215241402 }, 
+                { 'item1' : 0.21654933333333332, 'item2' : 0.38925412744493454, 'item3' : 0.00033782393398675166 },
+                { 'item1' : 0.1970966027777778,  'item2' : 0.38923325611415305, 'item3' : 0.00022927873054644834 },
+                { 'item1' : 0.19708312222222218, 'item2' : 0.37492359875955333, 'item3' : 0.000048328257273705895},
+                { 'item1' : 0.20502623888888888, 'item2' : 0.3749348317775085,  'item3' : 1} ]";
+            var ring = Container.GetService<IConfigurationStrategy>().FromInto<List<(double X, double Y, double Z)>>(ringJSON);
+
+
+            var retriever = new Retriever(new MockTileCacheStorage());
+            retriever.Rewind(ring, true);
+
+            Assert.AreEqual(0.20502623888888888d, ring[0].X);
+            Assert.AreEqual(0.37493483177750853d, ring[0].Y);
+            Assert.AreEqual(1d, ring[0].Z);
+
+            Assert.AreEqual(0.21652329444444446d, ring[1].X);
+            Assert.AreEqual(0.37491727535746489d, ring[1].Y);
+            Assert.AreEqual(8.0425332152414016E-05d, ring[1].Z);
+
+            Assert.AreEqual(0.21654933333333332d, ring[2].X);
+            Assert.AreEqual(0.38925412744493454d, ring[2].Y);
+            Assert.AreEqual(0.00033782393398675166d, ring[2].Z);
+
+            Assert.AreEqual(0.1970966027777778d, ring[3].X);
+            Assert.AreEqual(0.38923325611415305d, ring[3].Y);
+            Assert.AreEqual(0.00022927873054644834d, ring[3].Z);
+
+            Assert.AreEqual(0.19708312222222218d, ring[4].X);
+            Assert.AreEqual(0.37492359875955333d, ring[4].Y);
+            Assert.AreEqual(4.8328257273705895E-05d, ring[4].Z);
+
+            Assert.AreEqual(0.20502623888888888d, ring[5].X);
+            Assert.AreEqual(0.37493483177750853d, ring[5].Y);
+            Assert.AreEqual(1d, ring[5].Z);
         }
     }
 }

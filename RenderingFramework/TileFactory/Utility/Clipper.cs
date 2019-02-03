@@ -21,13 +21,8 @@ namespace TileFactory.Utility
 
         #region Methods
 
-        public Clipper()
-        {
-
-        }
-
         public IEnumerable<IGeometryItem> Clip(IEnumerable<IGeometryItem> features, 
-            double scale, double k1, double k2, double minAll, double maxAll, Axis axis)
+            double scale, double k1, double k2, Axis axis, double minAll, double maxAll)
         {
             k1 /= scale;
             k2 /= scale;
@@ -60,36 +55,79 @@ namespace TileFactory.Utility
                     continue;
                 
                 // This is a rare occurrance //
-                if (feature.Type == GeometryType.Point)
+                if (feature.Type == GeometryType.Point || feature.Type == GeometryType.MultiPoint)
                 {
-                    var clip = ClipPoints(feature, k1, k2);
+                    var clip = ClipPoints(feature, k1, k2, axis);
+                    //Need to add this to the collection ..//
                 }
                 else // Covers all the other types //
                 {
-
+                    this.ClipGeometry(feature, k1, k2, axis);
                 }
             }
             return clipped;
         }
 
-        public IGeometryItem ClipPoints(IGeometryItem feature, double k1, double k2)
+        public List<(double X, double Y, double Z)> ClipPoints(IGeometryItem feature, double k1, double k2, Axis axis)
         {
             var slice = new List<(double X, double Y, double Z)>();
 
             for (int i = 0; i < feature.Geometry.Length; i++)
             {
                 var a = feature.Geometry[i][0];
-
-                if (a.X >= k1 && a.X <= k2)
+                var aK = axis == Axis.X ? a.X : a.Y;
+                if (aK >= k1 && aK <= k2)
                 {
+                    slice.Add(a);
                 }
             }
-            throw new NotImplementedException("Multi points are not yet supported");
+            return slice;
         }
 
-        public IEnumerable<IGeometryItem> ClipGeometry()
+        public IEnumerable<IGeometryItem> ClipGeometry(IGeometryItem geometryItem, double k1, double k2, Axis axis)
         {
+            //var slices;
+
+            Feature feature = geometryItem as Feature;
+            for (int i = 0; i < feature.Geometry.Length; i++)
+            {
+                var ak = 0d;
+                var bk = 0d;
+                var points = feature.Geometry[i];
+                var area = feature.Area;
+                var distance = feature.Distance;
+                var outer = feature.IsOuter;
+                var length = points.Length;
+                (double X, double Y, double Z) a = points[0];
+                (double X, double Y, double Z) b = points[1];
+                int j, last;
+
+
+                var slice = new List<(double X, double Y, double Z)>();
+                for (j = 0; j < length - 1; j++)
+                {
+                    a = points[j];
+                    b = points[j + 1];
+
+                    if (bk == 0)
+                        ak = axis == Axis.X ? a.X : a.Y; 
+                    bk = axis == Axis.X ? b.X : b.Y;
+
+                    if (ak < k1)
+                    {
+                        if (bk > k2) // ---/---/---> //
+                        {
+                            
+                        }
+                    }
+                }
+            }
             return null;
+        }
+
+        internal (double X, double Y, double Z) intersectX((double X, double Y, double Z) a, (double X, double Y, double Z) b, double x)
+        {
+
         }
 
         #endregion

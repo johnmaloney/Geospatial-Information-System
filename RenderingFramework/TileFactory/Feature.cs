@@ -107,8 +107,8 @@ namespace TileFactory
                 max.Y = Math.Max(current.Y, max.Y);
             }
 
-            MinGeometry = minGeometry;
-            MaxGeometry = maxGeometry;
+            MinGeometry = min;
+            MaxGeometry = max;
         }
 
         /// <summary>
