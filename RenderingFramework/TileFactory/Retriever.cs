@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Models;
@@ -14,6 +15,7 @@ namespace TileFactory
 
         private readonly ITileCacheStorage tileCache;
         private readonly ITileContext tileContext;
+        private readonly ITileTransform tileTransform;
 
         #endregion
 
@@ -24,15 +26,21 @@ namespace TileFactory
         #endregion
 
         #region Methods
-        public Retriever(ITileCacheStorage tileCache)
+
+        public Retriever(ITileCacheStorage tileCache, ITileContext context)
         {
             this.tileCache = tileCache;
+            this.tileContext = context;
+            this.Coordinates = new List<(double X, double Y, double Z)>();
+
+            // This is only called at the beginning //
+            var initialTile = SplitTile(tileContext, zoom:0, x:0, y:0, currentX:null, currentY:null, currentZoom:null);
+            tileCache.StoreBy(0, initialTile);
         }
 
-        public ITile GetTile(ITileContext tileContext, int zoomLevel=0, int x=0, int y=0)
+        public ITile GetTile(IGeometryItem[] features, int zoomLevel=0, int x=0, int y=0)
         {
-            // This is only called at the beginning //
-            return SplitTile(tileContext, zoomLevel, x, y,null, null, null);
+            return null;
         }
 
         /// <summary>
@@ -46,9 +54,10 @@ namespace TileFactory
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns></returns>
-        internal ITile SplitTile(ITileContext context, int zoom, int x, int y, int? currentX, int? currentY, int? currentZoom)
+        internal int SplitTile(ITileContext context, int zoom, int x, int y, int? currentX, int? currentY, int? currentZoom)
         {
-            var features = context.TileFeatures;
+            var features = context.TileFeatures.ToArray();
+            int solidZoom = 0;
 
             var tileStack = new Stack<object>();
             tileStack.Push(features);
@@ -61,7 +70,7 @@ namespace TileFactory
                 zoom = (int)tileStack.Pop();
                 y = (int)tileStack.Pop();
                 x = (int)tileStack.Pop();
-                features = (List<TileFactory.Feature>)tileStack.Pop();
+                features = (Feature[])tileStack.Pop();
 
 
                 var zoomSqr = 1 << zoom;
@@ -100,6 +109,15 @@ namespace TileFactory
                         continue;
                 }
 
+                // stop tiling if the tile is a solid clipped square //
+                if (!context.SolidChildren && IsClippedSquare(currentTile, context.Extent, context.Buffer))
+                {
+                    // Remember the current zoom if we are drilling down //
+                    if (currentZoom.HasValue)
+                        solidZoom = zoom;
+                    continue;
+                }
+
                 // If we slice further down no need to keep source geometry //
                 currentTile.Source = null;
 
@@ -113,10 +131,50 @@ namespace TileFactory
                 var left = clipper.Clip(features, scale: zoomSqr, k1: x - k1, k2: x + k3, axis: Axis.X, minAll: currentTile.Min.X, maxAll: currentTile.Max.X);
                 var right = clipper.Clip(features, scale: zoomSqr, k1: x - k2, k2: x + k4, axis: Axis.X, minAll: currentTile.Min.X, maxAll: currentTile.Max.X);
 
-                return currentTile;
+                // set up the four sections of tiles //
+                var topLeft = new IGeometryItem[0];
+                var bottomLeft = new IGeometryItem[0];
+                var topRight = new IGeometryItem[0];
+                var bottomRight = new IGeometryItem[0]; 
+
+                if (left.Length > 0)
+                {
+                    topLeft =    clipper.Clip(left, scale: zoomSqr, k1: y - k1, k2: y + k3, axis: Axis.Y, minAll: currentTile.Min.Y, maxAll: currentTile.Max.Y);
+                    bottomLeft = clipper.Clip(left, scale: zoomSqr, k1: y + k2, k2: y + k4, axis: Axis.Y, minAll: currentTile.Min.Y, maxAll: currentTile.Max.Y);
+                }
+
+                if(right.Length > 0)
+                {
+                    topRight =    clipper.Clip(right, scale: zoomSqr, k1: y - k1, k2: y + k3, axis: Axis.Y, minAll: currentTile.Min.Y, maxAll: currentTile.Max.Y);
+                    bottomRight = clipper.Clip(right, scale: zoomSqr, k1: y + k2, k2: y + k4, axis: Axis.Y, minAll: currentTile.Min.Y, maxAll: currentTile.Max.Y);
+                }
+
+                if (features.Length > 0)
+                {
+                    tileStack.Push(topLeft);
+                    tileStack.Push(zoom + 1);
+                    tileStack.Push(x * 2);
+                    tileStack.Push(y * 2);
+                
+                    tileStack.Push(bottomLeft);
+                    tileStack.Push(zoom + 1);
+                    tileStack.Push(x * 2);
+                    tileStack.Push(y * 2 + 1);
+                    
+                    tileStack.Push(topRight);
+                    tileStack.Push(zoom + 1);
+                    tileStack.Push(x * 2 + 1);
+                    tileStack.Push(y * 2);
+                    
+                    tileStack.Push(bottomRight);
+                    tileStack.Push(zoom + 1);
+                    tileStack.Push(x * 2 + 1);
+                    tileStack.Push(y * 2 + 1);
+                }
             }
 
-            throw new NotImplementedException();
+
+            return zoom;
         }
 
         internal ITile CreateTile(IEnumerable<Feature> features, int zoomSquared, int x, int y, double tileTolerance, bool shouldSimplify)
@@ -234,6 +292,26 @@ namespace TileFactory
                 sum += (p2.X - p1.X) * (p1.Y + p2.Y);
             }
             return sum;
+        }
+
+        internal bool IsClippedSquare(ITile tile, double extent, double buffer)
+        {
+            var features = tile.Features;
+            if (features.Count != 1)
+                return false;
+
+            var feature = features.Single();
+            if (feature.Type != GeometryType.MultiLineString || feature.Geometry.Length > 1)
+                return false;
+
+            var length = feature.Geometry[0].Length;
+            if (length != 5)
+                return false;
+
+            for (int i = 0; i < length; i++)
+            {
+                var point = tran
+            }
         }
 
         #endregion

@@ -32,7 +32,7 @@ namespace TileFactory.Tests.Mocks
             if (tiles.TryGetValue(id, out ITile tile))
                 return tile;
 
-            throw new KeyNotFoundException($"Tile with ID: {id} could not be retrieved.");
+            return null;
         }
 
         public void StoreBy(int id, ITile tile)

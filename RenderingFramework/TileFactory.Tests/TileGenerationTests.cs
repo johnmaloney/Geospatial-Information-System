@@ -27,8 +27,8 @@ namespace TileFactory.Tests
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
 
-            var retriever = new Retriever(new MockTileCacheStorage());
-            var tile = retriever.GetTile(context);
+            var retriever = new Retriever(new MockTileCacheStorage(), context);
+            //var tile = retriever.GetTile();
         }
 
         [TestMethod]
@@ -38,8 +38,8 @@ namespace TileFactory.Tests
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
 
             context.TileFeatures = multiLinestring;
-            var retriever = new Retriever(new MockTileCacheStorage());
-            var tile = retriever.GetTile(context);
+            var retriever = new Retriever(new MockTileCacheStorage(), context);
+            //var tile = retriever.GetTile();
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace TileFactory.Tests
             var ring = Container.GetService<IConfigurationStrategy>().FromInto<List<(double X, double Y, double Z)>>(ringJSON);
 
 
-            var retriever = new Retriever(new MockTileCacheStorage());
+            var retriever = new Retriever(new MockTileCacheStorage(), new MockTileContext());
             retriever.Rewind(ring, true);
 
             Assert.AreEqual(0.20502623888888888d, ring[0].X);
