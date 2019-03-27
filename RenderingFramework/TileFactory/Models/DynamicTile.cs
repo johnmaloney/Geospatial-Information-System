@@ -18,9 +18,11 @@ namespace TileFactory.Models
 
         #region Properties
 
-        public IList<Feature> Features { get; set; }
+        public double ZoomSquared { get; set; }
 
-        public IList<Feature> Source { get; set; }
+        public IList<IGeometryItem> Features { get; set; }
+
+        public IList<IGeometryItem> Source { get; set; }
 
         public int NumberOfPoints { get; set; }
 
@@ -34,9 +36,9 @@ namespace TileFactory.Models
 
         public bool Transformed { get; set; }
 
-        public (int X, int Y) Min { get; set; }
+        public (double X, double Y) Min { get; set; }
 
-        public (int X, int Y) Max { get; set; }
+        public (double X, double Y) Max { get; set; }
 
         #endregion
 

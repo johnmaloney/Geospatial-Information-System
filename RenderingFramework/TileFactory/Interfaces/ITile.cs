@@ -6,9 +6,11 @@ namespace TileFactory.Interfaces
 {
     public interface ITile
     {
-        IList<Feature> Features { get; }
+        double ZoomSquared { get; }
 
-        IList<Feature> Source { get; set; }
+        IList<IGeometryItem> Features { get; }
+
+        IList<IGeometryItem> Source { get; set; }
 
         int NumberOfPoints { get; set; }
 
@@ -22,8 +24,8 @@ namespace TileFactory.Interfaces
 
         bool Transformed { get; }
 
-        (int X, int Y) Min { get; }
+        (double X, double Y) Min { get; }
 
-        (int X, int Y) Max { get; }
+        (double X, double Y) Max { get; }
     }
 }

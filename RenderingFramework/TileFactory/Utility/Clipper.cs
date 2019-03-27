@@ -31,7 +31,7 @@ namespace TileFactory.Utility
             if (minAll >= k1 && maxAll <= k2)
                 return features;
             else if (minAll > k2 || maxAll < k1)
-                return new IGeometryItem[0];
+                return null;
 
             var clipped = new List<IGeometryItem>();
             foreach(var feature in features)

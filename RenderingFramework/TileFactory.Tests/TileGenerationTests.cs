@@ -27,8 +27,43 @@ namespace TileFactory.Tests
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
 
-            var retriever = new Retriever(new MockTileCacheStorage(), context);
-            //var tile = retriever.GetTile();
+            var storage = new MockTileCacheStorage();
+            var retriever = new Retriever(storage, context);
+
+            var tile = storage.GetBy(0);
+            Assert.AreEqual(0d, tile.X);
+            Assert.AreEqual(0d, tile.Y);
+            Assert.AreEqual(1d, tile.ZoomSquared);
+            Assert.AreEqual(386, tile.NumberOfPoints);
+            Assert.AreEqual(6, tile.NumberOfSimplifiedPoints);
+            Assert.AreEqual(1, tile.NumberOfFeatures);
+            Assert.AreEqual(false, tile.Transformed);
+        }
+
+        [TestMethod]
+        public void given_feature_in_projected_coords_process_into_second_level_tile()
+        {
+            Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
+
+            var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
+            context.TileFeatures = coloradoFeature;
+
+            var storage = new MockTileCacheStorage();
+            var retriever = new Retriever(storage, context);
+            retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 0, x: 0, y: 0, currentZoom: 1, currentX: 0, currentY: 0);
+            retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 1, x: 0, y: 0, currentZoom: 2, currentX: 0, currentY: 1);
+            retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 2, x: 0, y: 1, currentZoom: 3, currentX: 1, currentY: 3);
+            var tile = storage.GetBy(0);
+            Assert.AreEqual(0d, tile.X);
+            Assert.AreEqual(0d, tile.Y);
+            Assert.AreEqual(1d, tile.ZoomSquared);
+            Assert.AreEqual(386, tile.NumberOfPoints);
+            Assert.AreEqual(6, tile.NumberOfSimplifiedPoints);
+            Assert.AreEqual(1, tile.NumberOfFeatures);
+
+            // This will be false since the GetBy method was used on the Storage //
+            // if the Get method was called from the retriever then the Transform would be true //
+            Assert.AreEqual(false, tile.Transformed);
         }
 
         [TestMethod]

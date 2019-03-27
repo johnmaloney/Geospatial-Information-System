@@ -5,7 +5,7 @@ using TileFactory.Interfaces;
 
 namespace TileFactory
 {
-    public class Feature : IGeometryItem
+    public class Feature : IGeometryItem, IGeoData
     {
         #region Fields
 

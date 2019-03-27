@@ -16,4 +16,12 @@ namespace TileFactory.Interfaces
         (double X, double Y, double Z) MinGeometry { get; }
         (double X, double Y, double Z) MaxGeometry { get; }
     }
+
+    public interface IGeoData
+    {
+        string Id { get; set; }
+
+        Dictionary<string, object> Tags { get; set; }
+    }
+
 }
