@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Settings", "Settings", "{E2
 		code_coverage.runsettings = code_coverage.runsettings
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TileServerSandbox", "TileServerSandbox\TileServerSandbox.csproj", "{FD2F82FD-0952-46AD-A9A3-DF291CE47768}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,12 +38,17 @@ Global
 		{BA388D34-DC11-44A4-B21B-0B3EE18B24D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA388D34-DC11-44A4-B21B-0B3EE18B24D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA388D34-DC11-44A4-B21B-0B3EE18B24D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD2F82FD-0952-46AD-A9A3-DF291CE47768}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD2F82FD-0952-46AD-A9A3-DF291CE47768}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD2F82FD-0952-46AD-A9A3-DF291CE47768}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD2F82FD-0952-46AD-A9A3-DF291CE47768}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BA388D34-DC11-44A4-B21B-0B3EE18B24D9} = {71DC38EF-1750-4120-A725-106F6D4BDCDA}
+		{FD2F82FD-0952-46AD-A9A3-DF291CE47768} = {71DC38EF-1750-4120-A725-106F6D4BDCDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B0DA688F-818A-4485-8CEC-22E6F500EAC1}

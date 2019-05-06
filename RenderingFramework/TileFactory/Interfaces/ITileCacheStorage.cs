@@ -4,9 +4,9 @@ using System.Text;
 
 namespace TileFactory.Interfaces
 {
-    public interface ITileCacheStorage
+    public interface ITileCacheStorage<TTile>
     {
-        ITile GetBy(int id);
-        void StoreBy(int id, ITile tile);
+        TTile GetBy(int id);
+        void StoreBy(int id, TTile tile);
     }
 }

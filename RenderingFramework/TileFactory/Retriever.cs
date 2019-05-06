@@ -5,17 +5,19 @@ using System.Linq;
 using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Models;
+using TileFactory.Transforms;
 using TileFactory.Utility;
 
 namespace TileFactory
 {
-    public class Retriever
+    public class TileRetriever<TTile> where TTile : class
     {
         #region Fields
 
-        private readonly ITileCacheStorage tileCache;
+        private readonly ITileCacheStorage<TTile> transformedCache;
+        private readonly ITileCacheStorage<ITile> rawCache;
         private readonly ITileContext tileContext;
-        private readonly Transform tileTransform;
+        private readonly ITransform<TTile> tileTransform;
 
         #endregion
 
@@ -27,26 +29,27 @@ namespace TileFactory
 
         #region Methods
 
-        public Retriever(ITileCacheStorage tileCache, ITileContext context)
+        public Retriever(ITileCacheStorage<TTile> transformedCache, ITileCacheStorage<ITile> rawCache, ITransform<TTile> transformer, ITileContext context)
         {
-            this.tileCache = tileCache;
+            this.transformedCache = transformedCache;
+            this.rawCache = rawCache;
             this.tileContext = context;
-            this.tileTransform = new Transform(context.Extent, context.Buffer);
+            this.tileTransform = transformer;
             this.Coordinates = new List<(double X, double Y, double Z)>();
 
             // This is only called at the beginning //
             var initialTile = SplitTile(tileContext.TileFeatures.ToArray(), zoom:0, x:0, y:0, currentZoom: null, currentX:null, currentY:null);
         }
 
-        public ITile GetTile(IGeometryItem feature, int zoomLevel=0, double x=0, double y=0)
+        public TTile GetTile(int zoomLevel=0, double x=0, double y=0)
         {
             var zoomSqr = 1 << zoomLevel;
             x = ((x % zoomSqr) + zoomSqr) % zoomSqr;
 
             var id = ToIdentifier(zoomLevel, (int)x, (int)y);
-            var tile = tileCache.GetBy(id);
+            var tile = transformedCache.GetBy(id);
             if (tile != null)
-                return tileTransform.ProcessTile(tile);
+                return tile;
 
             var z0 = zoomLevel;
             var x0 = x;
@@ -58,7 +61,7 @@ namespace TileFactory
                 z0--;
                 x0 = Math.Floor(x0 / 2);
                 y0 = Math.Floor(y0 / 2);
-                parent = tileCache.GetBy(ToIdentifier(z0, (int)x0, (int)y0));
+                parent = rawCache.GetBy(ToIdentifier(z0, (int)x0, (int)y0));
             }
 
             if (parent == null || parent.Source == null) return null;
@@ -74,7 +77,7 @@ namespace TileFactory
                 id = ToIdentifier(solid.Value, (int)Math.Floor((double)(x / m)), (int)Math.Floor((double)(y / m)));
             }
 
-            var currentTile = tileCache.GetBy(id);
+            var currentTile = rawCache.GetBy(id);
             return currentTile != null ? tileTransform.ProcessTile(currentTile) : null;
         }
 
@@ -111,15 +114,16 @@ namespace TileFactory
                 var id = ToIdentifier(zoom, x, y);
                 var tileTolerance = zoom == tileContext.MaxZoom ? 0 : tileContext.Tolerance / (zoomSqr * tileContext.Extent);
 
-                ITile currentTile = tileCache.GetBy(id);
+                ITile currentTile = rawCache.GetBy(id);
                 // If the tile is null then this is a creation of a tile //
                 if (currentTile == null)
                 {
                     currentTile = CreateTile(features, zoomSqr, x, y, tileTolerance, zoom != tileContext.MaxZoom);
-                    tileCache.StoreBy(id, currentTile);
+                    transformedCache.StoreBy(id, tileTransform.ProcessTile(currentTile));
                     Coordinates.Add((X: x, Y: y, Z: zoom));
                 }
 
+                // TO-DO: figure out if this can be moved to the interals of currentTile //
                 currentTile.Source = currentTile.Features;
 
                 // If this is the first-pass Tiling //
@@ -322,6 +326,11 @@ namespace TileFactory
                 }
 
                 tile.Features.Add(tileFeature);
+            }
+            else
+            {
+                // This occurs in a multi-line string scenario //
+                tile.Features.Add(geometryFeature);
             }
         }
 

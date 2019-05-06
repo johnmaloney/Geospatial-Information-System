@@ -1,0 +1,45 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css"
+          integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
+          crossorigin="" />
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
+            integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
+            crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
+    <!--<script src="https://unpkg.com/pbf@3.0.5/dist/pbf.js"></script>-->
+    <style>
+        #mapid {
+            height: 180px;
+        }
+    </style>
+</head>
+<body>
+    <div id="mapid"></div>
+    <script>
+        var map = L.map('mapid');
+
+        var mapboxUrl = "https://localhost:44379/v1/tiles/{z}/{x}/{y}.vector.pbf?access_token={token}";
+
+        var mapboxVectorTileOptions = {
+            rendererFactory: L.canvas.tile,
+            token: 'pk.eyJ1IjoiaXZhbnNhbmNoZXoiLCJhIjoiY2l6ZTJmd3FnMDA0dzMzbzFtaW10cXh2MSJ9.VsWCS9-EAX4_4W1K-nXnsA'
+        };
+
+
+        var mapboxPbfLayer = L.vectorGrid.protobuf(mapboxUrl, mapboxVectorTileOptions);
+
+
+        map.setView({ lat: 47.040182144806664, lng: 9.667968750000002 }, 0);
+
+        L.control.layers({
+            "MapBox Vector Tiles": mapboxPbfLayer
+        }, {}, { collapsed: false }).addTo(map);
+
+    </script>
+</body>
+</html>

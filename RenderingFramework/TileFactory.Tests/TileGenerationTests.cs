@@ -67,14 +67,16 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(NotImplementedException))]
         public void using_multilinestring_to_add_feature_expect_rewind()
         {
-            var multiLinestring = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("multi_linestring_sample_projected");
+            var multiLinestring = Container.GetService<IConfigurationStrategy>().Into<Feature[]>("multi_linestring_sample_projected");
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
 
             context.TileFeatures = multiLinestring;
             var retriever = new Retriever(new MockTileCacheStorage(), context);
-            //var tile = retriever.GetTile();
+            retriever.SplitTile(multiLinestring, zoom: 0, x: 0, y: 0, currentZoom: 0, currentX: 0, currentY: 0);
+            var tile = retriever.GetTile(multiLinestring.First(), 0, 0, 0);
         }
 
         [TestMethod]

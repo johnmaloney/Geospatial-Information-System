@@ -6,7 +6,7 @@ using TileFactory.Interfaces;
 
 namespace TileFactory.Tests.Mocks
 {
-    public class MockTileCacheStorage : ITileCacheStorage
+    public class MockTileCacheStorage : ITileCacheStorage<ITile>
     {
         #region Fields
 

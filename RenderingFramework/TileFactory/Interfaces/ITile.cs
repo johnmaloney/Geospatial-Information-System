@@ -22,10 +22,13 @@ namespace TileFactory.Interfaces
 
         int Y { get; }
 
-        bool Transformed { get; }
-
         (double X, double Y) Min { get; }
 
         (double X, double Y) Max { get; }
+    }
+
+    public interface ITransformedTile
+    {
+        (uint X, uint Y)[] TransformedFeatures { get; set; }
     }
 }
