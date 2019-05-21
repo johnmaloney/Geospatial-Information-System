@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using TileFactory.Interfaces;
@@ -7,11 +8,12 @@ using TileFactory.Transforms;
 
 namespace TileFactory.Tests.Mocks
 {
-    public class MockTransformedCacheStorage : ITileCacheStorage<Tile>
+    public class MockTransformedCacheStorage : ITileCacheStorage<ITransformedTile>
     {
         #region Fields
 
         private readonly ProtobufTransform transform;
+        private ConcurrentDictionary<int, ITransformedTile> tiles = new ConcurrentDictionary<int, ITransformedTile>();
 
         #endregion
 
@@ -28,14 +30,17 @@ namespace TileFactory.Tests.Mocks
             
         }
 
-        public Tile GetBy(int id)
+        public ITransformedTile GetBy(int id)
         {
-            throw new NotImplementedException();
+            if (tiles.TryGetValue(id, out ITransformedTile tile))
+                return tile;
+
+            return null;
         }
 
-        public void StoreBy(int id, Tile tile)
+        public void StoreBy(int id, ITransformedTile tile)
         {
-            throw new NotImplementedException();
+            tiles.AddOrUpdate(id, tile, (currentId, currentTile) => currentTile = tile);
         }
 
         #endregion

@@ -17,7 +17,7 @@ namespace TileFactory.Tests
 {
     [TestClass]
     // Processing a GeoJSON file into a set of tiles.
-    public class TileGenerationTests : ATest
+    public class RawTileTests : ATest
     {
         [TestMethod]
         public void given_feature_in_projected_coords_process_into_basic_tile()
@@ -27,17 +27,17 @@ namespace TileFactory.Tests
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
 
-            var storage = new MockTileCacheStorage();
-            var retriever = new Retriever(storage, context);
+            var raw  = new MockRawCacheStorage();
+            var transformed = new MockTransformedCacheStorage();
+            var retriever = new TileRetriever(transformed, raw, context);
 
-            var tile = storage.GetBy(0);
+            var tile = raw.GetBy(0);
             Assert.AreEqual(0d, tile.X);
             Assert.AreEqual(0d, tile.Y);
             Assert.AreEqual(1d, tile.ZoomSquared);
             Assert.AreEqual(386, tile.NumberOfPoints);
             Assert.AreEqual(6, tile.NumberOfSimplifiedPoints);
             Assert.AreEqual(1, tile.NumberOfFeatures);
-            Assert.AreEqual(false, tile.Transformed);
         }
 
         [TestMethod]
@@ -48,35 +48,36 @@ namespace TileFactory.Tests
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
 
-            var storage = new MockTileCacheStorage();
-            var retriever = new Retriever(storage, context);
+            var raw = new MockRawCacheStorage();
+            var transformed = new MockTransformedCacheStorage();
+            var retriever = new TileRetriever(transformed, raw, context);
+
             retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 0, x: 0, y: 0, currentZoom: 1, currentX: 0, currentY: 0);
             retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 1, x: 0, y: 0, currentZoom: 2, currentX: 0, currentY: 1);
             retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 2, x: 0, y: 1, currentZoom: 3, currentX: 1, currentY: 3);
-            var tile = storage.GetBy(0);
+            var tile = raw.GetBy(0);
             Assert.AreEqual(0d, tile.X);
             Assert.AreEqual(0d, tile.Y);
             Assert.AreEqual(1d, tile.ZoomSquared);
             Assert.AreEqual(386, tile.NumberOfPoints);
             Assert.AreEqual(6, tile.NumberOfSimplifiedPoints);
             Assert.AreEqual(1, tile.NumberOfFeatures);
-
-            // This will be false since the GetBy method was used on the Storage //
-            // if the Get method was called from the retriever then the Transform would be true //
-            Assert.AreEqual(false, tile.Transformed);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(NotImplementedException))]
         public void using_multilinestring_to_add_feature_expect_rewind()
         {
             var multiLinestring = Container.GetService<IConfigurationStrategy>().Into<Feature[]>("multi_linestring_sample_projected");
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
 
             context.TileFeatures = multiLinestring;
-            var retriever = new Retriever(new MockTileCacheStorage(), context);
+            var raw = new MockRawCacheStorage();
+            var transformed = new MockTransformedCacheStorage();
+            var retriever = new TileRetriever(transformed, raw, context);
+
             retriever.SplitTile(multiLinestring, zoom: 0, x: 0, y: 0, currentZoom: 0, currentX: 0, currentY: 0);
-            var tile = retriever.GetTile(multiLinestring.First(), 0, 0, 0);
+            var tile = retriever.GetTile(0, 0, 0);
+            Assert.AreEqual(4, tile.TransformedFeatures.Count());
         }
 
         [TestMethod]
@@ -91,8 +92,9 @@ namespace TileFactory.Tests
                 { 'item1' : 0.20502623888888888, 'item2' : 0.3749348317775085,  'item3' : 1} ]";
             var ring = Container.GetService<IConfigurationStrategy>().FromInto<List<(double X, double Y, double Z)>>(ringJSON);
 
-
-            var retriever = new Retriever(new MockTileCacheStorage(), new MockTileContext());
+            var raw = new MockRawCacheStorage();
+            var transformed = new MockTransformedCacheStorage();
+            var retriever = new TileRetriever(transformed, raw, new MockTileContext());
             retriever.Rewind(ring, true);
 
             Assert.AreEqual(0.20502623888888888d, ring[0].X);

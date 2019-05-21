@@ -10,14 +10,14 @@ using TileFactory.Utility;
 
 namespace TileFactory
 {
-    public class TileRetriever<TTile> where TTile : class
+    public class TileRetriever
     {
         #region Fields
 
-        private readonly ITileCacheStorage<TTile> transformedCache;
+        private readonly ITileCacheStorage<ITransformedTile> transformedCache;
         private readonly ITileCacheStorage<ITile> rawCache;
         private readonly ITileContext tileContext;
-        private readonly ITransform<TTile> tileTransform;
+        private readonly Transform tileTransform;
 
         #endregion
 
@@ -29,19 +29,27 @@ namespace TileFactory
 
         #region Methods
 
-        public Retriever(ITileCacheStorage<TTile> transformedCache, ITileCacheStorage<ITile> rawCache, ITransform<TTile> transformer, ITileContext context)
+        public TileRetriever(ITileCacheStorage<ITransformedTile> transformedCache, 
+            ITileCacheStorage<ITile> rawCache, ITileContext context)
         {
             this.transformedCache = transformedCache;
             this.rawCache = rawCache;
             this.tileContext = context;
-            this.tileTransform = transformer;
+            this.tileTransform = new Transform(context.Extent, context.Buffer);
             this.Coordinates = new List<(double X, double Y, double Z)>();
 
-            // This is only called at the beginning //
-            var initialTile = SplitTile(tileContext.TileFeatures.ToArray(), zoom:0, x:0, y:0, currentZoom: null, currentX:null, currentY:null);
+            if (tileContext == null)
+                throw new NotSupportedException("The TileContext must have a value.");
+
+            if (tileContext.TileFeatures != null)
+            {
+                // This is only called at the beginning //
+                var initialTile = SplitTile(tileContext.TileFeatures.ToArray(), 
+                    zoom: 0, x: 0, y: 0, currentZoom: null, currentX: null, currentY: null);
+            }
         }
 
-        public TTile GetTile(int zoomLevel=0, double x=0, double y=0)
+        public ITransformedTile GetTile(int zoomLevel=0, double x=0, double y=0)
         {
             var zoomSqr = 1 << zoomLevel;
             x = ((x % zoomSqr) + zoomSqr) % zoomSqr;
@@ -55,13 +63,17 @@ namespace TileFactory
             var x0 = x;
             var y0 = y;
             ITile parent = null;
+            ITransformedTile transformedParent = null;
 
-            while(parent == null && z0 > 0)
+            while(transformedParent == null && z0 > 0)
             {
                 z0--;
                 x0 = Math.Floor(x0 / 2);
                 y0 = Math.Floor(y0 / 2);
-                parent = rawCache.GetBy(ToIdentifier(z0, (int)x0, (int)y0));
+
+                int identifier = ToIdentifier(z0, (int)x0, (int)y0);
+                transformedParent = transformedCache.GetBy(identifier);
+                parent = rawCache.GetBy(identifier);
             }
 
             if (parent == null || parent.Source == null) return null;
@@ -120,6 +132,7 @@ namespace TileFactory
                 {
                     currentTile = CreateTile(features, zoomSqr, x, y, tileTolerance, zoom != tileContext.MaxZoom);
                     transformedCache.StoreBy(id, tileTransform.ProcessTile(currentTile));
+                    rawCache.StoreBy(id, currentTile);
                     Coordinates.Add((X: x, Y: y, Z: zoom));
                 }
 

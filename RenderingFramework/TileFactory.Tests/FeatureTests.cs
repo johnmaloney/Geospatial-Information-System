@@ -20,10 +20,10 @@ namespace TileFactory.Tests
                 Tags = new Dictionary<string, object>()
             };
 
-            Assert.AreEqual(0.20630438611111107d, feature.MinGeometry.X);
-            Assert.AreEqual(0.37493706948566913d, feature.MinGeometry.Y);
-            Assert.AreEqual(0.2053856083333333d, feature.MaxGeometry.X);
-            Assert.AreEqual(0.37493706948566913d, feature.MaxGeometry.Y);
+            Assert.AreEqual(0.20502623888888888d, feature.MinGeometry.X);
+            Assert.AreEqual(0.37493274862932147d, feature.MinGeometry.Y);
+            Assert.AreEqual(0.20756350555555558d, feature.MaxGeometry.X);
+            Assert.AreEqual(0.37493748537323368d, feature.MaxGeometry.Y);
         }
 
         [TestMethod]
@@ -36,7 +36,7 @@ namespace TileFactory.Tests
                 Tags = new Dictionary<string, object>()
             };
 
-            Assert.AreEqual(5.6323187919149476E-09d, feature.Area);
+            Assert.AreEqual(5.6323187919149476E-09d, feature.Area[0]);
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace TileFactory.Tests
                 Tags = new Dictionary<string, object>()
             };
 
-            Assert.AreEqual(0.0050840068211578382, feature.Distance);
+            Assert.AreEqual(0.0050840068211578382, feature.Distance[0]);
         }
 
         private string simplifiedPointData()

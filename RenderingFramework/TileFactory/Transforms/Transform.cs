@@ -9,7 +9,7 @@ namespace TileFactory.Transforms
     /// Transforms the coordinates of each feature in the given tile from
     /// mercator-projected space into (extent x extent) tile space.
     /// </summary>
-    public class Transform
+    public class Transform 
     {
         #region Fields
 
@@ -32,7 +32,7 @@ namespace TileFactory.Transforms
             this.buffer = buffer;
         }
 
-        public (uint X, uint Y)[] ProcessTile(ITile tile)
+        public ITransformedTile ProcessTile(ITile tile)
         {
             (uint X, uint Y)[] transformedRing = null;
 
@@ -62,7 +62,7 @@ namespace TileFactory.Transforms
                 }
             }
                        
-            return transformedRing;
+            return new TransformedTile(transformedRing);
         }
 
         public (uint X, uint Y) ProcessPoint((double X, double Y, double Z) point, double extent, double zoomSqr, double tX, double tY)

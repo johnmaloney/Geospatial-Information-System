@@ -123,7 +123,13 @@ namespace TileFactory.Tests
                 minAll:0.1970548527777778d, 
                 maxAll:0.21655132222222223d);
 
-            Assert.AreEqual(386, clippedFeatures.Count());
+            var feature = clippedFeatures.FirstOrDefault();
+            Assert.IsNotNull(feature);
+            var geometry = feature.Geometry;
+            Assert.IsNotNull(geometry);
+            var points = geometry.FirstOrDefault();
+            Assert.IsNotNull(points);
+            Assert.AreEqual(386, points.Count());
         }
 
         [TestMethod]
@@ -140,7 +146,7 @@ namespace TileFactory.Tests
                 minAll: 0.1970548527777778d, 
                 maxAll: 0.21655132222222223d);
 
-            Assert.AreEqual(0, clippedFeatures.Count());
+            Assert.AreEqual(null, clippedFeatures);
         }
 
         [TestMethod]
@@ -172,7 +178,7 @@ namespace TileFactory.Tests
             var bottomLeft = clipper.Clip(left, scale: 32, k1: 12.4921875d, k2: 13.0078125d, axis: Axis.Y, minAll: 0.374913347992747d, maxAll: 0.3892564123747916d);
 
             Assert.AreEqual(104, topLeft.First().Geometry[0].Length);
-            Assert.AreEqual(0, bottomLeft.Length);
+            Assert.AreEqual(null, bottomLeft);
         }
 
         [TestMethod]
@@ -205,7 +211,7 @@ namespace TileFactory.Tests
             var bottomRight = clipper.Clip(right, scale: 32, k1: 12.4921875d, k2: 13.0078125d, axis: Axis.Y, minAll: 0.374913347992747d, maxAll: 0.3892564123747916d);
 
             Assert.AreEqual(290, topRight.First().Geometry[0].Length);
-            Assert.AreEqual(0, bottomRight.Length);
+            Assert.AreEqual(null, bottomRight);
         }
 
 

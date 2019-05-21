@@ -29,6 +29,6 @@ namespace TileFactory.Interfaces
 
     public interface ITransformedTile
     {
-        (uint X, uint Y)[] TransformedFeatures { get; set; }
+        (uint X, uint Y)[] TransformedFeatures { get; }
     }
 }

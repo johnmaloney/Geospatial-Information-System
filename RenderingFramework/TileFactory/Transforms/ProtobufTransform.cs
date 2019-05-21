@@ -22,9 +22,6 @@ namespace TileFactory.Transforms
         #endregion
 
         #region Properties
-
-
-
         #endregion
 
         #region Methods
@@ -39,13 +36,14 @@ namespace TileFactory.Transforms
             var geometry = transformComposition.ProcessTile(tile);
 
             var feature = new TileFactory.Serialization.Tile.Types.Feature();
-            feature.Geometry.AddRange();
+            feature.Geometry.AddRange(geometry.TransformedFeatures.SelectMany(item=> { return new uint[] { item.X, item.Y }; }));
 
-            return new Tile()
-            {
-                Layers = new Google.Protobuf.Collections.RepeatedField<Tile.Types.Layer>() { Feature = 
-            }
-            
+            var layer = new TileFactory.Serialization.Tile.Types.Layer();
+            layer.Features.Add(feature);
+
+            var protoTile = new Tile();
+            protoTile.Layers.Add(layer);
+            return protoTile;            
         }
 
         public (uint X, uint Y) ProcessPoint((double X, double Y, double Z) point, double extent, double zoomSqr, double tX, double tY)

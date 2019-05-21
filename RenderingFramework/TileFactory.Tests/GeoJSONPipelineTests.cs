@@ -129,8 +129,8 @@ namespace TileFactory.Tests
             Assert.IsNotNull(feature);
 
             Assert.AreEqual(386, feature.Geometry[0].Length);
-            Assert.AreEqual(0.00027851809900100721d, feature.Area);
-            Assert.AreEqual(0.067996893428153737d, feature.Distance);
+            Assert.AreEqual(0.00027851809900100721d, feature.Area[0]);
+            Assert.AreEqual(0.067996893428153737d, feature.Distance[0]);
             Assert.AreEqual(0.21655132222222223d, feature.MaxGeometry.X);
             Assert.AreEqual(0.38925641237479158d, feature.MaxGeometry.Y);
             Assert.AreEqual(0.19705485277777779d, feature.MinGeometry.X);
