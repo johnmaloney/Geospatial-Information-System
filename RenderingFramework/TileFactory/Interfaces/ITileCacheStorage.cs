@@ -8,5 +8,6 @@ namespace TileFactory.Interfaces
     {
         TTile GetBy(int id);
         void StoreBy(int id, TTile tile);
+        void Clear();
     }
 }

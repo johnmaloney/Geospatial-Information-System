@@ -1,0 +1,34 @@
+{
+  "transformedFeatures": [
+    {
+      "$type": "TileFactory.Transforms.TransformedFeature, TileFactory",
+        "coordinates": [
+            {
+                "item1": 840,
+                "item2": 1536
+            },
+            {
+                "item1": 887,
+                "item2": 1536
+            },
+            {
+                "item1": 887,
+                "item2": 1594
+            },
+            {
+                "item1": 807,
+                "item2": 1594
+            },
+            {
+                "item1": 807,
+                "item2": 1536
+            },
+            {
+                "item1": 840,
+                "item2": 1536
+            }
+        ],
+      "geometryType": 3
+    }
+  ]
+}

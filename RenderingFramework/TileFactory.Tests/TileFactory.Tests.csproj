@@ -46,6 +46,9 @@
     <None Update="Data\multi_linestring_sample.geojson">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Data\transformed_tile.geojson">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Data\simple_stops.geojson">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

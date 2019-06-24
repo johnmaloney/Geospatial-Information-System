@@ -13,6 +13,10 @@ namespace TileFactory.Transforms
         (uint X, uint Y) ProcessPoint((double X, double Y, double Z) point, double extent, double zoomSqr, double tX, double tY);
     }
 
+    /// <summary>
+    /// Probably the wrong time for this file, protobuf is further along in the pipeline when the tile are being
+    /// returned to the client.
+    /// </summary>
     public class ProtobufTransform : ITransform<Tile>
     {
         #region Fields
@@ -36,7 +40,7 @@ namespace TileFactory.Transforms
             var geometry = transformComposition.ProcessTile(tile);
 
             var feature = new TileFactory.Serialization.Tile.Types.Feature();
-            feature.Geometry.AddRange(geometry.TransformedFeatures.SelectMany(item=> { return new uint[] { item.X, item.Y }; }));
+           // feature.Geometry.AddRange(geometry.TransformedFeatures.SelectMany(item=> { return new int[] { item.X, item.Y }; }));
 
             var layer = new TileFactory.Serialization.Tile.Types.Layer();
             layer.Features.Add(feature);

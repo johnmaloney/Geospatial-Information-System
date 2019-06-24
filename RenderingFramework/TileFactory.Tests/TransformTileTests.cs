@@ -17,30 +17,30 @@ namespace TileFactory.Tests
         [TestMethod]
         public void given_projd_tile_transform_expect_converted_points()
         {
-            var tile = Container.GetService<IConfigurationStrategy>().Into<DynamicTile>("colorado_outline_tile");
+            var tile = Container.GetService<IConfigurationStrategy>().Into<GeoTile>("colorado_outline_tile");
 
             var transform = new Transform(4096, 64);
             var transformed = transform.ProcessTile(tile);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
-            Assert.AreEqual((uint)840, transformed.TransformedFeatures[0].X);
-            Assert.AreEqual((uint)1536, transformed.TransformedFeatures[0].Y);
+            Assert.AreEqual(840, transformed.TransformedFeatures[0].Coordinates[0].X);
+            Assert.AreEqual(1536, transformed.TransformedFeatures[0].Coordinates[0].Y);
                             
-            Assert.AreEqual((uint)887, transformed.TransformedFeatures[1].X);
-            Assert.AreEqual((uint)1536, transformed.TransformedFeatures[1].Y);
+            Assert.AreEqual(887, transformed.TransformedFeatures[0].Coordinates[1].X);
+            Assert.AreEqual(1536, transformed.TransformedFeatures[0].Coordinates[1].Y);
                             
-            Assert.AreEqual((uint)887, transformed.TransformedFeatures[2].X);
-            Assert.AreEqual((uint)1594, transformed.TransformedFeatures[2].Y);
+            Assert.AreEqual(887, transformed.TransformedFeatures[0].Coordinates[2].X);
+            Assert.AreEqual(1594, transformed.TransformedFeatures[0].Coordinates[2].Y);
                             
-            Assert.AreEqual((uint)807, transformed.TransformedFeatures[3].X);
-            Assert.AreEqual((uint)1594, transformed.TransformedFeatures[3].Y);
+            Assert.AreEqual(807, transformed.TransformedFeatures[0].Coordinates[3].X);
+            Assert.AreEqual(1594, transformed.TransformedFeatures[0].Coordinates[3].Y);
                             
-            Assert.AreEqual((uint)807, transformed.TransformedFeatures[4].X);
-            Assert.AreEqual((uint)1536, transformed.TransformedFeatures[4].Y);
+            Assert.AreEqual(807, transformed.TransformedFeatures[0].Coordinates[4].X);
+            Assert.AreEqual(1536, transformed.TransformedFeatures[0].Coordinates[4].Y);
                             
-            Assert.AreEqual((uint)840, transformed.TransformedFeatures[5].X);
-            Assert.AreEqual((uint)1536, transformed.TransformedFeatures[5].Y);
+            Assert.AreEqual(840, transformed.TransformedFeatures[0].Coordinates[5].X);
+            Assert.AreEqual(1536, transformed.TransformedFeatures[0].Coordinates[5].Y);
         }
 
         [TestMethod]
@@ -50,12 +50,14 @@ namespace TileFactory.Tests
 
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
-
+            
             var raw = new MockRawCacheStorage();
+            var generator = new Generator(raw, context);
             var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetriever(transformed, raw, context);
+            var retriever = new TileRetriever(transformed, context, generator);
 
             var tile = retriever.GetTile(0, 0, 0);
+            Assert.IsNotNull(tile);
         }
     }
 }

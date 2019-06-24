@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TileFactory.Interfaces;
 using TileFactory.Tests.Utility;
 using TileFactory.Utility;
 
@@ -12,7 +13,7 @@ namespace TileFactory.Tests
     [DeploymentItem(@"Data\", @"Data\")]
     public abstract class ATest
     {
-        private IServiceCollection Registrations;
+        protected IServiceCollection Registrations;
         protected ServiceProvider Container;
 
         [TestInitialize]
@@ -20,6 +21,7 @@ namespace TileFactory.Tests
         {
             Registrations = new ServiceCollection();
             Registrations.AddSingleton<IConfigurationStrategy>(new ConfigurationStrategy());
+            Registrations.AddSingleton<MockContextRepository>(new MockContextRepository());
 
             // This processing factory needs a delegate that will dictate //
             // a process to instantiate a processing item foreach individual //
@@ -27,8 +29,6 @@ namespace TileFactory.Tests
             Registrations.AddSingleton<ProjectionProcessingFactory>(
                 new ProjectionProcessingFactory(
                     (geoItem)=> new WebMercatorProcessor(geoItem)));
-
-            Registrations.AddSingleton<MockContextRepository>(new MockContextRepository());
 
             Container = Registrations.BuildServiceProvider();
         }

@@ -43,6 +43,11 @@ namespace TileFactory.Tests.Mocks
             tiles.AddOrUpdate(id, tile, (currentId, currentTile) => currentTile = tile);
         }
 
+        public void Clear()
+        {
+            tiles.Clear();
+        }
+
         #endregion
     }
 }

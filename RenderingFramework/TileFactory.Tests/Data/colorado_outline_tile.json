@@ -4,7 +4,7 @@
     {
       "$type": "TileFactory.Feature, TileFactory",
       "id": null,
-      "type": 4,
+      "type": 3,
       "geometry": [
         [
           {

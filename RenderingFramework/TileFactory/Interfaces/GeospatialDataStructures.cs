@@ -20,14 +20,19 @@ namespace TileFactory.Interfaces
     /// </summary>
     public enum GeometryType
     {
-        Point = 0,
-        MultiPoint = 1,
+        // These first four (i.e. Unknown, Point, Linestring, Polygon) //
+        // follow the Vector Tile Spec ProtoBuf object//
+        // https://github.com/mapbox/vector-tile-spec/blob/master/2.1/vector_tile.proto
+        Unknown = 0,
+        Point = 1,
         LineString = 2,
-        MultiLineString = 3,
-        Polygon = 4,
-        MultiPolygon = 5,
-        GeometryCollection = 6,
-        Feature = 7,
-        FeatureCollection = 8
+        Polygon = 3,
+
+        MultiPoint = 4,
+        MultiLineString = 5,
+        MultiPolygon = 6,
+        GeometryCollection = 7,
+        Feature = 8,
+        FeatureCollection = 9
     }
 }

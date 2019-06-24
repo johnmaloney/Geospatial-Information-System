@@ -7,15 +7,28 @@ namespace TileFactory.Transforms
 {
     public class TransformedTile : ITransformedTile
     {
-        public (uint X, uint Y)[] TransformedFeatures
+        public IList<ITransformedFeature> TransformedFeatures
         {
             get;
             private set;
         }
 
-        public TransformedTile((uint X, uint Y)[] transformedFeatures)
+        public TransformedTile(IList<ITransformedFeature> transformedFeatures)
         {
             this.TransformedFeatures = transformedFeatures;
+        }
+    }
+
+    public class TransformedFeature : ITransformedFeature
+    {
+        public (int X, int Y)[] Coordinates { get; set; }
+
+        public int GeometryType { get; private set; }
+
+        public TransformedFeature(int geometryType, (int X, int Y)[] features)
+        {
+            Coordinates = features;
+            GeometryType = geometryType;
         }
     }
 }

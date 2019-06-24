@@ -3,11 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using TileFactory.Interfaces;
-using TileFactory.Tests.Utility;
 
-namespace TileFactory.Tests.Mocks
+namespace TileFactory.Models
 {
-    public class MockRawCacheStorage : ITileCacheStorage<ITile>
+    public class SimpleTileCacheStorage : ITileCacheStorage<ITile>
     {
         #region Fields
 
@@ -23,7 +22,7 @@ namespace TileFactory.Tests.Mocks
 
         #region Methods
 
-        public MockRawCacheStorage()
+        public SimpleTileCacheStorage()
         {
 
         }
@@ -39,7 +38,7 @@ namespace TileFactory.Tests.Mocks
         public void StoreBy(int id, ITile tile)
         {
             //var carbon = tile.CarbonCopy(); 
-            tiles.AddOrUpdate(id, tile, (currentId, currentTile) => currentTile = tile );
+            tiles.AddOrUpdate(id, tile, (currentId, currentTile) => currentTile = tile);
         }
 
         public void Clear()

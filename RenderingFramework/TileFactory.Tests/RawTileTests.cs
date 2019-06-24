@@ -27,9 +27,8 @@ namespace TileFactory.Tests
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
 
-            var raw  = new MockRawCacheStorage();
-            var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetriever(transformed, raw, context);
+            var raw = new MockRawCacheStorage();
+            var generator = new Generator(raw, context);
 
             var tile = raw.GetBy(0);
             Assert.AreEqual(0d, tile.X);
@@ -49,12 +48,11 @@ namespace TileFactory.Tests
             context.TileFeatures = coloradoFeature;
 
             var raw = new MockRawCacheStorage();
-            var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetriever(transformed, raw, context);
+            var generator = new Generator(raw, context);
 
-            retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 0, x: 0, y: 0, currentZoom: 1, currentX: 0, currentY: 0);
-            retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 1, x: 0, y: 0, currentZoom: 2, currentX: 0, currentY: 1);
-            retriever.SplitTile(context.TileFeatures.ToArray(), zoom: 2, x: 0, y: 1, currentZoom: 3, currentX: 1, currentY: 3);
+            generator.SplitTile(context.TileFeatures.ToArray(), zoom: 0, x: 0, y: 0, currentZoom: 1, currentX: 0, currentY: 0);
+            generator.SplitTile(context.TileFeatures.ToArray(), zoom: 1, x: 0, y: 0, currentZoom: 2, currentX: 0, currentY: 1);
+            generator.SplitTile(context.TileFeatures.ToArray(), zoom: 2, x: 0, y: 1, currentZoom: 3, currentX: 1, currentY: 3);
             var tile = raw.GetBy(0);
             Assert.AreEqual(0d, tile.X);
             Assert.AreEqual(0d, tile.Y);
@@ -72,12 +70,13 @@ namespace TileFactory.Tests
 
             context.TileFeatures = multiLinestring;
             var raw = new MockRawCacheStorage();
+            var generator = new Generator(raw, context);
             var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetriever(transformed, raw, context);
+            var retriever = new TileRetriever(transformed, context, generator);
 
-            retriever.SplitTile(multiLinestring, zoom: 0, x: 0, y: 0, currentZoom: 0, currentX: 0, currentY: 0);
+            generator.SplitTile(multiLinestring, zoom: 0, x: 0, y: 0, currentZoom: 0, currentX: 0, currentY: 0);
             var tile = retriever.GetTile(0, 0, 0);
-            Assert.AreEqual(4, tile.TransformedFeatures.Count());
+            Assert.AreEqual(2, tile.TransformedFeatures.Count());
         }
 
         [TestMethod]
@@ -93,9 +92,8 @@ namespace TileFactory.Tests
             var ring = Container.GetService<IConfigurationStrategy>().FromInto<List<(double X, double Y, double Z)>>(ringJSON);
 
             var raw = new MockRawCacheStorage();
-            var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetriever(transformed, raw, new MockTileContext());
-            retriever.Rewind(ring, true);
+            var generator = new Generator(raw, new MockTileContext());
+            generator.Rewind(ring, true);
 
             Assert.AreEqual(0.20502623888888888d, ring[0].X);
             Assert.AreEqual(0.37493483177750853d, ring[0].Y);

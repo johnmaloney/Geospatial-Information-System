@@ -8,7 +8,8 @@ namespace TileFactory.Models
     /// <summary>
     ///
     /// </summary>
-    public class DynamicTile : ITile
+    [Serializable]
+    public class GeoTile : ITile
     {
         #region Fields
 
