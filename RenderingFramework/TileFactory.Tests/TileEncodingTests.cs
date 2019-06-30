@@ -16,24 +16,26 @@ namespace TileFactory.Tests
     public class TileEncodingTests : ATest
     {
         [TestMethod]
-        [Description("")]
-        public void using_the_transformed_tile_generate_commands_expect_encoded_values()
+        [Description("Encoding the Geometry of a Tile")]
+        public void using_the_transformed_tile_generate_the_encoded_collection_of_data()
         {
             // the goal of this test is to take a TransformedTile, which is the coordinates of a geometry feature //
             // and turn it into a group of Commands with parameters. //
             var tile = Container.GetService<IConfigurationStrategy>().Into<TransformedTile>("transformed_tile");
 
-            for (int i = 0; i <= tile.TransformedFeatures.Count; i++)
+            for (int i = 0; i < tile.TransformedFeatures.Count; i++)
             {
-                var commands = new List<CommandData>();
+                var singleFeatureCommands = new List<CommandData>();
                 var features = tile.TransformedFeatures[i];
 
                 // The first item is a specific type //
                 var firstFeature = features.Coordinates[0];
-                var firstCmd = new CommandData(CommandType.MoveTo, 1);
-                firstCmd[0] = new ParameterData(firstFeature.X);
-                firstCmd[1] = new ParameterData(firstFeature.Y);
-                commands.Add(firstCmd);
+
+                // This is the typical opening command so it only has a Count of 1 //
+                var firstCmd = new CommandData(CommandType.MoveTo, 1, 
+                    new ParameterData(firstFeature.X),
+                    new ParameterData(firstFeature.Y));
+                singleFeatureCommands.Add(firstCmd);
 
                 // store the parameters based on the first and last not in the count //
                 var parameters = new List<ParameterData>();
@@ -46,17 +48,26 @@ namespace TileFactory.Tests
                     parameters.Add(new ParameterData(feature.Y));
                 }
 
-                var midCmd = new CommandData(CommandType.LineTo, parameters.Count /2);
-                for (int k = 0; k < parameters.Count; k++)
-                {
-                    midCmd[k] = parameters[k];
-                }
-                commands.Add(midCmd);
+                var midCmd = new CommandData(CommandType.LineTo, parameters.Count /2, parameters.ToArray());
+                singleFeatureCommands.Add(midCmd);
 
                 var lastFeature = features.Coordinates[features.Coordinates.Length-1];
                 var closeCmd = new CommandData(CommandType.ClosePath, 1);
-                commands.Add(closeCmd);
-            }
+                singleFeatureCommands.Add(closeCmd);
+
+                var countOfValues = singleFeatureCommands.Sum(c => c.EncodedValue.Length);
+                var featureEncoded = new int[countOfValues];
+                int featureCursor = 0;
+                foreach(var encodedCmd in singleFeatureCommands)
+                {
+                    for (int k = 0; k < encodedCmd.EncodedValue.Length; k++)
+                    {
+                        featureEncoded[featureCursor] = encodedCmd.EncodedValue[k];
+                       ++featureCursor;
+                    }
+                }
+                Assert.IsTrue(featureEncoded.All(f => f > 0));
+            }            
         }       
     }
 }

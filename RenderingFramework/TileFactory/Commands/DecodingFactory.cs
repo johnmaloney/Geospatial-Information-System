@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TileFactory
+namespace TileFactory.Commands
 {
     /// <summary>
     /// Should take the encoded value for a 
     /// </summary>
-    public class CommandFactory
+    public class DecodingFactory
     {
         #region Fields
 
@@ -26,7 +26,7 @@ namespace TileFactory
         /// Given an array of unsigned integers
         /// </summary>
         /// <param name="data"></param>
-        public CommandFactory(uint[] data)
+        public DecodingFactory(uint[] data)
         {
             this.commandDataSource = data;
         }

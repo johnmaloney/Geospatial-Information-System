@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
 using TileFactory;
+using TileFactory.Commands;
 
 namespace TileFactory.Tests
 {
@@ -36,7 +37,7 @@ namespace TileFactory.Tests
             //  | ===== relative MoveTo(+25, +17) == create point(25,17)
             //  `> [00001 001] = command id 1 (MoveTo), command count 1
 
-            var commandFactory = new CommandFactory(new uint[] { 9, 50, 34 });
+            var commandFactory = new DecodingFactory(new uint[] { 9, 50, 34 });
             var commands = commandFactory.Process();
 
             Assert.AreEqual(1, commands.Count());
@@ -57,7 +58,7 @@ namespace TileFactory.Tests
             //   |  `> Decoded: ((50 >> 1) ^ (-(50 & 1))) = +5
             //   | ===== relative MoveTo(+5, +7) == create point(5,7)
             //   `> [00010 001] = command id 1 (MoveTo), command count 2
-            var commandFactory = new CommandFactory(new uint[] { 17, 10, 14, 3, 9 });
+            var commandFactory = new DecodingFactory(new uint[] { 17, 10, 14, 3, 9 });
             var commands = commandFactory.Process();
 
             Assert.AreEqual(1, commands.Count());
@@ -78,7 +79,7 @@ namespace TileFactory.Tests
             //  |      `> [00010 010] = command id 2 (LineTo), command count 2
             //  | === relative MoveTo(+2, +2)
             //  `> [00001 001] = command id 1 (MoveTo), command count 1
-            var commandFactory = new CommandFactory(new uint[] { 9, 4, 4, 18, 0, 16, 16, 0 });
+            var commandFactory = new DecodingFactory(new uint[] { 9, 4, 4, 18, 0, 16, 16, 0 });
             var commands = commandFactory.Process();
 
             Assert.AreEqual(2, commands.Count());
@@ -111,7 +112,7 @@ namespace TileFactory.Tests
             //  |      `> [00010 010] = command id 2 (LineTo), command count 2
             //  | === relative MoveTo(+2, +2)
             //  `> [00001 001] = command id 1 (MoveTo), command count 1
-            var commandFactory = new CommandFactory(new uint[] { 9, 4, 4, 18, 0, 16, 16, 0, 9, 17, 17, 10, 4, 8 });
+            var commandFactory = new DecodingFactory(new uint[] { 9, 4, 4, 18, 0, 16, 16, 0, 9, 17, 17, 10, 4, 8 });
             var commands = commandFactory.Process();
 
             Assert.AreEqual(4, commands.Count());
@@ -152,7 +153,7 @@ namespace TileFactory.Tests
             //  | ==== relative MoveTo(+3, +6)
             //  `> [00001 001] = command id 1 (MoveTo), command count 1
 
-            var commandFactory = new CommandFactory(new uint[] { 9, 6, 12, 18, 10, 12, 24, 44, 15 });
+            var commandFactory = new DecodingFactory(new uint[] { 9, 6, 12, 18, 10, 12, 24, 44, 15 });
             var commands = commandFactory.Process();
 
             Assert.AreEqual(3, commands.Count());
@@ -195,7 +196,7 @@ namespace TileFactory.Tests
             //  |      `> [00011 010] = (LineTo), command count 3
             //  `> [00001 001] = command id 1 (MoveTo), command count 1
 
-            var commandFactory = new CommandFactory(new uint[] { 9,0,0,26,20,0,0,20,19,0,15,9,22,2,26,18,0,0,18,17,0,15,9,4,13,26,0,8,8,0,0,7,15 });
+            var commandFactory = new DecodingFactory(new uint[] { 9,0,0,26,20,0,0,20,19,0,15,9,22,2,26,18,0,0,18,17,0,15,9,4,13,26,0,8,8,0,0,7,15 });
             var commands = commandFactory.Process();
 
             Assert.AreEqual(9, commands.Count());

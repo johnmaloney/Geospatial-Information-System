@@ -72,7 +72,27 @@ namespace TileFactory
             }
         }
 
-        public int EncodedValue { get { return ((int)Command & 0x7) | (CommandTotal << 3); } }
+        public int[] EncodedValue
+        {
+            get
+            {
+                // Take this command type as the first value //
+                // Total count is command total * the parameters per command type //
+                var totalParameters = (ParameterPerCommand * CommandTotal);
+                var encodedValues = new int[totalParameters + 1];
+
+                // The command ID and COUNT aka CommandInteger //
+                // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#431-command-integers
+                encodedValues[0] = ((int)Command & 0x7) | (CommandTotal << 3);
+
+                // Encode the ParameterDate //
+                for (int i = 1; i <= totalParameters; i++)
+                {
+                    encodedValues[i] = this[i - 1].EncodedValue;
+                }
+                return encodedValues;
+            }
+        }
 
         #endregion
 
@@ -95,12 +115,15 @@ namespace TileFactory
         /// </summary>
         /// <param name="command"></param>
         /// <param name="parameterCount"></param>
-        public CommandData(CommandType command, int commandCount = 0)
+        public CommandData(CommandType command, int commandCount, params ParameterData[] parameters)
         {
             Command = command;
             CommandTotal = commandCount;
+            parameterData = parameters;
 
-            parameterData = new ParameterData[parametersPerCommand[Command] * this.CommandTotal];
+            // The count of parameters must be equal to the command count / command type's parameter count //
+            if (parameters.Length != ParameterCount)
+                throw new NotSupportedException($"The number of parameters we incorrect:{parameters.Length}. The parameters must be equal {ParameterCount} for Command type {Command.ToString()}");
         }
 
         #endregion
