@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
@@ -53,7 +54,12 @@ namespace Universal.Contracts.Serial
                 args.ErrorContext.Handled = true;
             };
 
-            return JsonConvert.SerializeObject(objectToSerialize, jsonSettings);
+            return 
+                JsonConvert.SerializeObject(objectToSerialize, jsonSettings);
+        }
+        public static T FromJsonInto<T>(this string jsonData) where T : class
+        {
+            return jsonData.DeserializeJson<T>();
         }
     }
 }
