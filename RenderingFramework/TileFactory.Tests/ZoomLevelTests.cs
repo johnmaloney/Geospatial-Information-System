@@ -9,41 +9,31 @@ using TileFactory.Utility;
 using TileFactory.Transforms;
 using TileFactory.Tests.Mocks;
 using TileFactory.Interfaces;
+using Microsoft.Extensions.FileProviders;
 
 namespace TileFactory.Tests
 {
     [TestClass]
-    public class ZoomLevelTests
+    public class ZoomLevelTests : ATest
     { 
         private static MockTileContext TileContext;
-        private static IServiceCollection Registrations;
-        private static ServiceProvider Services;
-        private static ITileCacheStorage<ITransformedTile> TransformedCache;
-        private static ITileCacheStorage<ITile> RawCache;
+        private static ITileCacheStorage<ITransformedTile> TransformedCache = new MockTransformedCacheStorage();
+        private static ITileCacheStorage<ITile> RawCache = new MockRawCacheStorage();
 
-        [ClassInitialize]
-        public static void ClassInit(TestContext context)
+        public ZoomLevelTests()
         {
-            Registrations = new ServiceCollection();
-            Registrations.AddSingleton<MockContextRepository>(new MockContextRepository());
-            Registrations.AddSingleton<IConfigurationStrategy>(new ConfigurationStrategy());
-            Services = Registrations.BuildServiceProvider();
-
             // Setup the singleton objects to replicate a server // 
-            Services.GetService<MockContextRepository>().TryGetAs("base", out TileContext);
-            var coloradoFeature = Services.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
+            Container.GetService<MockContextRepository>().TryGetAs("base", out TileContext);
+            var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             TileContext.TileFeatures = coloradoFeature;
-
-            RawCache = new MockRawCacheStorage();
-            TransformedCache = new MockTransformedCacheStorage();
         }
 
         [TestMethod]
         public void at_zoom_ZERO_level_expect_proper_extent_coodinates()
         {
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
-
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            
             var transformed = retriever.GetTile(0, 0, 0);
 
             // These values represent the screen conversion from web mercator //
@@ -72,8 +62,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
             var transformed = retriever.GetTile(1, 0, 0);
 
@@ -103,8 +93,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
             var transformed = retriever.GetTile(2, 0, 1);
 
@@ -134,8 +124,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = retriever.GetTile(3, 1, 3);
 
             // These values represent the screen conversion from web mercator //
@@ -164,8 +154,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
             var transformed = retriever.GetTile(4, 3, 6);
 
@@ -198,8 +188,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = retriever.GetTile(5, 6, 12);
 
             // These values represent the screen conversion from web mercator //
@@ -243,8 +233,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = retriever.GetTile(6,13,24);
 
             // These values represent the screen conversion from web mercator //
@@ -291,8 +281,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = retriever.GetTile(7, 26, 48);
 
             // These values represent the screen conversion from web mercator //
@@ -330,8 +320,8 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(RawCache, TileContext);
-            var retriever = new TileRetriever(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = retriever.GetTile(2, 3, 1);
             transformed = retriever.GetTile(2, 0, 1);
             transformed = retriever.GetTile(2, 1, 1);

@@ -73,6 +73,8 @@ namespace TileFactory.DataPipeline
             }
         }
 
+        public string Identifier { get; set; }
+
         public IEnumerable<TileFactory.Feature> TileFeatures { get; set; }
     }
 }

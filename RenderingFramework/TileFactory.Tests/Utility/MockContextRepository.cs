@@ -29,7 +29,8 @@ namespace TileFactory.Tests.Utility
                 MaxZoom = 14,
                 Buffer = 64,
                 Extent = 4096,
-                Tolerance = 3
+                Tolerance = 3, 
+                Identifier = "colorado_outline_projected.json"
             };
 
             serialContexts = new ConcurrentDictionary<string, string>();

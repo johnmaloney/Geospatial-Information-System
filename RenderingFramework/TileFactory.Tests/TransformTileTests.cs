@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using TileFactory.Utility;
 using TileFactory.Transforms;
 using TileFactory.Tests.Mocks;
+using Microsoft.Extensions.FileProviders;
 
 namespace TileFactory.Tests
 {
@@ -15,7 +16,7 @@ namespace TileFactory.Tests
     public class TransformTileTests : ATest
     {
         [TestMethod]
-        public void given_projd_tile_transform_expect_converted_points()
+        public void given_projected_tile_transform_expect_converted_points()
         {
             var tile = Container.GetService<IConfigurationStrategy>().Into<GeoTile>("colorado_outline_tile");
 
@@ -52,9 +53,11 @@ namespace TileFactory.Tests
             context.TileFeatures = coloradoFeature;
             
             var raw = new MockRawCacheStorage();
-            var generator = new Generator(raw, context);
+            var generator = new Generator(context, raw, 
+                new TileInitializationService(Container.GetService<IFileProvider>()));
+
             var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetriever(transformed, context, generator);
+            var retriever = new TileRetrieverService(transformed, context, generator);
 
             var tile = retriever.GetTile(0, 0, 0);
             Assert.IsNotNull(tile);

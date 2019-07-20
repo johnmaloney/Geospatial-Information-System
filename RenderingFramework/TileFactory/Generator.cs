@@ -24,7 +24,7 @@ namespace TileFactory
 
         #region Methods
 
-        public Generator(ITileCacheStorage<ITile> rawCache, ITileContext context)
+        public Generator(ITileContext context, ITileCacheStorage<ITile> rawCache, TileInitializationService initService)
         {
             this.rawCache = rawCache;
             this.tileContext = context;
@@ -33,12 +33,14 @@ namespace TileFactory
             if (tileContext == null)
                 throw new NotSupportedException("The TileContext must have a value.");
 
-            if (tileContext.TileFeatures != null)
+            if (tileContext.TileFeatures == null)
             {
-                // This is only called at the beginning //
-                var initialTile = SplitTile(tileContext.TileFeatures.ToArray(),
-                    zoom: 0, x: 0, y: 0, currentZoom: null, currentX: null, currentY: null);
+                tileContext.TileFeatures = initService.InitializeTile(tileContext.Identifier);
             }
+
+            // This is only called at the beginning //
+            var initialTile = SplitTile(tileContext.TileFeatures.ToArray(),
+                zoom: 0, x: 0, y: 0, currentZoom: null, currentX: null, currentY: null);
         }
 
         public ITile GenerateTile(int zoomLevel = 0, double x = 0, double y = 0)

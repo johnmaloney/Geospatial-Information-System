@@ -1,6 +1,7 @@
-﻿using Google.Protobuf.Collections;
+﻿using Google.Protobuf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using TileFactory.Commands;
 using TileFactory.Interfaces;
@@ -33,6 +34,7 @@ namespace TileFactory.Serialization
         {
             var pbfTile = new TileFactory.Serialization.Tile();
             var pbfLayer = new Serialization.Tile.Types.Layer();
+            pbfLayer.Name = "Layer1";
             pbfLayer.Extent = (uint)context.Extent;
             pbfLayer.Version = 2;
 
@@ -40,7 +42,8 @@ namespace TileFactory.Serialization
             {
                 var layerFeature = new Serialization.Tile.Types.Feature()
                 {
-                    Id = (ulong)new Random(0).Next()
+                    Id = (ulong)new Random(0).Next(), 
+                    Type = Tile.Types.GeomType.Polygon, 
                 };
 
                 layerFeature.Geometry.AddRange(encodingFactory.BuildEncodedGeometry(feature));
@@ -49,11 +52,18 @@ namespace TileFactory.Serialization
             }
             pbfTile.Layers.Add(pbfLayer);
             vectorTile = pbfTile;
+
+            return true;
         }
 
         public string SerializeTile()
         {
-            vectorTile.WriteTo()
+            using (var output = File.Create(@"C:\\temp\tile.pbf"))
+            {
+                vectorTile.WriteTo(output);
+            }
+
+            return string.Empty;                
         }
 
         #endregion

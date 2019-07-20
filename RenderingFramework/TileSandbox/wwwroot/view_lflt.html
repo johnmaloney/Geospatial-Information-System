@@ -23,17 +23,15 @@
     <script>
         var map = L.map('mapid');
 
-        var mapboxUrl = "https://localhost:44379/v1/tiles/{z}/{x}/{y}.vector.pbf?access_token={token}";
+        var mapboxUrl = "https://localhost:44379/v1/tiles/sample/{z}/{x}/{y}.vector.pbf?access_token={token}";
 
         var mapboxVectorTileOptions = {
             rendererFactory: L.canvas.tile,
             token: 'pk.eyJ1IjoiaXZhbnNhbmNoZXoiLCJhIjoiY2l6ZTJmd3FnMDA0dzMzbzFtaW10cXh2MSJ9.VsWCS9-EAX4_4W1K-nXnsA'
         };
-
-
+        
         var mapboxPbfLayer = L.vectorGrid.protobuf(mapboxUrl, mapboxVectorTileOptions);
-
-
+        
         map.setView({ lat: 47.040182144806664, lng: 9.667968750000002 }, 0);
 
         L.control.layers({

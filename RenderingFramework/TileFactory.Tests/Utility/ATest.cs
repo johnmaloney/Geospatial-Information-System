@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Tests.Utility;
@@ -30,6 +32,9 @@ namespace TileFactory.Tests
                 new ProjectionProcessingFactory(
                     (geoItem)=> new WebMercatorProcessor(geoItem)));
 
+            var currentDirectory = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            Registrations.AddSingleton<IFileProvider>(new PhysicalFileProvider(
+                Path.Combine(Directory.GetCurrentDirectory(), "data/tiles")));
             Container = Registrations.BuildServiceProvider();
         }
     }

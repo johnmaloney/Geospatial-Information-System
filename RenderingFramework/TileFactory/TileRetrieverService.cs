@@ -10,7 +10,13 @@ using TileFactory.Utility;
 
 namespace TileFactory
 {
-    public class TileRetriever
+    /// <summary>
+    /// Service that brings together the many disparate items needed
+    /// to initialize and retrieve a tile. This is a service and therefore 
+    /// should act as a broker only to the workers that know the initialization 
+    /// and retrieval processes.
+    /// </summary>
+    public class TileRetrieverService
     {
         #region Fields
 
@@ -26,7 +32,7 @@ namespace TileFactory
 
         #region Methods
 
-        public TileRetriever(ITileCacheStorage<ITransformedTile> transformedCache, 
+        public TileRetrieverService(ITileCacheStorage<ITransformedTile> transformedCache, 
             ITileContext context, Generator tileGenerator)
         {
             this.transformedCache = transformedCache;
@@ -47,7 +53,10 @@ namespace TileFactory
             var transformedTile = transformedCache.GetBy(id);
             if (transformedTile != null)
                 return transformedTile;
-                        
+            
+            // This scenario means that this could be an initialization request //
+            // Need to handle this by initializing the tiles into memory //
+
             var geoTile = tileGenerator.GenerateTile(zoomLevel, xDenom, y);
 
             if (geoTile == null)
