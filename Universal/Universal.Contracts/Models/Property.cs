@@ -22,7 +22,15 @@ namespace Universal.Contracts.Models
 
         #region Methods
 
-
+        public T GetValueAs<T>()
+        {
+            // Next ensure that the type of T is the same as the Property Type assigned //
+            if (ValueType == typeof(T))
+            {
+                return (T)Value;
+            }
+            return default(T);
+        }
 
         #endregion
     }

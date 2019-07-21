@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Universal.Contracts.Models
@@ -23,7 +24,17 @@ namespace Universal.Contracts.Models
 
         #region Methods
 
+        public T GetPropertyValueAs<T>(string name)
+        {
+            // First check the properties to ensure that one of them meet the criteria //
+            if (this.Properties != null && Properties.Any(p => p.Name.ToLowerInvariant() == name.ToLowerInvariant()))
+            {
+                var property = Properties.First(p => p.Name.ToLowerInvariant() == name.ToLowerInvariant());
+                return property.GetValueAs<T>();
+            }
 
+            return default(T);
+        }
 
         #endregion
     }
