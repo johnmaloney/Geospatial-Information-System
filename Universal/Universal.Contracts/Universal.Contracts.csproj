@@ -7,7 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Messaging\" />
+    <Compile Remove="Messaging\**" />
+    <EmbeddedResource Remove="Messaging\**" />
+    <None Remove="Messaging\**" />
   </ItemGroup>
 
   <ItemGroup>
