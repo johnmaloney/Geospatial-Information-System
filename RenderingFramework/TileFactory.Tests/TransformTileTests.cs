@@ -48,10 +48,7 @@ namespace TileFactory.Tests
         public void given_projected_outline_retrieve_points_transformed()
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
-
-            var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
-            context.TileFeatures = coloradoFeature;
-            
+                        
             var raw = new MockRawCacheStorage();
             var generator = new Generator(context, raw, 
                 new TileInitializationService(Container.GetService<IFileProvider>()));

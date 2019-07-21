@@ -21,7 +21,7 @@ namespace TileFactory.Interfaces
     {
         string Id { get; set; }
 
-        Dictionary<string, object> Tags { get; set; }
+        IDictionary<string, object> Tags { get; set; }
     }
 
 }

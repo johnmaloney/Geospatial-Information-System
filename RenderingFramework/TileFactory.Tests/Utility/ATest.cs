@@ -34,7 +34,7 @@ namespace TileFactory.Tests
 
             var currentDirectory = System.Reflection.Assembly.GetExecutingAssembly().Location;
             Registrations.AddSingleton<IFileProvider>(new PhysicalFileProvider(
-                Path.Combine(Directory.GetCurrentDirectory(), "data/tiles")));
+                Path.Combine(Directory.GetCurrentDirectory(), "data")));
             Container = Registrations.BuildServiceProvider();
         }
     }

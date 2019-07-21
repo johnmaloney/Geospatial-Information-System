@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Universal.Contracts.Serial;
 
 namespace TileFactory
 {
@@ -53,13 +54,12 @@ namespace TileFactory
             {
                 var regex = new Regex(@"\.[A-Za-z0-9]+$");
                 var match = regex.Match(identifier);
-                switch (match.Result)
+                switch (match.Value)
                 {
                     case ".json":
                         {
                             var json = GetText(files[identifier]);
-                            return json.DeserializeJson()
-                            break;
+                            return json.FromJsonInto<List<Feature>>();
                         }
                     default:
                         break;
@@ -69,9 +69,14 @@ namespace TileFactory
             return null;
         }
 
-        private async Task<string> GetText(string filePath)
+        private string GetText(string filePath)
         {
-            return await File.ReadAllTextAsync(filePath);
+            string fileText = string.Empty;
+            lock(fileLock)
+            {
+                fileText = File.ReadAllText(filePath);
+            }
+            return fileText;
         }
 
         #endregion

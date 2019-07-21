@@ -21,6 +21,7 @@ namespace TileServerSandbox.Controllers
         // GET api/values/5
         [HttpGet("{layerId}/{z}/{x}/{y}.{fileExtension}.{fileSerializer?}")]
         [EnableCors]
+
         public async Task<IActionResult> Get(string layerId, int z, int x, int y, string fileExtension, string fileSerializer, [FromQuery(Name="access_token")]string accessToken)
         {
             var tile = generator.GenerateTile(z, x, y);

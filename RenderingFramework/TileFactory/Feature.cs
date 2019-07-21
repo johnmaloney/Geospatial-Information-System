@@ -32,7 +32,7 @@ namespace TileFactory
             }
         }
 
-        public Dictionary<string, object> Tags { get; set; }
+        public IDictionary<string, object> Tags { get; set; }
 
         public (double X, double Y, double Z) MaxGeometry { get; private set; }
 
