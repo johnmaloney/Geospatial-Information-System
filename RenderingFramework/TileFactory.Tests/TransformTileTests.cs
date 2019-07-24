@@ -9,6 +9,7 @@ using TileFactory.Utility;
 using TileFactory.Transforms;
 using TileFactory.Tests.Mocks;
 using Microsoft.Extensions.FileProviders;
+using System.Threading.Tasks;
 
 namespace TileFactory.Tests
 {
@@ -45,18 +46,18 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void given_projected_outline_retrieve_points_transformed()
+        public async Task given_projected_outline_retrieve_points_transformed()
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
                         
             var raw = new MockRawCacheStorage();
             var generator = new Generator(context, raw, 
-                new TileInitializationService(Container.GetService<IFileProvider>()));
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
 
             var transformed = new MockTransformedCacheStorage();
             var retriever = new TileRetrieverService(transformed, context, generator);
 
-            var tile = retriever.GetTile(0, 0, 0);
+            var tile = await retriever.GetTile(0, 0, 0);
             Assert.IsNotNull(tile);
         }
     }

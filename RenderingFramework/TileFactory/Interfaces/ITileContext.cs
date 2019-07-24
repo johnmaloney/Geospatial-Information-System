@@ -7,7 +7,7 @@ namespace TileFactory.Interfaces
 {
     public interface ITileContext : IContext
     {
-        string Identifier { get; }
+        string Identifier { get; set; }
         IEnumerable<TileFactory.Feature> TileFeatures { get; set; }
     }
 }

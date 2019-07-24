@@ -10,6 +10,7 @@ using TileFactory.Transforms;
 using TileFactory.Tests.Mocks;
 using TileFactory.Interfaces;
 using Microsoft.Extensions.FileProviders;
+using System.Threading.Tasks;
 
 namespace TileFactory.Tests
 {
@@ -25,16 +26,16 @@ namespace TileFactory.Tests
             // Setup the singleton objects to replicate a server // 
             Container.GetService<MockContextRepository>().TryGetAs("base", out TileContext);
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
-            TileContext.TileFeatures = coloradoFeature;
+            TileContext.Identifier = "colorado_outline_projected";
         }
 
         [TestMethod]
-        public void at_zoom_ZERO_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_ZERO_level_expect_proper_extent_coodinates()
         {
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             
-            var transformed = retriever.GetTile(0, 0, 0);
+            var transformed = await retriever.GetTile(0, 0, 0);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -58,14 +59,14 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void at_zoom_ONE_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_ONE_level_expect_proper_extent_coodinates()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
-            var transformed = retriever.GetTile(1, 0, 0);
+            var transformed = await retriever.GetTile(1, 0, 0);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -89,14 +90,14 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void at_zoom_TWO_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_TWO_level_expect_proper_extent_coodinates()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
-            var transformed = retriever.GetTile(2, 0, 1);
+            var transformed = await retriever.GetTile(2, 0, 1);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -120,13 +121,13 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void at_zoom_THREE_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_THREE_level_expect_proper_extent_coodinates()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformed = retriever.GetTile(3, 1, 3);
+            var transformed = await retriever.GetTile(3, 1, 3);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -150,14 +151,14 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void at_zoom_FOUR_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_FOUR_level_expect_proper_extent_coodinates()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
-            var transformed = retriever.GetTile(4, 3, 6);
+            var transformed = await retriever.GetTile(4, 3, 6);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -184,13 +185,13 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void at_zoom_FIVE_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_FIVE_level_expect_proper_extent_coodinates()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformed = retriever.GetTile(5, 6, 12);
+            var transformed = await retriever.GetTile(5, 6, 12);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -229,13 +230,13 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void at_zoom_SIX_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_SIX_level_expect_proper_extent_coodinates()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformed = retriever.GetTile(6,13,24);
+            var transformed = await retriever.GetTile(6,13,24);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -277,13 +278,13 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void at_zoom_SEVEN_level_expect_proper_extent_coodinates()
+        public async Task at_zoom_SEVEN_level_expect_proper_extent_coodinates()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformed = retriever.GetTile(7, 26, 48);
+            var transformed = await retriever.GetTile(7, 26, 48);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -316,17 +317,18 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public void with_many_tiled_requests_ensure_the_cache_built()
+        public async Task with_many_tiled_requests_ensure_the_cache_built()
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new TileInitializationService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, 
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformed = retriever.GetTile(2, 3, 1);
-            transformed = retriever.GetTile(2, 0, 1);
-            transformed = retriever.GetTile(2, 1, 1);
-            transformed = retriever.GetTile(2, 2, 1);
-            transformed = retriever.GetTile(2, 2, 1);
+            var transformed = await retriever.GetTile(2, 3, 1);
+            transformed = await retriever.GetTile(2, 0, 1);
+            transformed = await retriever.GetTile(2, 1, 1);
+            transformed = await retriever.GetTile(2, 2, 1);
+            transformed = await retriever.GetTile(2, 2, 1);
 
         }
     }   

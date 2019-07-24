@@ -23,7 +23,7 @@
     <script>
         var map = L.map('mapid');
 
-        var mapboxUrl = "https://localhost:44379/v1/tiles/sample/{z}/{x}/{y}.vector.pbf?access_token={token}";
+        var mapboxUrl = "https://localhost:44379/v1/tiles/colorado_outline_projected/{z}/{x}/{y}.vector.pbf?access_token={token}";
 
         var mapboxVectorTileOptions = {
             rendererFactory: L.canvas.tile,
@@ -37,6 +37,12 @@
         L.control.layers({
             "MapBox Vector Tiles": mapboxPbfLayer
         }, {}, { collapsed: false }).addTo(map);
+
+        var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+        });
+
+        Esri_WorldImagery.addTo(map);
 
     </script>
 </body>

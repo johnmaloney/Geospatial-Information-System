@@ -6,11 +6,11 @@ using TileFactory.Interfaces;
 
 namespace TileFactory.Models
 {
-    public class SimpleTileCacheStorage : ITileCacheStorage<ITile>
+    public class SimpleTileCacheStorage<TTile> : ITileCacheStorage<TTile> where TTile : class
     {
         #region Fields
 
-        private ConcurrentDictionary<int, ITile> tiles = new ConcurrentDictionary<int, ITile>();
+        private ConcurrentDictionary<int, TTile> tiles = new ConcurrentDictionary<int, TTile>();
 
         #endregion
 
@@ -27,15 +27,15 @@ namespace TileFactory.Models
 
         }
 
-        public ITile GetBy(int id)
+        public TTile GetBy(int id)
         {
-            if (tiles.TryGetValue(id, out ITile tile))
+            if (tiles.TryGetValue(id, out TTile tile))
                 return tile;
 
             return null;
         }
 
-        public void StoreBy(int id, ITile tile)
+        public void StoreBy(int id, TTile tile)
         {
             //var carbon = tile.CarbonCopy(); 
             tiles.AddOrUpdate(id, tile, (currentId, currentTile) => currentTile = tile);

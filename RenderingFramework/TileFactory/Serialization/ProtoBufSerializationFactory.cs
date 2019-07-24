@@ -56,14 +56,12 @@ namespace TileFactory.Serialization
             return true;
         }
 
-        public string SerializeTile()
+        public Stream SerializeTile()
         {
-            using (var output = File.Create(@"C:\\temp\tile.pbf"))
-            {
-                vectorTile.WriteTo(output);
-            }
-
-            return string.Empty;                
+            var output = new MemoryStream();
+            vectorTile.WriteTo(output);
+            output.Position = 0;
+            return output;               
         }
 
         #endregion

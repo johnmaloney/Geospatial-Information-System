@@ -18,8 +18,7 @@ namespace TileFactory.Tests
         protected IServiceCollection Registrations;
         protected ServiceProvider Container;
 
-        [TestInitialize]
-        public void EachTestInitialization()
+        public ATest()
         {
             Registrations = new ServiceCollection();
             Registrations.AddSingleton<IConfigurationStrategy>(new ConfigurationStrategy());

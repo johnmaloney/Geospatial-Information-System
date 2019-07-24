@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using TileFactory;
 using TileFactory.Interfaces;
 using TileFactory.Models;
 
@@ -28,16 +29,23 @@ namespace TileServerSandbox
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<IFileProvider>(new PhysicalFileProvider(
-                Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/tiles")));
+            var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/layers"));
 
-            services.AddSingleton<ITileCacheStorage<ITile>>(new SimpleTileCacheStorage());
-            services.AddSingleton<ITileContext>(new SimpleTileContext()
+            services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider));
+
+            services.AddSingleton<IFileProvider>(fileProvider);
+
+            services.AddSingleton<ITileCacheStorage<ITile>>(new SimpleTileCacheStorage<ITile>());
+            services.AddSingleton<ITileCacheStorage<ITransformedTile>>(new SimpleTileCacheStorage<ITransformedTile>());
+            services.AddTransient<ITileContext>((sp)=>
             {
-                MaxZoom = 14,
-                Buffer = 64,
-                Extent = 4096,
-                Tolerance = 3
+                return new SimpleTileContext()
+                {
+                    MaxZoom = 14,
+                    Buffer = 64,
+                    Extent = 4096,
+                    Tolerance = 3
+                };
             });
        
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

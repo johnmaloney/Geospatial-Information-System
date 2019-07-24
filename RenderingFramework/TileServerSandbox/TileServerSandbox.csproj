@@ -5,8 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\data\" />
+    <Content Remove="wwwroot\layers\colorado_outline_projected.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="wwwroot\tiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\layers\colorado_outline_projected.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

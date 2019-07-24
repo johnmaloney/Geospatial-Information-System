@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using TileFactory;
 using TileFactory.Interfaces;
+using TileFactory.Serialization;
 
 namespace TileServerSandbox.Controllers
 {
@@ -15,32 +16,50 @@ namespace TileServerSandbox.Controllers
     [ApiController]
     public class TilesController : ControllerBase
     {
-        private readonly Generator generator;
+        private readonly TileRetrieverService tileRetrieverService;
+        private readonly ITileContext tileContext;
         private readonly IFileProvider files;
 
         // GET api/values/5
         [HttpGet("{layerId}/{z}/{x}/{y}.{fileExtension}.{fileSerializer?}")]
         [EnableCors]
-
         public async Task<IActionResult> Get(string layerId, int z, int x, int y, string fileExtension, string fileSerializer, [FromQuery(Name="access_token")]string accessToken)
         {
-            var tile = generator.GenerateTile(z, x, y);
+            tileContext.Identifier = layerId;
+            var tile = await tileRetrieverService.GetTile(z, x, y);
 
-            var path = files.GetFileInfo($"{layerId}.{fileExtension}.{fileSerializer}");
-            
+            var factory = new ProtoBufSerializationFactory();
+            factory.BuildFrom(tile, tileContext);
+
             var memStream = new MemoryStream();
-            using (var stream = new FileStream(path.PhysicalPath, FileMode.Open))
+            using (var serialStream = factory.SerializeTile())
             {
-                await stream.CopyToAsync(memStream);
+                await serialStream.CopyToAsync(memStream);
             }
             memStream.Position = 0;
-            return File(memStream, "application/octet-stream", Path.GetFileName(path.PhysicalPath));
+            return File(memStream, "application/octet-stream", "tile.pbf");
+
+            //var path = files.GetFileInfo($"{layerId}.{fileExtension}.{fileSerializer}");
+            
+            //var memStream = new MemoryStream();
+            //using (var stream = new FileStream(path.PhysicalPath, FileMode.Open))
+            //{
+            //    await stream.CopyToAsync(memStream);
+            //}
+            //memStream.Position = 0;
+            //return File(memStream, "application/octet-stream", "tile.pbf");
         }
 
-        public TilesController(ITileCacheStorage<ITile> tileCache, ITileContext tileContext, IFileProvider files)
+        public TilesController(ITileCacheStorage<ITile> tileCache, 
+            ITileCacheStorage<ITransformedTile> transformedCache, 
+            ITileContext tileContext, 
+            IFileProvider files)
         {
-            generator = new Generator(tileContext, tileCache, new TileInitializationService(files));
+            this.tileContext = tileContext;
             this.files = files;
+
+            var generator = new Generator(tileContext, tileCache, new LayerInitializationFileService(files));
+            tileRetrieverService = new TileRetrieverService(transformedCache, tileContext, generator);
         }
     }
 }

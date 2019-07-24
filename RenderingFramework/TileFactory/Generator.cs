@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using TileFactory.Interfaces;
 using TileFactory.Models;
 using TileFactory.Transforms;
@@ -16,6 +17,7 @@ namespace TileFactory
         private readonly ITileCacheStorage<ITile> rawCache;
         private readonly ITileContext tileContext;
         private readonly Transform transform;
+        public readonly ILayerInitializationService tileInitService;
 
         #endregion
 
@@ -24,27 +26,31 @@ namespace TileFactory
 
         #region Methods
 
-        public Generator(ITileContext context, ITileCacheStorage<ITile> rawCache, TileInitializationService initService)
+        public Generator(ITileContext context, 
+            ITileCacheStorage<ITile> rawCache, 
+            ILayerInitializationService initService)
         {
             this.rawCache = rawCache;
             this.tileContext = context;
             this.transform = new Transform(context.Extent, context.Buffer);
+            this.tileInitService = initService;
 
             if (tileContext == null)
                 throw new NotSupportedException("The TileContext must have a value.");
+        }
+
+        public async Task<ITile> GenerateTile(int zoomLevel = 0, double x = 0, double y = 0)
+        {
 
             if (tileContext.TileFeatures == null)
             {
-                tileContext.TileFeatures = initService.InitializeTile(tileContext.Identifier);
+                tileContext.TileFeatures = await tileInitService.InitializeLayer(tileContext.Identifier);
+
+                // This is only called at the beginning //
+                SplitTile(tileContext.TileFeatures.ToArray(),
+                    zoom: 0, x: 0, y: 0, currentZoom: null, currentX: null, currentY: null);
             }
 
-            // This is only called at the beginning //
-            var initialTile = SplitTile(tileContext.TileFeatures.ToArray(),
-                zoom: 0, x: 0, y: 0, currentZoom: null, currentX: null, currentY: null);
-        }
-
-        public ITile GenerateTile(int zoomLevel = 0, double x = 0, double y = 0)
-        {
             // x must be the reduced value from the squared version of the zoom //
             // verify that the caller used this algorithm: //
             var zoomSqr = 1 << zoomLevel;

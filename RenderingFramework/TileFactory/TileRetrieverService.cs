@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using TileFactory.Interfaces;
 using TileFactory.Models;
 using TileFactory.Transforms;
@@ -44,7 +45,7 @@ namespace TileFactory
                 throw new NotSupportedException("The TileContext must have a value.");            
         }
 
-        public ITransformedTile GetTile(int zoomLevel=0, double x=0, double y=0)
+        public async Task<ITransformedTile> GetTile(int zoomLevel=0, double x=0, double y=0)
         {
             var zoomSqr = 1 << zoomLevel;
             var xDenom = ((x % zoomSqr) + zoomSqr) % zoomSqr;
@@ -57,7 +58,7 @@ namespace TileFactory
             // This scenario means that this could be an initialization request //
             // Need to handle this by initializing the tiles into memory //
 
-            var geoTile = tileGenerator.GenerateTile(zoomLevel, xDenom, y);
+            var geoTile = await tileGenerator.GenerateTile(zoomLevel, xDenom, y);
 
             if (geoTile == null)
                 throw new NotSupportedException($"The tile with id:{id} was not in the base geo tiles collection.");

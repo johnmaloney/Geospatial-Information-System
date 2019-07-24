@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
+using TileFactory;
 
 namespace TileServerSandbox.Controllers
 {
@@ -12,17 +13,17 @@ namespace TileServerSandbox.Controllers
     [ApiController]
     public class LayerController : ControllerBase
     {
-        private readonly IFileProvider files;
+        private readonly ILayerInitializationService layerService;
         
         [HttpGet("{group}/{name?}")]
-        public async Task<IActionResult> Get(string group, string name)
+        public IActionResult Get(string group, string name)
         {
-            return null;
+            return new ObjectResult(layerService.Models);
         }
 
-        public LayerController(IFileProvider files)
+        public LayerController(ILayerInitializationService layers)
         {
-            this.files = files;
+            layerService = layers;
         }
     }
 }

@@ -8,7 +8,7 @@
     <PackageReference Include="GeoJSON.Net" Version="1.1.72" />
     <PackageReference Include="Google.Protobuf" Version="3.8.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
-    <PackageReference Include="Universal.Contracts" Version="64.0.0" />
+    <PackageReference Include="Universal.Contracts" Version="76.0.0" />
   </ItemGroup>
 
   <ItemGroup>
