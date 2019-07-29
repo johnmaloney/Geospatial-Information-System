@@ -271,7 +271,7 @@ namespace TileFactory
             var simplified = new List<(double X, double Y, double Z)[]>();
             var sqTolerance = (tileTolerance * tileTolerance);
 
-            if (geometryFeature.Type == GeometryType.MultiPoint)
+            if (geometryFeature.Type == GeometryType.Point)
             {
                 for (int i = 0; i < geometryFeature.Geometry.Length; i++)
                 {

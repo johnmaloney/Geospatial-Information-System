@@ -18,7 +18,7 @@ namespace TileFactory.Interfaces
     /// Polygon & Multipolygon = 3
     /// 
     /// </summary>
-    public enum GeometryType
+    public enum GeometryType : int
     {
         // These first four (i.e. Unknown, Point, Linestring, Polygon) //
         // follow the Vector Tile Spec ProtoBuf object//

@@ -23,22 +23,26 @@ namespace TileServerSandbox.Controllers
         // GET api/values/5
         [HttpGet("{layerId}/{z}/{x}/{y}.{fileExtension}.{fileSerializer?}")]
         [EnableCors]
-        public async Task<IActionResult> Get(string layerId, int z, int x, int y, string fileExtension, string fileSerializer, [FromQuery(Name="access_token")]string accessToken)
+        public async Task<IActionResult> Get(string layerId, int z, int x, int y, string fileExtension, string fileSerializer, [FromQuery(Name = "access_token")]string accessToken)
         {
             tileContext.Identifier = layerId;
             var tile = await tileRetrieverService.GetTile(z, x, y);
 
-            var factory = new ProtoBufSerializationFactory();
-            factory.BuildFrom(tile, tileContext);
-
-            var memStream = new MemoryStream();
-            using (var serialStream = factory.SerializeTile())
+            if (tile != null)
             {
-                await serialStream.CopyToAsync(memStream);
-            }
-            memStream.Position = 0;
-            return File(memStream, "application/octet-stream", "tile.pbf");
+                var factory = new ProtoBufSerializationFactory();
+                factory.BuildFrom(tile, tileContext);
 
+                var memStream = new MemoryStream();
+                using (var serialStream = factory.SerializeTile())
+                {
+                    await serialStream.CopyToAsync(memStream);
+                }
+                memStream.Position = 0;
+                return File(memStream, "application/octet-stream", "tile.pbf");
+            }
+            else
+                return new EmptyResult();
             //var path = files.GetFileInfo($"{layerId}.{fileExtension}.{fileSerializer}");
             
             //var memStream = new MemoryStream();

@@ -43,7 +43,7 @@ namespace TileFactory.Serialization
                 var layerFeature = new Serialization.Tile.Types.Feature()
                 {
                     Id = (ulong)new Random(0).Next(), 
-                    Type = Tile.Types.GeomType.Polygon, 
+                    Type = convertToGeomType(feature.GeometryType)
                 };
 
                 layerFeature.Geometry.AddRange(encodingFactory.BuildEncodedGeometry(feature));
@@ -54,6 +54,38 @@ namespace TileFactory.Serialization
             vectorTile = pbfTile;
 
             return true;
+        }
+
+        private Tile.Types.GeomType convertToGeomType(int geometryTypeValue)
+        {
+            var geometryType = (GeometryType)geometryTypeValue;
+            switch (geometryType)
+            {
+                case GeometryType.Unknown:
+                    break;
+                case GeometryType.Point:
+                    return Tile.Types.GeomType.Point;
+                case GeometryType.LineString:
+                    break;
+                case GeometryType.Polygon:
+                    return Tile.Types.GeomType.Polygon;
+                case GeometryType.MultiPoint:
+                    break;
+                case GeometryType.MultiLineString:
+                    break;
+                case GeometryType.MultiPolygon:
+                    break;
+                case GeometryType.GeometryCollection:
+                    break;
+                case GeometryType.Feature:
+                    break;
+                case GeometryType.FeatureCollection:
+                    break;
+                default:
+                    break;
+            }
+
+            throw new NotSupportedException($"The Geometry type of {geometryType} cannot be converted to a Protobuf GeomType.");
         }
 
         public Stream SerializeTile()

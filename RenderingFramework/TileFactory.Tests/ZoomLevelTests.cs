@@ -319,17 +319,31 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task with_many_tiled_requests_ensure_the_cache_built()
         {
+            Container.GetService<MockContextRepository>().TryGetAs("simple_points", out TileContext);
             TransformedCache.Clear();
             RawCache.Clear();
             var generator = new Generator(TileContext, RawCache, 
-                new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformed = await retriever.GetTile(2, 3, 1);
-            transformed = await retriever.GetTile(2, 0, 1);
-            transformed = await retriever.GetTile(2, 1, 1);
-            transformed = await retriever.GetTile(2, 2, 1);
-            transformed = await retriever.GetTile(2, 2, 1);
+            var transformedWorking = await retriever.GetTile(14, 16145, 9998);
+            var transformedNonWorking = await retriever.GetTile(14, 16146, 9998);
+        }
 
+        [TestMethod]
+        public async Task with_denver_tiled_requests_ensure_the_cache_built()
+        {
+            Container.GetService<MockContextRepository>().TryGetAs("simple_points_two", out TileContext);
+            TransformedCache.Clear();
+            RawCache.Clear();
+
+            // Is this the answer from line 144 in Generator //
+            TileContext.MaxAllowablePoints = 100;
+
+            var generator = new Generator(TileContext, RawCache,
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var transformedWorking = await retriever.GetTile(7, 26, 48);
+            var transformedWorking2 = await retriever.GetTile(7, 126, 78);
         }
     }   
 }

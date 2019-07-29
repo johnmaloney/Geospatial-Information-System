@@ -86,7 +86,7 @@ namespace TileFactory.Tests
         [TestMethod]
         public void parse_and_wrap_geometry_through_the_pipeline_expect_rendered_data()
         {
-            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("simple_stops");
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("populated_points_simple");
 
             var context = new GeoJsonContext(geoJSON)
             {

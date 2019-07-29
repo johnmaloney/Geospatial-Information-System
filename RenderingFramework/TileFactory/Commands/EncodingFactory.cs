@@ -38,23 +38,26 @@ namespace TileFactory.Commands
                 new ParameterData(firstCoordinate.Y));
             singleFeatureCommands.Add(firstCmd);
 
-            // store the parameters based on the first and last not in the count //
-            var parameters = new List<ParameterData>();
-            // iterate the middle of the collection this is the lineTo Commands //
-            for (int j = 1; j < feature.Coordinates.Length - 1; j++)
+            if (feature.Coordinates.Length > 1)
             {
-                (int X, int Y) coordinate = feature.Coordinates[j];
-                // all other cases get put into a default //
-                parameters.Add(new ParameterData(coordinate.X));
-                parameters.Add(new ParameterData(coordinate.Y));
+                // store the parameters based on the first and last not in the count //
+                var parameters = new List<ParameterData>();
+                // iterate the middle of the collection this is the lineTo Commands //
+                for (int j = 1; j < feature.Coordinates.Length - 1; j++)
+                {
+                    (int X, int Y) coordinate = feature.Coordinates[j];
+                    // all other cases get put into a default //
+                    parameters.Add(new ParameterData(coordinate.X));
+                    parameters.Add(new ParameterData(coordinate.Y));
+                }
+
+                var midCmd = new CommandData(CommandType.LineTo, parameters.Count / 2, parameters.ToArray());
+                singleFeatureCommands.Add(midCmd);
+
+                var lastFeature = feature.Coordinates[feature.Coordinates.Length - 1];
+                var closeCmd = new CommandData(CommandType.ClosePath, 1);
+                singleFeatureCommands.Add(closeCmd);
             }
-
-            var midCmd = new CommandData(CommandType.LineTo, parameters.Count / 2, parameters.ToArray());
-            singleFeatureCommands.Add(midCmd);
-
-            var lastFeature = feature.Coordinates[feature.Coordinates.Length - 1];
-            var closeCmd = new CommandData(CommandType.ClosePath, 1);
-            singleFeatureCommands.Add(closeCmd);
 
             var countOfValues = singleFeatureCommands.Sum(c => c.EncodedValue.Length);
             var featureEncoded = new uint[countOfValues];

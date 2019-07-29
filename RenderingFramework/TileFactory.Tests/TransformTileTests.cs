@@ -17,7 +17,7 @@ namespace TileFactory.Tests
     public class TransformTileTests : ATest
     {
         [TestMethod]
-        public void given_projected_tile_transform_expect_converted_points()
+        public void given_projected_tile_transform_expect_converted_outline()
         {
             var tile = Container.GetService<IConfigurationStrategy>().Into<GeoTile>("colorado_outline_tile");
 
@@ -46,12 +46,28 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        public async Task given_projected_outline_retrieve_points_transformed()
+        public async Task given_projected_outline_retrieve_outline_transformed()
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
                         
             var raw = new MockRawCacheStorage();
             var generator = new Generator(context, raw, 
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+
+            var transformed = new MockTransformedCacheStorage();
+            var retriever = new TileRetrieverService(transformed, context, generator);
+
+            var tile = await retriever.GetTile(0, 0, 0);
+            Assert.IsNotNull(tile);
+        }
+
+        [TestMethod]
+        public async Task given_projected_points_retrieve_points_transformed()
+        {
+            Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("simple_points", out MockTileContext context);
+
+            var raw = new MockRawCacheStorage();
+            var generator = new Generator(context, raw,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
 
             var transformed = new MockTransformedCacheStorage();

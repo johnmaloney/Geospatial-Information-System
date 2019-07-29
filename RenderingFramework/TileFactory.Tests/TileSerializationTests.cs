@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TileFactory;
 using TileFactory.Interfaces;
 using TileFactory.Serialization;
@@ -17,16 +19,40 @@ namespace TileFactory.Tests
     public class TileSerializationTests : ATest
     {
         [TestMethod]
-        [Description("Encoding the Geometry of a Tile")]
-        public void using_the_transformed_tile_generate_serialized_tile()
+        [Description("Encoding the Polygon Geometry of a Tile")]
+        public void using_polygon_transformed_tile_generate_serialized_tile()
         {
             // the goal of this test is to take a TransformedTile, which is the coordinates of a geometry feature //
             // and turn it into a group of Commands with parameters. //
             var tile = Container.GetService<IConfigurationStrategy>().Into<TransformedTile>("transformed_tile");
             var factory = new ProtoBufSerializationFactory();
             factory.BuildFrom(tile, new MockTileContext());
-            factory.SerializeTile();
+            var stream = factory.SerializeTile();
 
-        }       
+            Assert.IsNotNull(stream);
+            Assert.AreEqual(47, stream.Length);
+        }
+
+        [TestMethod]
+        [Description("Encoding the Point Geometry of a Tile")]
+        public async Task using_points_tile_generate_serialized_tile()
+        {
+            Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("simple_points", out MockTileContext context);
+
+            var raw = new MockRawCacheStorage();
+            var generator = new Generator(context, raw,
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+
+            var transformed = new MockTransformedCacheStorage();
+            var retriever = new TileRetrieverService(transformed, context, generator);
+
+            var tile = await retriever.GetTile(0, 0, 0);
+            var factory = new ProtoBufSerializationFactory();
+            factory.BuildFrom(tile, new MockTileContext());
+            var stream = factory.SerializeTile();
+
+            Assert.IsNotNull(stream);
+            Assert.AreEqual(114, stream.Length);
+        }
     }
 }

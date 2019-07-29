@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\layers\colorado_outline_projected.json" />
+    <Content Remove="wwwroot\layers\populated_points_denver_projected.json" />
+    <Content Remove="wwwroot\layers\populated_points_simple_projected.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -14,6 +16,12 @@
 
   <ItemGroup>
     <None Include="wwwroot\layers\colorado_outline_projected.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\layers\populated_points_denver_projected.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\layers\populated_points_simple_projected.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

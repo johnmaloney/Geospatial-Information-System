@@ -60,12 +60,13 @@ namespace TileFactory
 
             var geoTile = await tileGenerator.GenerateTile(zoomLevel, xDenom, y);
 
-            if (geoTile == null)
-                throw new NotSupportedException($"The tile with id:{id} was not in the base geo tiles collection.");
-
-            transformedTile = tileTransform.ProcessTile(geoTile);
-            transformedCache.StoreBy(id, transformedTile);
-            return transformedTile;
+            if (geoTile != null)
+            {
+                transformedTile = tileTransform.ProcessTile(geoTile);
+                transformedCache.StoreBy(id, transformedTile);
+                return transformedTile;
+            }
+            return null;
         }
 
         #endregion

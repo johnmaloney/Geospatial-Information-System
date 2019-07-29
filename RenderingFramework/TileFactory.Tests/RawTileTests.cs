@@ -21,15 +21,13 @@ namespace TileFactory.Tests
     public class RawTileTests : ATest
     {
         [TestMethod]
-        public void given_feature_in_projected_coords_process_into_basic_tile()
+        public async Task given_feature_in_projected_coords_process_into_basic_tile()
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
 
-            var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
-            context.TileFeatures = coloradoFeature;
-
             var raw = new MockRawCacheStorage();
             var generator = new Generator(context, raw, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            await generator.GenerateTile(0, 0, 0);
 
             var tile = raw.GetBy(0);
             Assert.AreEqual(0d, tile.X);
@@ -64,6 +62,7 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(NotSupportedException))]
         public async Task using_multilinestring_to_add_feature_expect_rewind()
         {
             var multiLinestring = Container.GetService<IConfigurationStrategy>().Into<Feature[]>("multi_linestring_sample_projected");
@@ -75,8 +74,7 @@ namespace TileFactory.Tests
             var transformed = new MockTransformedCacheStorage();
             var retriever = new TileRetrieverService(transformed, context, generator);
 
-            generator.SplitTile(multiLinestring, zoom: 0, x: 0, y: 0, currentZoom: 0, currentX: 0, currentY: 0);
-            var tile = await retriever.GetTile(0, 0, 0);
+            var tile = await retriever.GetTile(1, 0, 0);
             Assert.AreEqual(2, tile.TransformedFeatures.Count());
         }
 

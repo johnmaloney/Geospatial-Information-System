@@ -35,38 +35,46 @@ namespace TileFactory.Transforms
 
         public ITransformedTile ProcessTile(ITile tile)
         {
-            var transformedRings = new List<ITransformedFeature>();
+            var transformedFeatures = new List<ITransformedFeature>();
 
             foreach (var feature in tile.Features)
             {
-                (int X, int Y)[] transformedRing = null;
+                (int X, int Y)[] transformedFeature = null;
 
-                if (feature.Type == GeometryType.MultiPoint)
+                if (feature.Type == GeometryType.Point)
                 {
-                    throw new NotSupportedException("This type of transform is not supported yet.");
-                    //var transformedRing = new (uint X, uint Y)[feature.Geometry.Length][];
-                    //for (int i = 0; i < feature.Geometry.Length; i++)
-                    //{
-                    //    transformedRing[i][0] = ProcessPoint(feature.Geometry[i][0], extent, tile.ZoomSquared, tile.X, tile.Y);
-                    //}
-                    //return transformedRing
+                    transformedFeature = new (int X, int Y)[feature.Geometry.Length];
+                    for (int i = 0; i < feature.Geometry.Length; i++)
+                    {
+                        var point = feature.Geometry[i][0];
+                        //if (point.X >= 0 &&
+                        //    point.X <= extent &&
+                        //    point.Y >= 0 &&
+                        //    point.X <= extent)
+                        //{
+                            transformedFeature[i] = ProcessPoint(point, extent, tile.ZoomSquared, tile.X, tile.Y);
+                        //}
+                    }
                 }
-                else
+                else if (feature.Type == GeometryType.Polygon)
                 {
                     for (int i = 0; i < feature.Geometry.Length; i++)
                     {
                         var ring = feature.Geometry[i];
-                        transformedRing = new (int X, int Y)[ring.Length];
+                        transformedFeature = new (int X, int Y)[ring.Length];
                         for (int j = 0; j < ring.Length; j++)
                         {
-                            transformedRing[j]= ProcessPoint(feature.Geometry[i][j], extent, tile.ZoomSquared, tile.X, tile.Y);
+                            transformedFeature[j] = ProcessPoint(feature.Geometry[i][j], extent, tile.ZoomSquared, tile.X, tile.Y);
                         }
                     }
                 }
-                transformedRings.Add(new TransformedFeature((int)feature.Type, transformedRing));    
+                else
+                    throw new NotSupportedException($"Processing a feature of Geometry type : {feature.Type} is not supported.");
+
+                transformedFeatures.Add(new TransformedFeature((int)feature.Type, transformedFeature));    
             }
 
-            return new TransformedTile(transformedRings);
+            return new TransformedTile(transformedFeatures);
         }
 
         public (int X, int Y) ProcessPoint((double X, double Y, double Z) point, double extent, double zoomSqr, double tX, double tY)

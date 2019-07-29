@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Universal.Contracts.Serial;
 using System;
 using System.Collections.Generic;
 using System.IO;
