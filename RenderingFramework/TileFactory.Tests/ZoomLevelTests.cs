@@ -16,7 +16,7 @@ namespace TileFactory.Tests
 {
     [TestClass]
     public class ZoomLevelTests : ATest
-    { 
+    {
         private static MockTileContext TileContext;
         private static ITileCacheStorage<ITransformedTile> TransformedCache = new MockTransformedCacheStorage();
         private static ITileCacheStorage<ITile> RawCache = new MockRawCacheStorage();
@@ -34,7 +34,7 @@ namespace TileFactory.Tests
         {
             var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            
+
             var transformed = await retriever.GetTile(0, 0, 0);
 
             // These values represent the screen conversion from web mercator //
@@ -63,7 +63,7 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
             var transformed = await retriever.GetTile(1, 0, 0);
@@ -94,7 +94,7 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
             var transformed = await retriever.GetTile(2, 0, 1);
@@ -125,7 +125,7 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = await retriever.GetTile(3, 1, 3);
 
@@ -155,7 +155,7 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
 
             var transformed = await retriever.GetTile(4, 3, 6);
@@ -189,7 +189,7 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = await retriever.GetTile(5, 6, 12);
 
@@ -215,7 +215,7 @@ namespace TileFactory.Tests
 
             Assert.AreEqual(1258, transformed.TransformedFeatures[0].Coordinates[6].X);
             Assert.AreEqual(1866, transformed.TransformedFeatures[0].Coordinates[6].Y);
-            
+
             Assert.AreEqual(1259, transformed.TransformedFeatures[0].Coordinates[7].X);
             Assert.AreEqual(1330, transformed.TransformedFeatures[0].Coordinates[7].Y);
 
@@ -234,9 +234,9 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformed = await retriever.GetTile(6,13,24);
+            var transformed = await retriever.GetTile(6, 13, 24);
 
             // These values represent the screen conversion from web mercator //
             // based on the extent provided, they should not change //
@@ -282,7 +282,7 @@ namespace TileFactory.Tests
         {
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));;
+            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformed = await retriever.GetTile(7, 26, 48);
 
@@ -322,7 +322,7 @@ namespace TileFactory.Tests
             Container.GetService<MockContextRepository>().TryGetAs("simple_points", out TileContext);
             TransformedCache.Clear();
             RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, 
+            var generator = new Generator(TileContext, RawCache,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
             var transformedWorking = await retriever.GetTile(14, 16145, 9998);
@@ -332,7 +332,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task with_denver_tiled_requests_ensure_the_cache_built()
         {
-            Container.GetService<MockContextRepository>().TryGetAs("simple_points_two", out TileContext);
+            // Case 1 - Two points : Denver, US and Auckland New Zealand, only the Auckland point is returned //
+            Container.GetService<MockContextRepository>().TryGetAs("simple_points_two", out MockTileContext TileContext);
             TransformedCache.Clear();
             RawCache.Clear();
 
@@ -342,8 +343,52 @@ namespace TileFactory.Tests
             var generator = new Generator(TileContext, RawCache,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
             var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
-            var transformedWorking = await retriever.GetTile(7, 26, 48);
-            var transformedWorking2 = await retriever.GetTile(7, 126, 78);
+            var NotWorking_Denver = await retriever.GetTile(7, 26, 48);
+            var aucklandAt7 = await retriever.GetTile(7, 126, 78);
+            var aucklandAt3 = await retriever.GetTile(3, 7, 4);
+
+            Container.GetService<MockContextRepository>().TryGetAs("simple_points_denver", out MockTileContext TileContext1);
+            TransformedCache.Clear();
+            RawCache.Clear();
+            var generator1 = new Generator(TileContext1, RawCache,
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var retriever1 = new TileRetrieverService(TransformedCache, TileContext1, generator1);
+            var Working_Denver2 = await retriever1.GetTile(7, 26, 48);
+            var NotWorking_aucklandAt7 = await retriever1.GetTile(7, 126, 78);
+            var NotWorking_aucklandAt3 = await retriever1.GetTile(3, 7, 4);
+
+            Container.GetService<MockContextRepository>().TryGetAs("simple_points_US", out MockTileContext TileContext2);
+            TransformedCache.Clear();
+            RawCache.Clear();
+            var generator2 = new Generator(TileContext2, RawCache,
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var retriever2 = new TileRetrieverService(TransformedCache, TileContext2, generator2);
+            var Working_Denver3 = await retriever2.GetTile(7, 26, 48);
+            var Working_Chicago = await retriever2.GetTile(7, 26, 48);
+            var NotWorking_aucklandAt7_2 = await retriever2.GetTile(7, 126, 78);
+            var NotWorking_aucklandAt3_2 = await retriever2.GetTile(3, 7, 4);
+        }
+
+        [TestMethod]
+        public async Task drill_down_from_ZERO_to_SEVEN_expect_sequential_caching()
+        {
+            Container.GetService<MockContextRepository>().TryGetAs("simple_points_US", out MockTileContext TileContext);
+            TransformedCache.Clear();
+            RawCache.Clear();
+
+            var generator = new Generator(TileContext, RawCache,
+                new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            await retriever.GetTile(0, 0, 0);
+
+            // Drill down to the Denver point //
+            await retriever.GetTile(1, 0, 0);
+            await retriever.GetTile(2, 0, 1);
+            await retriever.GetTile(3, 1, 3);
+            await retriever.GetTile(4, 3, 6);
+            await retriever.GetTile(5, 6, 12);
+            await retriever.GetTile(6, 13, 24);
+            var tile =await retriever.GetTile(7, 26,48);
         }
     }   
 }

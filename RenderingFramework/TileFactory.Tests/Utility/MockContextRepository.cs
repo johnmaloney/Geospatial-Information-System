@@ -36,20 +36,22 @@ namespace TileFactory.Tests.Utility
 
             var mockPointsContext = mockContext.SerializeToJson().FromJsonInto<MockTileContext>();
             mockPointsContext.Identifier = "populated_points_simple_projected";
-
-
+            
             var mockPointsDenverOnlyContext = mockContext.SerializeToJson().FromJsonInto<MockTileContext>();
             mockPointsDenverOnlyContext.Identifier = "populated_points_denver_projected";
-
-
+            
             var mockPointsTwoOnlyContext = mockContext.SerializeToJson().FromJsonInto<MockTileContext>();
             mockPointsTwoOnlyContext.Identifier = "populated_points_two_projected";
+
+            var mockPointsTwoUSOnlyContext = mockContext.SerializeToJson().FromJsonInto<MockTileContext>();
+            mockPointsTwoUSOnlyContext.Identifier = "populated_points_two_US_projected";
 
             serialContexts = new ConcurrentDictionary<string, string>();
             serialContexts.TryAdd("base", mockContext.SerializeToJson());
             serialContexts.TryAdd("simple_points", mockPointsContext.SerializeToJson());
             serialContexts.TryAdd("simple_points_denver", mockPointsDenverOnlyContext.SerializeToJson());
             serialContexts.TryAdd("simple_points_two", mockPointsTwoOnlyContext.SerializeToJson());
+            serialContexts.TryAdd("simple_points_US", mockPointsTwoUSOnlyContext.SerializeToJson());
 
         }
 

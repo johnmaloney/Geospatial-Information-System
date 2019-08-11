@@ -42,7 +42,6 @@ namespace TileFactory.DataPipeline.GeoJson
                 if (capture.Contains("FeatureCollection"))
                 {
                     dataContext.Features = JsonConvert.DeserializeObject<GeoJSON.Net.Feature.FeatureCollection>(dataContext.OriginalData);
-
                 }
                 else if (capture.Contains("Feature"))
                 {
@@ -121,7 +120,7 @@ namespace TileFactory.DataPipeline.GeoJson
 
             var tileFeature = new TileFactory.Feature(convertToGeometryType(geoJsonFeature.Geometry.Type))
             {
-                Id = geoJsonFeature.Id, 
+                Id = !string.IsNullOrEmpty(geoJsonFeature.Id) ? geoJsonFeature.Id : Guid.NewGuid().ToString(), 
                 Tags = geoJsonFeature.Properties
             };
                         

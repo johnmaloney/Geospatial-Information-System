@@ -252,12 +252,12 @@ namespace TileFactory
 
                     (double X, double Y) tileMinimum = (X: tile.Min.X, Y: tile.Min.Y);
                     (double X, double Y) tileMaximum = (X: tile.Max.X, Y: tile.Max.Y);
+                    
+                    if (min.X < tile.Min.X || tile.Min.X == 0) tileMinimum.X = min.X;
+                    if (min.Y < tile.Min.Y || tile.Min.Y == 0) tileMinimum.Y = min.Y;
 
-                    if (min.X > tile.Min.X) tileMinimum.X = min.X;
-                    if (min.Y > tile.Min.Y) tileMinimum.Y = min.Y;
-
-                    if (max.X > tile.Max.X) tileMaximum.X = max.X;
-                    if (max.Y > tile.Max.Y) tileMaximum.Y = max.Y;
+                    if (max.X > tile.Max.X || tile.Max.X == 0) tileMaximum.X = max.X;
+                    if (max.Y > tile.Max.Y || tile.Max.Y == 0) tileMaximum.Y = max.Y;
 
                     tile.Min = tileMinimum;
                     tile.Max = tileMaximum;

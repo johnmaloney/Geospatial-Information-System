@@ -8,6 +8,7 @@
     <Content Remove="wwwroot\layers\colorado_outline_projected.json" />
     <Content Remove="wwwroot\layers\populated_points_denver_projected.json" />
     <Content Remove="wwwroot\layers\populated_points_simple_projected.json" />
+    <Content Remove="wwwroot\layers\populated_points_two_US_projected.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="wwwroot\layers\populated_points_simple_projected.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="wwwroot\layers\populated_points_two_US_projected.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

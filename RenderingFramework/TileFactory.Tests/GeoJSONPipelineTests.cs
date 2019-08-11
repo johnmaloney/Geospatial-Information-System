@@ -86,8 +86,9 @@ namespace TileFactory.Tests
         [TestMethod]
         public void parse_and_wrap_geometry_through_the_pipeline_expect_rendered_data()
         {
-            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("populated_points_simple");
-
+            //var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("populated_points_simple");
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("populated_points_two_US");
+           
             var context = new GeoJsonContext(geoJSON)
             {
                 MaxZoom = 14,

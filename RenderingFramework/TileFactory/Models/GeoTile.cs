@@ -45,8 +45,17 @@ namespace TileFactory.Models
 
         #region Methods
 
-
-
+        public override string ToString()
+        {
+            try
+            {
+                return $"Zsqr:{ZoomSquared} | X:{X} Y:{Y} | Has Source:{Source != null && Source.Count > 0}";
+            }
+            catch
+            {
+                return base.ToString();
+            }
+        }
         #endregion
     }
 }
