@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Messaging.Interfaces
+namespace Universal.Contracts.Messaging
 {
     public interface IMessage
     {

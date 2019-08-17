@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Messaging.Interfaces
+namespace Universal.Contracts.Messaging
 {
-    public interface IQueueClient
+    public interface IQueueMessengerClient
     {
         Task Send(IMessage message);
     }
