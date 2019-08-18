@@ -8,5 +8,7 @@ namespace Universal.Contracts.Messaging
     {
         Guid Id { get; }
         int CorrellationId { get; }
+        string Type { get; }
+        int Version { get; }
     }
 }
