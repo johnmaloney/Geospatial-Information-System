@@ -8,6 +8,6 @@ namespace Universal.Contracts.Messaging
 {
     public interface IQueueObserverClient
     {
-        Task Process(IMessage message, CancellationToken cancellation);
+        void RegisterForNotificationOf<TMessage>(Func<IMessage, Task> messageHandler);
     }
 }
