@@ -39,12 +39,55 @@ namespace Logging
         }
 
         public async Task<bool> Log(ILogEntry entry)
-        {            
-            return await Task.Factory.StartNew(()=>
+        {
+            Func<bool> task = null;
+            switch (Enum.Parse(typeof(LogType),entry.Type))
             {
-                seriLogger.Information($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
-                return true;
-            });
+                case LogType.Default:
+                    task = () =>
+                    {
+                        seriLogger.Information($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        return true;
+                    };
+                    break;
+                case LogType.Debug:
+                    task = () =>
+                    {
+                        seriLogger.Debug($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        return true;
+                    };
+                    break;
+                case LogType.Error:
+                    task = () =>
+                    {
+                        seriLogger.Error($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        return true;
+                    };
+                    break;
+                case LogType.Fatal:
+                    task = () =>
+                    {
+                        seriLogger.Fatal($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        return true;
+                    };
+                    break;
+                case LogType.Information:
+                    task = () =>
+                    {
+                        seriLogger.Information($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        return true;
+                    };
+                    break;
+                default:
+                    task = () =>
+                    {
+                        seriLogger.Information($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        return true;
+                    };
+                    break;
+            }
+
+            return await Task.Factory.StartNew(task);
         }
 
         #endregion

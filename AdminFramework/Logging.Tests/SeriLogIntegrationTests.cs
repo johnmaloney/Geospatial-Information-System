@@ -15,8 +15,7 @@ namespace Logging.Tests
         public async Task given_log_entry_send_to_kibana_expect_entry()
         {
             var manager = ATest.Container.GetService<ILogger>();
-            var results = await manager.Log(new MockLogEntry() { Type = "Test", Title = "Logging Integratrion Test", Id = 1.0d });
-
+            var results = await manager.Log(new MockLogEntry() { Type = "Test", Title = "Logging Integration Test", Id = 1.0d });
         }
     }
 
