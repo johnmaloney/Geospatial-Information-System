@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,24 +18,30 @@ namespace Messaging
         public string Type { get { return this.GetType().ToString(); } }
         public int Version { get; set; }
     }
-    
-    public class MessengerClient : IQueueMessengerClient
+
+    /// <summary>
+    /// Provides implementation for the Queue and Topic sender modes.
+    /// Queue and Topic modes allows for registering a receiver of messages.
+    /// Subscription mode (ctor with ISubscriptionClient) allows for registration as a receiver of Topics.
+    /// To send Topics use the MessengerClient.
+    /// </summary>
+    public class MessengerClient : IQueueMessengerClient, ITopicMessengerClient
     {
         #region Fields
 
-        private readonly IQueueClient client;
+        private readonly ISenderClient sender;
 
         #endregion
 
         #region Properties
-               
+
         #endregion
 
         #region Methods
 
-        public MessengerClient(IQueueClient client)
+        public MessengerClient(ISenderClient client)
         {
-            this.client = client;
+            this.sender = client;
         }
 
         public async Task Send(IMessage message)
@@ -48,7 +55,7 @@ namespace Messaging
                 var body = JsonConvert.SerializeObject(gMessage);
                 var qMessage = new Message(Encoding.UTF8.GetBytes(body));
                 qMessage.CorrelationId = gMessage.Id.ToString();
-                await client.SendAsync(qMessage);
+                await sender.SendAsync(qMessage);
             }
             catch (Exception)
             {

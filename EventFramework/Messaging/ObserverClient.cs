@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.ServiceBus;
+using Microsoft.Azure.ServiceBus.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,11 +10,18 @@ using Universal.Contracts.Messaging;
 
 namespace Messaging
 {
-    public class ObserverClient : IQueueObserverClient
+    /// <summary>
+    /// Provides implementation for the Queue and Suscription modes.
+    /// Queue mode (ctor with IReceiverClient) allows for registering a receiver of Queues.
+    /// Subscription mode (ctor with ISubscriptionClient) allows for registration as a receiver of Topics.
+    /// To send Topics use the MessengerClient.
+    /// </summary>
+    public class ObserverClient : IQueueObserverClient, ITopicObserverClient
     {
         #region Fields
 
-        private readonly IQueueClient client;
+        private readonly IReceiverClient receiver;
+        private readonly bool shouldOnlyReceiveOnce;
 
         private Dictionary<Type, IList<Func<IMessage, Task>>> registrations = new Dictionary<Type, IList<Func<IMessage, Task>>>()
         {
@@ -29,10 +37,21 @@ namespace Messaging
         #endregion
 
         #region Methods
-
-        public ObserverClient(IQueueClient client)
+        public ObserverClient(ISubscriptionClient client)
         {
-            this.client = client;
+            this.receiver = client;
+
+            // Register QueueClient's MessageHandler and receive messages in a loop //
+            RegisterOnMessageHandlerAndReceiveMessages();
+        }
+
+        public ObserverClient(IReceiverClient client)
+        {
+            // Set the receive once flag for Queues //
+            shouldOnlyReceiveOnce = true;
+
+            this.receiver = client;
+
             // Register QueueClient's MessageHandler and receive messages in a loop //
             RegisterOnMessageHandlerAndReceiveMessages();
         }
@@ -61,7 +80,7 @@ namespace Messaging
             };
 
             // Register the function that will process messages
-            client.RegisterMessageHandler(Process, messageHandlerOptions);
+            receiver.RegisterMessageHandler(Process, messageHandlerOptions);
         }
 
         private async Task Process(Message message, CancellationToken token)
@@ -71,9 +90,12 @@ namespace Messaging
 
             var gMessage = JsonConvert.DeserializeObject<GeneralMessage>(Encoding.UTF8.GetString(message.Body));
 
-            // Complete the message so that it is not received again.
-            // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
-            await client.CompleteAsync(message.SystemProperties.LockToken);
+            if (shouldOnlyReceiveOnce)
+            {
+                // Complete the message so that it is not received again.
+                // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
+                await receiver.CompleteAsync(message.SystemProperties.LockToken);
+            }
 
             // Note: Use the cancellationToken passed as necessary to determine if the queueClient has already been closed.
             // If queueClient has already been Closed, you may chose to not call CompleteAsync() or AbandonAsync() etc. calls 
