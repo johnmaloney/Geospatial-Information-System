@@ -8,13 +8,13 @@ namespace AdminManagementApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ValuesController : ControllerBase
+    public class MessageController : ControllerBase
     {
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<IEnumerable<object>> Get()
         {
-            return new string[] { "value1", "value2" };
+            return new object[] { new {id=1, title="Item 1"}, new { id=2, title="Item 2" } };
         }
 
         // GET api/values/5

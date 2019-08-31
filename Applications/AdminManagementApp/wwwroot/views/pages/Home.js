@@ -10,7 +10,7 @@ let getPostsList = async () => {
         }
     };
     try {
-        const response = await fetch(`https://5bb634f6695f8d001496c082.mockapi.io/api/posts`, options);
+        const response = await fetch(`api/message`, options);
         const json = await response.json();
         // console.log(json)
         return json;
@@ -21,7 +21,7 @@ let getPostsList = async () => {
 
 let Home = {
     render: async () => {
-        let posts = await getPostsList()
+        let posts = await getPostsList();
         let view =  /*html*/`
             <section class="section">
                 <h1> Home </h1>
