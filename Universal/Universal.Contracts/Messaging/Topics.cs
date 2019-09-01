@@ -13,5 +13,6 @@ namespace Universal.Contracts.Messaging
     public struct Queues
     {
         public const string GeneralCommand = "general-command";
+        public const string JobCommand = "job-command";
     }
 }
