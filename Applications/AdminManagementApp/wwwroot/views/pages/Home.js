@@ -2,7 +2,7 @@
 //  Define Data Sources
 // --------------------------------
 
-let getPostsList = async () => {
+let getMessageList = async () => {
     const options = {
         method: 'GET',
         headers: {
@@ -21,18 +21,18 @@ let getPostsList = async () => {
 
 let Home = {
     render: async () => {
-        let posts = await getPostsList();
+        let messages = await getMessageList();
         let view =  /*html*/`
             <section class="section">
                 <h1> Home </h1>
                 <ul>
-                    ${ posts.map(post =>
-                        /*html*/`<li><a href="#/p/${post.id}">${post.title}</a></li>`
+                    ${ messages.map(m =>
+                        /*html*/`<li><a href="#/p/${m.id}">${m.type}</a></li>`
         ).join('\n ')
             }
                 </ul>
             </section>
-        `
+        `;
         return view;
     }
     , after_render: async () => {

@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AdminManagementApp.Data;
+using Messaging;
 using Microsoft.AspNetCore.Mvc;
+using Universal.Contracts.Messaging;
 
 namespace AdminManagementApp.Controllers
 {
@@ -10,11 +13,18 @@ namespace AdminManagementApp.Controllers
     [ApiController]
     public class MessageController : ControllerBase
     {
+        private readonly MessageRepository repository;
+
+        public MessageController(MessageRepository repository)
+        {
+            this.repository = repository;
+        }
+
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<object>> Get()
+        public ActionResult<IEnumerable<IMessage>> Get()
         {
-            return new object[] { new {id=1, title="Item 1"}, new { id=2, title="Item 2" } };
+            return new ActionResult<IEnumerable<IMessage>>(repository.GetAll());
         }
 
         // GET api/values/5
@@ -26,13 +36,14 @@ namespace AdminManagementApp.Controllers
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public async Task Post([FromForm] object value)
         {
+            await repository.Generate(new GeneralMessage { CorrellationId = new Random().Next(), Id = Guid.NewGuid() });
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(int id, [FromForm] string value)
         {
         }
 

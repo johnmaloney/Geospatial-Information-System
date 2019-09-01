@@ -12,6 +12,7 @@ import Navbar from './views/components/Navbar.js';
 import Bottombar from './views/components/Bottombar.js';
 
 import Utils from './services/Utils.js';
+import JobService from './services/JobService.js';
 
 // List of supported routes. Any url other than these routes will throw a 404 error
 const routes = {
@@ -56,3 +57,11 @@ window.addEventListener('hashchange', router);
 
 // Listen on page load:
 window.addEventListener('load', router);
+
+
+var form = document.getElementById("jobForm");
+form.addEventListener("submit", function (event) {
+    event.preventDefault();
+
+    JobService.sendJobRequest();
+});
