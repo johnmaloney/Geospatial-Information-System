@@ -28,7 +28,6 @@
     <!-- Dependencies are automatically installed when the package is installed -->
     <dependencies>
       <dependency id="Microsoft.Azure.ServiceBus" version="4.0.0" />
-      <dependency id="Universal.Contracts" version="90.0.0" />
     </dependencies>
   </metadata>
 

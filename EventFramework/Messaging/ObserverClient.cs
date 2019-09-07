@@ -37,9 +37,11 @@ namespace Messaging
         #endregion
 
         #region Methods
-        public ObserverClient(ISubscriptionClient client)
+        public ObserverClient(ISubscriptionClient client, bool shouldRecieveOnce = true)
         {
             this.receiver = client;
+
+            shouldOnlyReceiveOnce = shouldRecieveOnce;
 
             // Register QueueClient's MessageHandler and receive messages in a loop //
             RegisterOnMessageHandlerAndReceiveMessages();
