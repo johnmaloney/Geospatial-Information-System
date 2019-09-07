@@ -19,7 +19,7 @@
     <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.0.0" />
-    <PackageReference Include="Universal.Contracts" Version="*" />
+    <PackageReference Include="Universal.Contracts" Version="121.0.0" />
   </ItemGroup>
 
   <ItemGroup>
