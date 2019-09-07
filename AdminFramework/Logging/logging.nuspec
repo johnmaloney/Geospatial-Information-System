@@ -27,10 +27,8 @@
 
     <!-- Dependencies are automatically installed when the package is installed -->
     <dependencies>
-      <!--<dependency id="Serilog" version="2.7.1" />
-      <dependency id="Serilog.Extensions.Logging" version="2.0.2" />
-      <dependency id="Serilog.Sinks.Elasticsearch" version="6.5.0" />
-      <dependency id="Universal.Contracts" version="96.0.0" />-->
+      <dependency id="Serilog" version="2.*" />
+      <!--<dependency id="Universal.Contracts" version="96.0.0" />-->
     </dependencies>
   </metadata>
 
