@@ -28,6 +28,8 @@
     <!-- Dependencies are automatically installed when the package is installed -->
     <dependencies>
       <dependency id="Serilog" version="2.*" />
+      <PackageReference Include="Serilog.Extensions.Logging" Version="3.*" />
+      <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.*" />
       <!--<dependency id="Universal.Contracts" version="96.0.0" />-->
     </dependencies>
   </metadata>
