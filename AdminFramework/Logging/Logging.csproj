@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version Condition=" '$(constantVersionNumber)' == '' ">0.0.1-local</Version>
-    <Version Condition=" '$(constantVersionNumber)' != '' ">$(constantVersionNumber)</Version>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' == '' ">0.0.1-local</Version>
+    <Version Condition=" '$(BUILD_BUILDNUMBER)' != '' ">$(BUILD_BUILDNUMBER)</Version>
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
@@ -10,7 +10,7 @@
     <PackageReference Include="Serilog" Version="2.8.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.0.0" />
-    <PackageReference Include="Universal.Contracts" Version="96.0.0" />
+    <PackageReference Include="Universal.Contracts" Version="$(universalContractsVersionNumber)" />
   </ItemGroup>
 
 </Project>
