@@ -6,13 +6,13 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
-RUN dotnet restore "AdminManagementApp.csproj"
+RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj"
 COPY . .
 WORKDIR "/src/AdminManagementApp"
 RUN dotnet build "AdminManagementApp.csproj" -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish "AdminManagementApp.csproj" -c Release -o /app
+RUN dotnet publish "AdminManagementApp/AdminManagementApp.csproj" -c Release -o /app
 
 FROM base AS final
 WORKDIR /app
