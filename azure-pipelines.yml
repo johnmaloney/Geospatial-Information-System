@@ -1,5 +1,5 @@
 trigger:
-- admin_app
+- master
 
 pool:
   vmImage: 'Ubuntu-16.04'
@@ -11,11 +11,10 @@ steps:
 - task: Docker@1
   displayName: Build an image
   inputs:
-    projects: '$(build.sourcesdirectory)/Applications/AdminManagementApp/AdminManagementApp.csproj'
     command: Build an image
     containerregistrytype: Azure Container Registry
     dockerRegistryEndpoint: GISDockerRegistry
-    dockerFile: Dockerfile
+    dockerFile: $(build.sourcesdirectory)/Applications/AdminManagementApp/Dockerfile
     imageName: $(imageName)
     imageNamesPath: 
     restartPolicy: always
@@ -25,7 +24,7 @@ steps:
     command: Push an image
     containerregistrytype: Azure Container Registry
     dockerRegistryEndpoint: GISDockerRegistry
-    dockerFile: Dockerfile
+    dockerFile: $(build.sourcesdirectory)/Applications/AdminManagementApp/Dockerfile
     imageName: $(imageName)
     imageNamesPath: 
     restartPolicy: always
