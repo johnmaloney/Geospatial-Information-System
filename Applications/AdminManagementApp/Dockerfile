@@ -17,7 +17,7 @@ ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
 # Environment variable for adding endpoint credentials. More on this here: https://github.com/Microsoft/artifacts-credprovider#help
 # Add "FEED_URL" AND "PAT" using --build-arg in docker build step. "endpointCredentials" field is an array, you can add multiple endpoint configurations.
 # Make sure that you *do not* hard code the "PAT" here. That is a sensitive information and must not be checked in.
-ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"maloney1@hotmail.com\", \"password\":\"${PAT}\"}]}
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"https://aetos.pkgs.visualstudio.com/_packaging/GIS-Packages/nuget/v3/index.json\", \"username\":\"maloney1@hotmail.com\", \"password\":\"o4wrt3525ow3xgpcshie7zo6stkqs7l7mxnuiqfl6xuuukslfqkq\"}]}
 
 #COPY NuGet.config /src/NuGet/
 RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj" --source "https://aetos.pkgs.visualstudio.com/_packaging/GIS-Packages/nuget/v3/index.json"
