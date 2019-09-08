@@ -2,10 +2,23 @@
 #WORKDIR /app
 #EXPOSE 80
 #EXPOSE 443
+ARG FEED_URL
+ARG PAT
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
+
+# Optional: Sometimes the http client hangs because of a .NEt issue. Setting this in dockerfile helps 
+ENV DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
+# Environment variable to enable seesion token cache. More on this here: https://github.com/Microsoft/artifacts-credprovider#help
+ENV NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED true
+
+# Environment variable for adding endpoint credentials. More on this here: https://github.com/Microsoft/artifacts-credprovider#help
+# Add "FEED_URL" AND "PAT" using --build-arg in docker build step. "endpointCredentials" field is an array, you can add multiple endpoint configurations.
+# Make sure that you *do not* hard code the "PAT" here. That is a sensitive information and must not be checked in.
+ENV VSS_NUGET_EXTERNAL_FEED_ENDPOINTS {\"endpointCredentials\": [{\"endpoint\":\"${FEED_URL}\", \"username\":\"maloney1@hotmail.com\", \"password\":\"${PAT}\"}]}
+
 #COPY NuGet.config /src/NuGet/
 RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj" --source "https://aetos.pkgs.visualstudio.com/_packaging/GIS-Packages/nuget/v3/index.json"
 COPY . .
