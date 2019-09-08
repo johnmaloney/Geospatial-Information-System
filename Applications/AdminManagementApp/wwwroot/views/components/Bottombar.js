@@ -4,12 +4,12 @@ let Bottombar = {
         <footer class="footer">
             <div class="content has-text-centered">
                 <p>
-                    This is my foot. There are many like it, but this one is mine.
+                    GIS Administration ${Date(Date.now()).toString()}
                 </p>
             </div>
         </footer>
-        `
-        return view
+        `;
+        return view;
     },
     after_render: async () => { }
 

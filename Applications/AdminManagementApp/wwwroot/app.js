@@ -4,6 +4,8 @@
 
 import Home from './views/pages/Home.js';
 import About from './views/pages/About.js';
+import JobEntry from './views/components/JobEntry.js';
+import LogEntry from './views/components/LogEntry.js';
 import Error404 from './views/pages/Error404.js';
 import PostShow from './views/pages/PostShow.js';
 import Register from './views/pages/Register.js';
@@ -12,7 +14,6 @@ import Navbar from './views/components/Navbar.js';
 import Bottombar from './views/components/Bottombar.js';
 
 import Utils from './services/Utils.js';
-import JobService from './services/JobService.js';
 
 // List of supported routes. Any url other than these routes will throw a 404 error
 const routes = {
@@ -29,6 +30,8 @@ const router = async () => {
     // Lazy load view element:
     const header = null || document.getElementById('header_container');
     const content = null || document.getElementById('page_container');
+    const logEntryForm = null || document.getElementById('logentry_container');
+    const jobEntryForm = null || document.getElementById('jobentry_container');
     const footer = null || document.getElementById('footer_container');
     
     // Render the Header and footer of the page
@@ -36,10 +39,9 @@ const router = async () => {
     await Navbar.after_render();
     footer.innerHTML = await Bottombar.render();
     await Bottombar.after_render();
-
-
+    
     // Get the parsed URl from the addressbar
-    let request = Utils.parseRequestURL()
+    let request = Utils.parseRequestURL();
 
     // Parse the URL and if it has an id part, change it with the string ":id"
     let parsedURL = (request.resource ? '/' + request.resource : '/') + (request.id ? '/:id' : '') + (request.verb ? '/' + request.verb : '')
@@ -48,6 +50,13 @@ const router = async () => {
     // If the parsed URL is not in our list of supported routes, select the 404 page instead
     let page = routes[parsedURL] ? routes[parsedURL] : Error404;
     content.innerHTML = await page.render();
+
+    jobEntryForm.innerHTML = await JobEntry.render();
+    await JobEntry.after_render();
+
+    logEntryForm.innerHTML = await LogEntry.render();
+    await LogEntry.after_render();
+
     await page.after_render();
   
 }
@@ -58,10 +67,3 @@ window.addEventListener('hashchange', router);
 // Listen on page load:
 window.addEventListener('load', router);
 
-
-var form = document.getElementById("jobForm");
-form.addEventListener("submit", function (event) {
-    event.preventDefault();
-
-    JobService.sendJobRequest();
-});

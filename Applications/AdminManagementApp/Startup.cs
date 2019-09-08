@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AdminManagementApp.Data;
+﻿using AdminManagementApp.Data;
+using Logging;
 using Messaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Universal.Contracts.Messaging;
 
 namespace AdminManagementApp
@@ -47,6 +41,12 @@ namespace AdminManagementApp
             services.AddSingleton<ITopicObserverClient>(sp =>
                 new ObserverClient(subscriberBus));
             
+            // START the Logger, connects to Kibana //
+            var logger = new LogManager(Configuration["ElasticConfiguration:Uri"]);
+            logger.Log(new LogEntry { Id = 1, Title = "Administration Management App initializing.", Type = LogType.Information.ToString() });
+            services.AddSingleton<Universal.Contracts.Logging.ILogger>(logger);
+
+            // ADD a default data storage mechanism //
             services.AddDbContext<ApplicationDbContext>(options => options.UseInMemoryDatabase("Messages"));
             
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);

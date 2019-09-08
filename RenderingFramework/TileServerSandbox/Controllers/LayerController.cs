@@ -20,7 +20,7 @@ namespace TileServerSandbox.Controllers
         {
             return new ObjectResult(layerService.Models);
         }
-
+        
         public LayerController(ILayerInitializationService layers)
         {
             layerService = layers;

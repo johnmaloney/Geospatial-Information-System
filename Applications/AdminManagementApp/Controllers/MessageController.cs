@@ -29,9 +29,9 @@ namespace AdminManagementApp.Controllers
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<IMessage> Get(string id)
         {
-            return "value";
+            return new ActionResult<IMessage>(repository.Get(Guid.Parse(id)));
         }
 
         // POST api/values

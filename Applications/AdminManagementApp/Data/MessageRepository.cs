@@ -28,6 +28,12 @@ namespace AdminManagementApp.Data
             return database.Messages;
         }
 
+        public IMessage Get(Guid id)
+        {
+            var message = this.database.Messages.Find(id);
+            return message ?? null;
+        }
+
         public async Task<bool> Generate(IMessage message)
         {
             await messenger.Send(message);
