@@ -1,12 +1,12 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+#FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+#WORKDIR /app
+#EXPOSE 80
+#EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
+#FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
-COPY $(System.DefaultWorkingDirectory)/AdminManagementApp/NuGet.config /src/NuGet/
+COPY src/AdminManagementApp/NuGet.config /src/NuGet/
 RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj"
 COPY . .
 WORKDIR "/src/AdminManagementApp"
