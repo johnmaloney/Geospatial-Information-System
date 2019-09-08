@@ -6,7 +6,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
-RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj" -s $(build.sourcesdirectory)/packages
+RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj" -s /home/vsts/work/1/s/packages
 COPY . .
 WORKDIR "/src/AdminManagementApp"
 RUN dotnet build "AdminManagementApp.csproj" -c Release -o /app
