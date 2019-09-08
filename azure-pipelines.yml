@@ -2,7 +2,6 @@ trigger:
 - admin_app
 
 pool:
-  name: CI for Administration
   vmImage: 'Ubuntu-16.04'
 
 variables:
