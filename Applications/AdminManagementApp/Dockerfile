@@ -6,7 +6,7 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
-COPY src/AdminManagementApp/NuGet.config /src/NuGet/
+COPY NuGet.config /src/NuGet/
 RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj"
 COPY . .
 WORKDIR "/src/AdminManagementApp"
