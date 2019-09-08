@@ -1,5 +1,6 @@
 ### Logging
 
+Logging is hosted on a Docker VM in Windows Azure(MyDockerVM)
 [Url for Kibana Logs](http://40.118.239.120:5601/app/kibana)
 
 

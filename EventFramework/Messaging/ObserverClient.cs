@@ -37,6 +37,7 @@ namespace Messaging
         #endregion
 
         #region Methods
+
         public ObserverClient(ISubscriptionClient client, bool shouldRecieveOnce = true)
         {
             this.receiver = client;
