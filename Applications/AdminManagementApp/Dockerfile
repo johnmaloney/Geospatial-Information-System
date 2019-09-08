@@ -6,8 +6,8 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
-COPY NuGet.config /src/NuGet/
-RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj"
+#COPY NuGet.config /src/NuGet/
+RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj" -source "https://aetos.pkgs.visualstudio.com/_packaging/GIS-Packages/nuget/v3/index.json"
 COPY . .
 WORKDIR "/src/AdminManagementApp"
 RUN dotnet build "AdminManagementApp.csproj" -c Release -o /app
