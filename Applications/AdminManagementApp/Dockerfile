@@ -3,7 +3,7 @@
 #EXPOSE 80
 #EXPOSE 443
 
-#FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
+FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
 COPY src/AdminManagementApp/NuGet.config /src/NuGet/
