@@ -1,39 +1,32 @@
+trigger:
+- admin_app
+
 pool:
-  name: Azure Pipelines
-#Your build pipeline references an undefined variable named ‘BuildConfiguration’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
+  name: CI for Administration
+  vmImage: 'Ubuntu-16.04'
+
+variables:
+  imageName: 'gis/adminapp:$(build.buildNumber)'
 
 steps:
-- task: NuGetToolInstaller@1
-  displayName: 'Use NuGet '
+- task: Docker@1
+  displayName: Build an image
   inputs:
-    checkLatest: true
-
-- task: NuGetCommand@2
-  displayName: 'NuGet restore'
+    projects: '$(build.sourcesdirectory)/Applications/AdminManagementApp/AdminManagementApp.csproj'
+    command: Build an image
+    containerregistrytype: Azure Container Registry
+    dockerRegistryEndpoint: GISDockerRegistry
+    dockerFile: Dockerfile
+    imageName: $(imageName)
+    imageNamesPath: 
+    restartPolicy: always
+- task: Docker@1
+  displayName: Push an image
   inputs:
-    restoreSolution: EventFramework/Messaging.sln
-    vstsFeed: '8641428b-255c-4810-87f1-24d0742ee9ba'
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
-  inputs:
-    projects: '$(build.sourcesdirectory)/EventFramework/Messaging/Messaging.csproj'
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet test'
-  inputs:
-    command: test
-    projects: '$(build.sourcesdirectory)/EventFramework/Messaging.Tests/Messaging.Tests.csproj'
-    arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
-
-- task: NuGetCommand@2
-  displayName: 'NuGet pack'
-  inputs:
-    command: pack
-    packagesToPack: EventFramework/Messaging/Messaging.csproj
-
-- task: NuGetCommand@2
-  displayName: 'NuGet push'
-  inputs:
-    command: push
-    publishVstsFeed: '8641428b-255c-4810-87f1-24d0742ee9ba'
+    command: Push an image
+    containerregistrytype: Azure Container Registry
+    dockerRegistryEndpoint: GISDockerRegistry
+    dockerFile: Dockerfile
+    imageName: $(imageName)
+    imageNamesPath: 
+    restartPolicy: always
