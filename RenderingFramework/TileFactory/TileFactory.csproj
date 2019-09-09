@@ -7,14 +7,13 @@
   <ItemGroup>
     <PackageReference Include="GeoJSON.Net" Version="1.1.72" />
     <PackageReference Include="Google.Protobuf" Version="3.8.0" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
     <PackageReference Include="Universal.Contracts" Version="206.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.FileProviders.Abstractions">
-      <HintPath>..\..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.extensions.fileproviders.abstractions\2.0.1\lib\netstandard2.0\Microsoft.Extensions.FileProviders.Abstractions.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web">
       <HintPath>System.Web</HintPath>
     </Reference>
