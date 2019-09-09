@@ -3,4 +3,10 @@
     <add key="NuGet.org" value="https://api.nuget.org/v3/index.json" />
     <add key="GIS-Packages" value="https://aetos.pkgs.visualstudio.com/_packaging/GIS-Packages/nuget/v3/index.json" />
   </packageSources>
+  <packageSourceCredentials>
+        <GIS-Packages>
+            <add key="Username" value="$(NuGetUsername)" />
+            <add key="ClearTextPassword" value="$(NuGetPassword)" />
+        </GIS-Packages>
+    </packageSourceCredentials>
 </configuration>
