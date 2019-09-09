@@ -62,7 +62,7 @@ namespace TileFactory.Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(NotSupportedException))]
+        //[ExpectedException(typeof(NotSupportedException))]
         public async Task using_multilinestring_to_add_feature_expect_rewind()
         {
             var multiLinestring = Container.GetService<IConfigurationStrategy>().Into<Feature[]>("multi_linestring_sample_projected");
@@ -75,7 +75,10 @@ namespace TileFactory.Tests
             var retriever = new TileRetrieverService(transformed, context, generator);
 
             var tile = await retriever.GetTile(1, 0, 0);
-            Assert.AreEqual(2, tile.TransformedFeatures.Count());
+
+            // This is not supported yet so the tile is null //
+            Assert.IsNull(tile);
+            //Assert.AreEqual(2, tile.TransformedFeatures.Count());
         }
 
         [TestMethod]
