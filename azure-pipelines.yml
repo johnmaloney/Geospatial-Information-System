@@ -1,30 +1,40 @@
-trigger:
-- master
-
 pool:
-  vmImage: 'Ubuntu-16.04'
-
-variables:
-  imageName: 'gis/adminapp:$(build.buildNumber)'
+  name: Azure Pipelines
+#Your build pipeline references an undefined variable named ‘BuildConfiguration’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab. See https://go.microsoft.com/fwlink/?linkid=865972
 
 steps:
-- task: Docker@1
-  displayName: Build an image
+- task: NuGetToolInstaller@1
+  displayName: 'Use NuGet '
   inputs:
-    command: Build an image
-    containerregistrytype: Azure Container Registry
-    dockerRegistryEndpoint: GISDockerRegistry
-    dockerFile: $(build.sourcesdirectory)/Applications/AdminManagementApp/Dockerfile
-    imageName: $(imageName)
-    imageNamesPath: 
-    restartPolicy: always
-- task: Docker@1
-  displayName: Push an image
+    checkLatest: true
+
+- task: NuGetCommand@2
+  displayName: 'NuGet restore'
   inputs:
-    command: Push an image
-    containerregistrytype: Azure Container Registry
-    dockerRegistryEndpoint: GISDockerRegistry
-    dockerFile: $(build.sourcesdirectory)/Applications/AdminManagementApp/Dockerfile
-    imageName: $(imageName)
-    imageNamesPath: 
-    restartPolicy: always
+    restoreSolution: RenderingFramework/TileFactory.sln
+    vstsFeed: 'e61822ea-e45c-482a-b8b9-1fadca5217cc/d0ddad52-9144-4ca3-985d-75d86712761d'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet build'
+  inputs:
+    projects: '$(build.sourcesdirectory)/RenderingFramework/TileFactory/TileFactory.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'dotnet test'
+  inputs:
+    command: test
+    projects: '$(build.sourcesdirectory)/RenderingFramework/TileFactory.Tests/TileFactory.Tests.csproj'
+    arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet pack'
+  inputs:
+    command: pack
+    packagesToPack: /RenderingFramework/TileFactory/TileFactory.csproj
+    includeSymbols: true
+
+- task: NuGetCommand@2
+  displayName: 'NuGet push'
+  inputs:
+    command: push
+    publishVstsFeed: 'e61822ea-e45c-482a-b8b9-1fadca5217cc/d0ddad52-9144-4ca3-985d-75d86712761d'
