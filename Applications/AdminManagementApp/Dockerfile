@@ -1,13 +1,13 @@
-#FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
-#WORKDIR /app
-#EXPOSE 80
-#EXPOSE 443
+FROM mcr.microsoft.com/dotnet/core/aspnet:2.1-stretch-slim AS base
+WORKDIR /app
+EXPOSE 80
+EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/core/sdk:2.1-stretch AS build
 WORKDIR /src
 COPY ["AdminManagementApp.csproj", "AdminManagementApp/"]
-#COPY NuGet.config /src/NuGet/
-RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj" -source "https://aetos.pkgs.visualstudio.com/_packaging/GIS-Packages/nuget/v3/index.json"
+#COPY AdminManagementApp/NuGet.config /src/NuGet/
+RUN dotnet restore "AdminManagementApp/AdminManagementApp.csproj"
 COPY . .
 WORKDIR "/src/AdminManagementApp"
 RUN dotnet build "AdminManagementApp.csproj" -c Release -o /app
