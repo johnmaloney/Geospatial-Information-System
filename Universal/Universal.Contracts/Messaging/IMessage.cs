@@ -9,6 +9,14 @@ namespace Universal.Contracts.Messaging
         Guid Id { get; }
         int CorrellationId { get; }
         string Type { get; }
-        int Version { get; }
+        double Version { get; }
+    }
+
+    public interface ICommandData
+    { 
+        string DataType { get; }
+        object Data { get; }
+        double Version { get; }  
+        T DataAs<T>();
     }
 }
