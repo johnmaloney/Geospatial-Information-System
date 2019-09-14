@@ -13,7 +13,7 @@ namespace Universal.Tests.Messaging
 
         public string Type { get; set; }
 
-        public int Version { get; set; }
+        public double Version { get; set; }
     }
 
     public class SpecificMessage : IMessage
@@ -24,6 +24,6 @@ namespace Universal.Tests.Messaging
 
         public string Type { get; set; }
 
-        public int Version { get; set; }
+        public double Version { get; set; }
     }
 }
