@@ -16,7 +16,7 @@ namespace Messaging
         public Guid Id { get; set; }
         public int CorrellationId { get; set; }
         public string Type { get { return this.GetType().ToString(); } }
-        public int Version { get; set; }
+        public double Version { get; set; }
     }
 
     /// <summary>

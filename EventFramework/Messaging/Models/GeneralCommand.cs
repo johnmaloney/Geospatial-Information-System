@@ -13,8 +13,10 @@ namespace Messaging.Models
 
         public string Type { get; set; }
 
-        public int Version { get; set; }
+        public double Version { get; set; }
 
-        public string Message { get; set; }
+        public string Command { get; set; }
+
+        public IEnumerable<ICommandData> CommandDataCollection { get; set; }
     }
 }
