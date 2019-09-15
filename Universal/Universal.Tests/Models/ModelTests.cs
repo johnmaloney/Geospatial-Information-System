@@ -8,6 +8,7 @@ using Universal.Contracts.Models;
 using Universal.Contracts.Serial;
 using Universal.Tests.Messaging;
 using Universal.Contracts.Messaging;
+using System.Linq;
 
 namespace Universal.Tests.Models
 {
@@ -53,6 +54,26 @@ namespace Universal.Tests.Models
 
             IMessage deserial3 = serial.DeserializeJson<IMessage>(gMessage.Type);
             Assert.AreEqual(gMessage.Id, deserial3.Id);
+        }
+
+        [TestMethod]
+        public void with_general_command_serialize_expect_proper_deserial()
+        {
+            var command = new GeneralCommand
+            {
+                Command = "",
+                CommandDataCollection = new List<MockCommandData>
+                {
+                    new MockCommandData { Data = true, DataType = typeof(bool).AssemblyQualifiedName }
+                },
+                Id = Guid.NewGuid()
+            };
+
+            var serial = command.SerializeToJson();
+            var deserial = serial.DeserializeJson<IMessage>(command.Type);
+            var deserial1 = serial.DeserializeJson<GeneralCommand>();
+            Assert.AreEqual(command.Id, deserial.Id);
+            Assert.AreEqual(command.CommandDataCollection.Count(), deserial1.CommandDataCollection.Count());
         }
     }
 }

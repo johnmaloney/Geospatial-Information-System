@@ -26,4 +26,19 @@ namespace Universal.Tests.Messaging
 
         public double Version { get; set; }
     }
+
+    public class GeneralCommand : IMessage
+    {
+        public Guid Id { get; set; }
+
+        public int CorrellationId { get; set; }
+
+        public string Type { get { return typeof(GeneralCommand).AssemblyQualifiedName; } }
+
+        public double Version { get { return 1.0; } }
+
+        public string Command { get; set; }
+
+        public IEnumerable<ICommandData> CommandDataCollection { get; set; }
+    }
 }

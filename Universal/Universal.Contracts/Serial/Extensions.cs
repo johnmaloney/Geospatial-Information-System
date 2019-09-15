@@ -4,6 +4,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Universal.Contracts.Serial
 {
@@ -19,34 +20,26 @@ namespace Universal.Contracts.Serial
         /// <returns></returns>
         public static T DeserializeJson<T>(this string json) where T : class
         {
-            if (jsonSettings == null)
-            {
-                jsonSettings = new JsonSerializerSettings();
-                jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                jsonSettings.TypeNameHandling = TypeNameHandling.Auto;
-                jsonSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
-                jsonSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-            }
+            SetJsonSettingUp();
 
             return JsonConvert.DeserializeObject<T>(json, jsonSettings);
         }
         
         public static T DeserializeJson<T>(this string json, Type typeOfObject)
         {
-            if (jsonSettings == null)
-            {
-                jsonSettings = new JsonSerializerSettings();
-                jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                jsonSettings.TypeNameHandling = TypeNameHandling.Auto;
-                jsonSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
-                jsonSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-            }
+            SetJsonSettingUp();
 
             return (T)JsonConvert.DeserializeObject(json, typeOfObject, jsonSettings);
         }
         
         public static T DeserializeJson<T>(this string json, string typeOfObject)
         {
+            SetJsonSettingUp();
+
+            // Clean up the type name to avoid version information //
+            // this is assuming the typeOfObject is the full assembly qualified name //
+            typeOfObject = Regex.Replace(typeOfObject, @", Version=\d+.\d+.\d+.\d+", string.Empty);
+
             var type = Type.GetType(typeOfObject);
 
             if (type != null)
@@ -63,14 +56,7 @@ namespace Universal.Contracts.Serial
         /// <returns></returns>
         public static string SerializeToJson<T>(this T objectToSerialize) where T : class
         {
-            if (jsonSettings == null)
-            {
-                jsonSettings = new JsonSerializerSettings();
-                jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                jsonSettings.TypeNameHandling = TypeNameHandling.Auto;
-                jsonSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
-                jsonSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-            }
+            SetJsonSettingUp();
 
             jsonSettings.Error = delegate (object sender, Newtonsoft.Json.Serialization.ErrorEventArgs args)
             {
@@ -85,6 +71,18 @@ namespace Universal.Contracts.Serial
         public static T FromJsonInto<T>(this string jsonData) where T : class
         {
             return jsonData.DeserializeJson<T>();
+        }
+
+        private static void SetJsonSettingUp()
+        {
+            if (jsonSettings == null)
+            {
+                jsonSettings = new JsonSerializerSettings();
+                jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                jsonSettings.TypeNameHandling = TypeNameHandling.Auto;
+                jsonSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
+                jsonSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+            }
         }
 
     }
