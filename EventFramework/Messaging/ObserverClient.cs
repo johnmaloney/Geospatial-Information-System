@@ -1,11 +1,14 @@
-﻿using Microsoft.Azure.ServiceBus;
+﻿using Messaging.Models;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Universal.Contracts.Logging;
 using Universal.Contracts.Messaging;
 using Universal.Contracts.Serial;
 
@@ -26,6 +29,9 @@ namespace Messaging
 
         private Dictionary<Type, IList<Func<IMessage, Task>>> registrations = 
             new Dictionary<Type, IList<Func<IMessage, Task>>>();
+
+        private IList<Func<IEnumerable<ILogEntry>, Task>> logRegistrations =
+            new List<Func<IEnumerable<ILogEntry>, Task>>();
 
         #endregion
 
@@ -90,39 +96,103 @@ namespace Messaging
 
         private async Task Process(Message message, CancellationToken token)
         {
-            // Process the message
-            Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
+            var logging = new List<ILogEntry>();
+            // Used as a unique identifier //
+            double id = new Random().NextDouble();
+            Type contentType = null;
+            IMessage gMessage = null;
 
-            var contentType = Type.GetType(message.ContentType);
+            try
+            {
+                // We need to discern the type and version to know how to properly deserialize the message //
+                // and the version for the registered delegates //
+                contentType = Type.GetType(message.ContentType);
+                var version = Double.TryParse(message.Label, out double mVersion);
 
-            var gMessage = Encoding.UTF8.GetString(message.Body).DeserializeJson<IMessage>(contentType);
+                // Process the message
+                logging.Add(new MessageLogEntry
+                {
+                    Type = LogType.Information.ToString(),
+                    Title = $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber}, ContentType : {contentType} Body: {Encoding.UTF8.GetString(message.Body)}",
+                    Id = id
+                });
 
-            if (shouldOnlyReceiveOnce)
+                // Process the message
+                gMessage = Encoding.UTF8.GetString(message.Body).DeserializeJson<IMessage>(contentType);
+
+                logging.Add(new MessageLogEntry
+                {
+                    Type = LogType.Information.ToString(),
+                    Title = $"Successfully processed the Message Body into {contentType}",
+                    Id = id
+                });
+            }
+            catch (Exception ex)
+            {
+                // Process the message
+                logging.Add(new MessageLogEntry
+                {
+                    Type = LogType.Error.ToString(),
+                    Title = $"A message was received that could not be parsed for notificaion. Error Message : {ex.Message}",
+                    Id = id
+                });
+            }
+
+            // Only complete the queued item if we should receive only once and there were no processing errors //
+            if (shouldOnlyReceiveOnce && !logging.Any(l=> l.Type == LogType.Error.ToString()))
             {
                 // Complete the message so that it is not received again.
                 // This can be done only if the queueClient is created in ReceiveMode.PeekLock mode (which is default).
                 await receiver.CompleteAsync(message.SystemProperties.LockToken);
+
+                logging.Add(new MessageLogEntry
+                {
+                    Type = LogType.Information.ToString(),
+                    Title = $"Completed the message in the service bus queue.",
+                    Id = id
+                });
             }
 
             // Note: Use the cancellationToken passed as necessary to determine if the queueClient has already been closed.
             // If queueClient has already been Closed, you may chose to not call CompleteAsync() or AbandonAsync() etc. calls 
             // to avoid unnecessary exceptions.
 
-            foreach (var handler in registrations[contentType])
+            if (contentType != null && gMessage != null)
             {
-                await handler(gMessage);
+                foreach (var handler in registrations[contentType])
+                {
+                    await handler(gMessage);
+                }
+            }
+
+            // Notify any registrations of the log events. //
+            if (registrations.ContainsKey(typeof(List<ILogEntry>)))
+            {
+                foreach (var handler in logRegistrations)
+                {
+                    await handler(logging);
+                }
             }
         }
 
-        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        private async Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
-            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
-            var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
-            Console.WriteLine("Exception context for troubleshooting:");
-            Console.WriteLine($"- Endpoint: {context.Endpoint}");
-            Console.WriteLine($"- Entity Path: {context.EntityPath}");
-            Console.WriteLine($"- Executing Action: {context.Action}");
-            return Task.CompletedTask;
+            var logging = new List<ILogEntry>() {
+            new MessageLogEntry
+                {
+                    Type = LogType.Error.ToString(),
+                    Title = $"The queue raised an exception before handling the message. Error Message : {exceptionReceivedEventArgs.Exception}",
+                    MessageBody = exceptionReceivedEventArgs.Exception.StackTrace
+                }
+            };
+
+            if (registrations.ContainsKey(typeof(List<ILogEntry>)))
+            {
+                foreach (var handler in logRegistrations)
+                {
+                    await handler(logging);
+                }
+            }
         }
 
         #endregion

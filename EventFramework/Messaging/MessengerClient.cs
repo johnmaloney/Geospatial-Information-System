@@ -63,6 +63,7 @@ namespace Messaging
             {
                 var qMessage = new Message(Encoding.UTF8.GetBytes(messageBody));
                 qMessage.ContentType = messageType.AssemblyQualifiedName;
+                qMessage.Label = message.Version.ToString();
                 qMessage.CorrelationId = message.Id.ToString();
                 await sender.SendAsync(qMessage);
             }
