@@ -11,7 +11,7 @@ namespace Universal.Tests.Messaging
 
         public int CorrellationId { get; set; }
 
-        public string Type { get; set; }
+        public string Type { get { return typeof(GeneralMessage).AssemblyQualifiedName; } }
 
         public double Version { get; set; }
     }

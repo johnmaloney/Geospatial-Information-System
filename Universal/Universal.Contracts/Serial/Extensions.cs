@@ -30,6 +30,30 @@ namespace Universal.Contracts.Serial
 
             return JsonConvert.DeserializeObject<T>(json, jsonSettings);
         }
+        
+        public static T DeserializeJson<T>(this string json, Type typeOfObject)
+        {
+            if (jsonSettings == null)
+            {
+                jsonSettings = new JsonSerializerSettings();
+                jsonSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                jsonSettings.TypeNameHandling = TypeNameHandling.Auto;
+                jsonSettings.ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor;
+                jsonSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+            }
+
+            return (T)JsonConvert.DeserializeObject(json, typeOfObject, jsonSettings);
+        }
+        
+        public static T DeserializeJson<T>(this string json, string typeOfObject)
+        {
+            var type = Type.GetType(typeOfObject);
+
+            if (type != null)
+                return (T)JsonConvert.DeserializeObject(json, type, jsonSettings);
+            else
+                throw new NotSupportedException($"The typeOfObject: {typeOfObject} was not found.");
+        }
 
         /// <summary>
         /// Convert a class object into a JSON object
@@ -57,9 +81,11 @@ namespace Universal.Contracts.Serial
             return 
                 JsonConvert.SerializeObject(objectToSerialize, jsonSettings);
         }
+
         public static T FromJsonInto<T>(this string jsonData) where T : class
         {
             return jsonData.DeserializeJson<T>();
         }
+
     }
 }
