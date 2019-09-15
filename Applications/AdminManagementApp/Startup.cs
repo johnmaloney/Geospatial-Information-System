@@ -1,4 +1,5 @@
 ﻿using AdminManagementApp.Data;
+using AdminManagementApp.Services;
 using Logging;
 using Messaging;
 using Microsoft.AspNetCore.Builder;
@@ -53,11 +54,11 @@ namespace AdminManagementApp
 
             var container = services.BuildServiceProvider();
             var repository = new MessageRepository(
-                container.GetService<ApplicationDbContext>(),
-                container.GetService<ITopicMessengerClient>(),
-                container.GetService<ITopicObserverClient>());
+                container.GetService<ApplicationDbContext>());
 
             services.AddSingleton<MessageRepository>(repository);
+
+            services.AddSingleton<MessagingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

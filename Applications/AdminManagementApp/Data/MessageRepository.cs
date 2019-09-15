@@ -1,4 +1,5 @@
 ﻿using Messaging;
+using Messaging.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,50 +11,50 @@ namespace AdminManagementApp.Data
     public class MessageRepository
     {
         private readonly ApplicationDbContext database;
-        private readonly ITopicMessengerClient messenger;
-        private readonly ITopicObserverClient topicObserver;
 
-        public MessageRepository(ApplicationDbContext context, 
-            ITopicMessengerClient messenger, 
-            ITopicObserverClient topicObserver)
+        public MessageRepository(ApplicationDbContext context)
         {
             this.database = context;
-            this.messenger = messenger;
-            this.topicObserver = topicObserver;
-            this.topicObserver.RegisterForNotificationOf<GeneralMessage>(MessageReceiver);
         }
 
         public IEnumerable<IMessage> GetAll()
         {
-            return database.Messages;
+            var messages = new List<IMessage>();
+            messages.AddRange(database.GeneralMessages);
+            messages.AddRange(database.TopicMessages);
+            messages.AddRange(database.GeneralCommands);
+            return messages;
         }
 
         public IMessage Get(Guid id)
         {
-            var message = this.database.Messages.Find(id);
+            IMessage message = this.database.TopicMessages.Find(id);
+            if (message == null)
+                message = this.database.GeneralMessages.Find(id);
+            if (message == null)
+                message= this.database.GeneralCommands.Find(id);
             return message ?? null;
         }
 
-        public async Task<bool> Generate(IMessage message)
+        public void Add(IMessage message)
         {
-            await messenger.Send(message);
-            return true;
-        }
-
-        public Task MessageReceiver(IMessage message)
-        {
-            if (message is GeneralMessage gMessage)
+            if (message is GeneralCommand gCommand)
             {
-                var existingMessage = this.database.Messages.Find(gMessage.Id);
-                if (existingMessage == null)
-                {
-                    this.database.Messages.Add(gMessage);
-                    this.database.SaveChanges();
-                }
+                this.database.GeneralCommands.Add(gCommand);
+                this.database.SaveChanges();
             }
-
-
-            return Task.FromResult(true);
+            else if (message is GeneralMessage gMessage)
+            {
+                this.database.GeneralMessages.Add(gMessage);
+                this.database.SaveChanges();
+            }
+            else if (message is TopicMessage gTopic)
+            {
+                this.database.TopicMessages.Add(gTopic);
+                this.database.SaveChanges();
+            }
+            else
+                throw new NotSupportedException($"The message type of : {message.GetType()} does not have a database store.");
         }
     }
 }
