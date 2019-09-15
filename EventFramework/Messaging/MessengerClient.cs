@@ -1,4 +1,5 @@
 ﻿
+using Messaging.Models;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.ServiceBus.Core;
 using Newtonsoft.Json;
@@ -11,14 +12,6 @@ using Universal.Contracts.Messaging;
 
 namespace Messaging
 {
-    public class GeneralMessage : IMessage
-    {
-        public Guid Id { get; set; }
-        public int CorrellationId { get; set; }
-        public string Type { get { return this.GetType().ToString(); } }
-        public double Version { get; set; }
-    }
-
     /// <summary>
     /// Provides implementation for the Queue and Topic sender modes.
     /// Queue and Topic modes allows for registering a receiver of messages.
@@ -46,15 +39,31 @@ namespace Messaging
 
         public async Task Send(IMessage message)
         {
-            var gMessage = message as GeneralMessage;
-            if (gMessage == null)
-                throw new NotSupportedException("The message type of: {message.GetType()} is not supported.");
+            string messageBody = string.Empty;
+            Type messageType = Type.GetType(message.Type);
+            if (messageType == typeof(GeneralMessage))
+            {
+                var gMessage = message as GeneralMessage;
+                messageBody = JsonConvert.SerializeObject(gMessage);
+            }
+            else if (messageType == typeof(GeneralCommand))
+            {
+                var gCommand = message as GeneralCommand;
+                messageBody = JsonConvert.SerializeObject(gCommand);
+            }
+            else if (messageType == typeof(TopicMessage))
+            {
+                var gCommand = message as TopicMessage;
+                messageBody = JsonConvert.SerializeObject(gCommand);
+            }
+            else
+                throw new NotSupportedException($"The message type of: {message.GetType()} is not supported.");
 
             try
             {
-                var body = JsonConvert.SerializeObject(gMessage);
-                var qMessage = new Message(Encoding.UTF8.GetBytes(body));
-                qMessage.CorrelationId = gMessage.Id.ToString();
+                var qMessage = new Message(Encoding.UTF8.GetBytes(messageBody));
+                qMessage.ContentType = messageType.AssemblyQualifiedName;
+                qMessage.CorrelationId = message.Id.ToString();
                 await sender.SendAsync(qMessage);
             }
             catch (Exception)

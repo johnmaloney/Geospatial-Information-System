@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Universal.Contracts.Messaging;
+using Universal.Contracts.Serial;
 
 namespace Messaging
 {
@@ -23,10 +24,8 @@ namespace Messaging
         private readonly IReceiverClient receiver;
         private readonly bool shouldOnlyReceiveOnce;
 
-        private Dictionary<Type, IList<Func<IMessage, Task>>> registrations = new Dictionary<Type, IList<Func<IMessage, Task>>>()
-        {
-            { typeof(GeneralMessage), new List<Func<IMessage, Task>>() }
-        };
+        private Dictionary<Type, IList<Func<IMessage, Task>>> registrations = 
+            new Dictionary<Type, IList<Func<IMessage, Task>>>();
 
         #endregion
 
@@ -37,7 +36,6 @@ namespace Messaging
         #endregion
 
         #region Methods
-
         public ObserverClient(ISubscriptionClient client, bool shouldRecieveOnce = true)
         {
             this.receiver = client;
@@ -66,6 +64,10 @@ namespace Messaging
                 // If the delegate list contains the type of TMessage then replace the delegate pointer //
                 registrations[typeof(TMessage)].Add(messageHandler);
             }
+            else
+            {
+                registrations.Add(typeof(TMessage), new List<Func<IMessage, Task>> { messageHandler });
+            }
         }
 
         private void RegisterOnMessageHandlerAndReceiveMessages()
@@ -91,7 +93,9 @@ namespace Messaging
             // Process the message
             Console.WriteLine($"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber} Body:{Encoding.UTF8.GetString(message.Body)}");
 
-            var gMessage = JsonConvert.DeserializeObject<GeneralMessage>(Encoding.UTF8.GetString(message.Body));
+            var contentType = Type.GetType(message.ContentType);
+
+            var gMessage = Encoding.UTF8.GetString(message.Body).DeserializeJson<IMessage>(contentType);
 
             if (shouldOnlyReceiveOnce)
             {
@@ -104,7 +108,7 @@ namespace Messaging
             // If queueClient has already been Closed, you may chose to not call CompleteAsync() or AbandonAsync() etc. calls 
             // to avoid unnecessary exceptions.
 
-            foreach (var handler in registrations[typeof(GeneralMessage)])
+            foreach (var handler in registrations[contentType])
             {
                 await handler(gMessage);
             }
