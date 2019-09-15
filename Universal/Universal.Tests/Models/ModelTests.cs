@@ -75,5 +75,13 @@ namespace Universal.Tests.Models
             Assert.AreEqual(command.Id, deserial.Id);
             Assert.AreEqual(command.CommandDataCollection.Count(), deserial1.CommandDataCollection.Count());
         }
+
+        [TestMethod]
+        public void given_different_assembly_names_expect_removal_of_version()
+        {
+            var name = typeof(IMessage).AssemblyQualifiedName;
+            name = name.SanitizeAssemblyName();
+            Assert.AreEqual("Universal.Contracts.Messaging.IMessage, Universal.Contracts", name);
+        }
     }
 }

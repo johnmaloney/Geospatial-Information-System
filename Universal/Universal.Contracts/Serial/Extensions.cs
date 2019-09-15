@@ -38,7 +38,7 @@ namespace Universal.Contracts.Serial
 
             // Clean up the type name to avoid version information //
             // this is assuming the typeOfObject is the full assembly qualified name //
-            typeOfObject = Regex.Replace(typeOfObject, @", Version=\d+.\d+.\d+.\d+", string.Empty);
+            typeOfObject = typeOfObject.SanitizeAssemblyName();
 
             var type = Type.GetType(typeOfObject);
 
@@ -71,6 +71,25 @@ namespace Universal.Contracts.Serial
         public static T FromJsonInto<T>(this string jsonData) where T : class
         {
             return jsonData.DeserializeJson<T>();
+        }
+
+        /// <summary>
+        /// Replaces/Removes the version, culture and publickeytoken from the assembly name.
+        /// example: this --> 
+        /// System.String, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e08
+        /// becomes this --> System.String, mscorlib
+        /// </summary>
+        /// <param name="fullQualifiedAssemblyName"></param>
+        /// <returns></returns>
+        public static string SanitizeAssemblyName(this string fullQualifiedAssemblyName)
+        {
+            fullQualifiedAssemblyName = Regex.Replace(fullQualifiedAssemblyName, @", Version=\d+.\d+.\d+.\d+", string.Empty);
+
+            fullQualifiedAssemblyName = Regex.Replace(fullQualifiedAssemblyName, @", Culture=\w+", string.Empty);
+
+            fullQualifiedAssemblyName = Regex.Replace(fullQualifiedAssemblyName, @", PublicKeyToken=\w+", string.Empty);
+
+            return fullQualifiedAssemblyName;
         }
 
         private static void SetJsonSettingUp()
