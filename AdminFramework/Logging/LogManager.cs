@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Universal.Contracts.Logging;
+using Universal.Contracts.Serial;
 
 namespace Logging
 {
@@ -46,42 +47,42 @@ namespace Logging
                 case LogType.Default:
                     task = () =>
                     {
-                        seriLogger.Information($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        seriLogger.Information("Title : {Title} Body: {Body}", entry.Title, entry.SerializeToJson());
                         return true;
                     };
                     break;
                 case LogType.Debug:
                     task = () =>
                     {
-                        seriLogger.Debug($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        seriLogger.Debug("Title : {Title} Body: {Body}", entry.Title, entry.SerializeToJson());
                         return true;
                     };
                     break;
                 case LogType.Error:
                     task = () =>
                     {
-                        seriLogger.Error($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        seriLogger.Error("Title : {Title} Body: {Body}", entry.Title, entry.SerializeToJson());
                         return true;
                     };
                     break;
                 case LogType.Fatal:
                     task = () =>
                     {
-                        seriLogger.Fatal($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        seriLogger.Fatal("Title : {Title} Body: {Body}", entry.Title, entry.SerializeToJson());
                         return true;
                     };
                     break;
                 case LogType.Information:
                     task = () =>
                     {
-                        seriLogger.Information($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        seriLogger.Information("Title : {Title} Body: {Body}", entry.Title, entry.SerializeToJson());
                         return true;
                     };
                     break;
                 default:
                     task = () =>
                     {
-                        seriLogger.Information($"Title: {entry.Title}, Type:{entry.Type}, Version:{entry.Id}", entry);
+                        seriLogger.Information("Title : {Title} Body: {Body}", entry.Title, entry.SerializeToJson());
                         return true;
                     };
                     break;

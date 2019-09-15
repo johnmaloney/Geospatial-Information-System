@@ -15,7 +15,20 @@ namespace Logging.Tests
         public async Task given_log_entry_send_to_kibana_expect_entry()
         {
             var manager = ATest.Container.GetService<ILogger>();
-            var results = await manager.Log(new MockLogEntry() { Type = LogType.Information.ToString(), Title = "Logging Integration Test", Id = 1.0d });
+            var results = await manager.Log(new MockLogEntry()
+            {
+                Type = LogType.Information.ToString(),
+                Title = "Logging Integration Test",
+                Id = 1.0d,
+                Document = new ComplexType()
+                {
+                    Children = new List<ComplexType>
+                    {
+                        new ComplexType(),
+                        new ComplexType()
+                    }
+                }
+            });       
         }
     }
 
@@ -24,5 +37,14 @@ namespace Logging.Tests
         public string Type  { get; set;}
         public string Title { get; set;}
         public double Id { get; set; }
+        public ComplexType Document { get; set; }
+    }
+
+    public class ComplexType
+    {
+        public int Id => 1000;
+        public string Message => "This is a test mock object";
+        public string Title => "Regal Mock Title";
+        public List<ComplexType> Children { get; set; }
     }
 }
