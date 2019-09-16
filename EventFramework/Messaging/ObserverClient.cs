@@ -63,6 +63,11 @@ namespace Messaging
             RegisterOnMessageHandlerAndReceiveMessages();
         }
         
+        public void RegisterForLogNotifications(Func<IEnumerable<ILogEntry>, Task> logHandler)
+        {
+            logRegistrations.Add(logHandler);
+        }
+
         public void RegisterForNotificationOf<TMessage>(Func<IMessage, Task> messageHandler)
         {
             if (registrations.ContainsKey(typeof(TMessage)))
@@ -98,7 +103,7 @@ namespace Messaging
         {
             var logging = new List<ILogEntry>();
             // Used as a unique identifier //
-            double id = new Random().NextDouble();
+            double logEntryId = new Random().NextDouble();
             IMessage gMessage = null;
             Type contentType = null;
 
@@ -114,7 +119,7 @@ namespace Messaging
                 {
                     Type = LogType.Information.ToString(),
                     Title = $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber}, ContentType : {message.ContentType} Body: {Encoding.UTF8.GetString(message.Body)}",
-                    Id = id
+                    Id = logEntryId
                 });
 
                 // Process the message
@@ -124,7 +129,7 @@ namespace Messaging
                 {
                     Type = LogType.Information.ToString(),
                     Title = $"Successfully processed the Message Body into {contentType}",
-                    Id = id
+                    Id = logEntryId
                 });
             }
             catch (Exception ex)
@@ -134,7 +139,7 @@ namespace Messaging
                 {
                     Type = LogType.Error.ToString(),
                     Title = $"A message was received that could not be parsed for notificaion. Error Message : {ex.Message}",
-                    Id = id
+                    Id = logEntryId
                 });
             }
 
@@ -149,7 +154,7 @@ namespace Messaging
                 {
                     Type = LogType.Information.ToString(),
                     Title = $"Completed the message in the service bus queue.",
-                    Id = id
+                    Id = logEntryId
                 });
             }
 
@@ -166,7 +171,7 @@ namespace Messaging
             }
 
             // Notify any registrations of the log events. //
-            if (registrations.ContainsKey(typeof(List<ILogEntry>)))
+            if (logRegistrations != null && logRegistrations.Count > 0)
             {
                 foreach (var handler in logRegistrations)
                 {
