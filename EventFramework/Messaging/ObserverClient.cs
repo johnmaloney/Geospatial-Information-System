@@ -99,21 +99,21 @@ namespace Messaging
             var logging = new List<ILogEntry>();
             // Used as a unique identifier //
             double id = new Random().NextDouble();
-            Type contentType = null;
             IMessage gMessage = null;
+            Type contentType = null;
 
             try
             {
                 // We need to discern the type and version to know how to properly deserialize the message //
                 // and the version for the registered delegates //
-                contentType = Type.GetType(message.ContentType);
+                contentType = Type.GetType(message.ContentType.SanitizeAssemblyName());
                 var version = Double.TryParse(message.Label, out double mVersion);
 
                 // Process the message
                 logging.Add(new MessageLogEntry
                 {
                     Type = LogType.Information.ToString(),
-                    Title = $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber}, ContentType : {contentType} Body: {Encoding.UTF8.GetString(message.Body)}",
+                    Title = $"Received message: SequenceNumber:{message.SystemProperties.SequenceNumber}, ContentType : {message.ContentType} Body: {Encoding.UTF8.GetString(message.Body)}",
                     Id = id
                 });
 
@@ -157,7 +157,7 @@ namespace Messaging
             // If queueClient has already been Closed, you may chose to not call CompleteAsync() or AbandonAsync() etc. calls 
             // to avoid unnecessary exceptions.
 
-            if (contentType != null && gMessage != null)
+            if (contentType != null && gMessage != null && registrations.ContainsKey(contentType))
             {
                 foreach (var handler in registrations[contentType])
                 {

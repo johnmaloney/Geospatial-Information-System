@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Universal.Contracts.Messaging;
+using Universal.Contracts.Serial;
 
 namespace Messaging
 {
@@ -44,17 +45,17 @@ namespace Messaging
             if (messageType == typeof(GeneralMessage))
             {
                 var gMessage = message as GeneralMessage;
-                messageBody = JsonConvert.SerializeObject(gMessage);
+                messageBody = gMessage.SerializeToJson();
             }
             else if (messageType == typeof(GeneralCommand))
             {
                 var gCommand = message as GeneralCommand;
-                messageBody = JsonConvert.SerializeObject(gCommand);
+                messageBody = gCommand.SerializeToJson();
             }
             else if (messageType == typeof(TopicMessage))
             {
-                var gCommand = message as TopicMessage;
-                messageBody = JsonConvert.SerializeObject(gCommand);
+                var topic = message as TopicMessage;
+                messageBody = topic.SerializeToJson();
             }
             else
                 throw new NotSupportedException($"The message type of: {message.GetType()} is not supported.");
