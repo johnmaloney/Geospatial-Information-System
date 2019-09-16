@@ -1,6 +1,7 @@
 ﻿using Messaging;
 using Messaging.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,13 @@ namespace AdminManagementApp.Data
         public ApplicationDbContext(DbContextOptions options)
             : base(options)
         {
+            
+        }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<GeneralCommand>().Ignore("CommandDataCollection");
         }
     }
 }

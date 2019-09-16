@@ -9,6 +9,7 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Universal.Contracts.Logging;
 using Universal.Contracts.Messaging;
 
 namespace AdminManagementApp
