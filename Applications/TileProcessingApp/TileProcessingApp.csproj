@@ -7,19 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\layers\" />
+    <Folder Include="wwwroot\raw\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logging" Version="203.0.0" />
-    <PackageReference Include="Messaging" Version="205.0.0" />
+    <PackageReference Include="Logging" Version="233.0.0" />
+    <PackageReference Include="Messaging" Version="244.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.7.12" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
     <PackageReference Include="TileFactory" Version="219.0.0" />
-    <PackageReference Include="Universal.Contracts" Version="214.0.0" />
+    <PackageReference Include="Universal.Contracts" Version="243.0.0" />
   </ItemGroup>
 
 </Project>

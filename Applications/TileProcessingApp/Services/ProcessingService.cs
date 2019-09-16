@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TileProcessingApp.Observers;
 using Universal.Contracts.Messaging;
+using Universal.Contracts.Logging;
 
 namespace TileProcessingApp.Services
 {
@@ -16,6 +17,7 @@ namespace TileProcessingApp.Services
         private readonly IQueueMessengerClient queueMesssenger;
         private readonly ITopicObserverClient topicObserver;
         private readonly ITopicMessengerClient messenger;
+        private readonly ILogger logger;
 
         #endregion
 
@@ -31,19 +33,22 @@ namespace TileProcessingApp.Services
             IQueueObserverClient queueObserver,
             IQueueMessengerClient queueMesssenger,
             ITopicObserverClient topicObserver,
-            ITopicMessengerClient TopicMessenger)
+            ITopicMessengerClient TopicMessenger, 
+            ILogger logger)
         {
             this.queueObserver = queueObserver;
             this.queueMesssenger = queueMesssenger;
             this.topicObserver = topicObserver;
             this.messenger = TopicMessenger;
+            this.logger = logger;
         }
 
         public void RegisterNotificationHandlers()
         {
-            queueObserver.RegisterForNotificationOf<GeneralCommand>(new ProjectDataObserver().CommandReceiver);
+            var executor = new ProjectedDataObserver(messenger);
+            queueObserver.RegisterForNotificationOf<GeneralCommand>(executor.CommandReceiver);
         }
-
+        
         #endregion
     }
 }

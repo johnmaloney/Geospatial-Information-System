@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using TileFactory;
+using Universal.Contracts.Models;
 
 namespace TileProcessingApp.Controllers
 {
@@ -11,9 +13,17 @@ namespace TileProcessingApp.Controllers
     [ApiController]
     public class LayerController : ControllerBase
     {
-        public void Post()
-        {
+        private readonly ILayerInitializationService layerService;
 
+        [HttpGet]
+        public ActionResult<IEnumerable<LayerInformationModel>> Get()
+        {
+            return new ObjectResult(layerService.Models);
+        }
+
+        public LayerController(ILayerInitializationService layerService)
+        {
+            this.layerService = layerService;
         }
     }
 }
