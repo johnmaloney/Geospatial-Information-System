@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 namespace Universal.Contracts.Files
 {
     interface IFIleRepository
-    {
-        Task<File> Get(string directoryPath, string fileName);
-        Task Add(File file);
+    { 
+         Task<IEnumerable<IFileMetadata>> GetDirectory(string directory);
+        Task<IFile> Get(string directoryPath, string fileName);
+        Task Add(IFile file);
     }
 }
