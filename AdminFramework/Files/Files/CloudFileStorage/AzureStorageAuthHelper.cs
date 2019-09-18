@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
+using System.Linq;
+using System.Collections.Specialized;
 using System.Web;
 
 namespace Files.CloudFileStorage
 {
-    internal class AzureStorageAuthenticationHelper_OLd
+    /// <summary>
+    /// You can take this class and drop it into another project and use this code
+    /// to create the headers you need to make a REST API call to Azure Storage.
+    /// Sources used:
+    /// https://docs.microsoft.com/en-us/rest/api/storageservices/authorization-for-the-azure-storage-services
+    /// https://docs.microsoft.com/en-us/rest/api/storageservices/authorize-with-shared-key
+    /// https://docs.microsoft.com/en-us/rest/api/storageservices/create-file
+    /// https://docs.microsoft.com/de-de/azure/storage/common/storage-rest-api-auth
+    /// </summary>
+    internal static class AzureStorageAuthenticationHelper
     {
         /// <summary>
         /// This creates the authorization header. This is required, and must be built 
@@ -27,34 +36,48 @@ namespace Files.CloudFileStorage
         /// <param name="md5">Provide the md5 and it will check and make sure it matches the blob's md5.
         /// If it doesn't match, it won't return a value.</param>
         /// <returns></returns>
-        internal AuthenticationHeaderValue GetAuthorizationHeader(
+        internal static AuthenticationHeaderValue GetAuthorizationHeader(
            string storageAccountName, string storageAccountKey, DateTime now,
            HttpRequestMessage httpRequestMessage, string ifMatch = "", string md5 = "")
         {
             // This is the raw representation of the message signature.
-            HttpMethod method = httpRequestMessage.Method;
-            String MessageSignature = String.Format("{0}\n\n\n{1}\n{5}\n\n\n\n{2}\n\n\n\n{3}{4}",
-                      method.ToString(),
-                      (method == HttpMethod.Get || method == HttpMethod.Head) ? String.Empty
-                        : httpRequestMessage.Content.Headers.ContentLength.ToString(),
+            var method = httpRequestMessage.Method;
+
+            // content length
+            var contentLength = string.Empty;
+            if (!(method == HttpMethod.Get || method == HttpMethod.Head))
+            {
+                var length = httpRequestMessage.Content?.Headers.ContentLength;
+
+                if (length != null && length > 0)
+                {
+                    contentLength = length.ToString();
+                }
+            }
+
+            String messageSignature = String.Format("{0}\n\n\n{1}\n{5}\n{7}\n{6}\n\n{2}\n\n\n\n{3}{4}",
+                      method.ToString().ToUpper(),
+                      contentLength,
                       ifMatch,
-                      GetCanonicalizedHeaders_Old(httpRequestMessage),
-                      GetCanonicalizedResource_Old(httpRequestMessage.RequestUri, storageAccountName),
-                      md5);
+                      GetCanonicalizedHeaders(httpRequestMessage),
+                      GetCanonicalizedResource(httpRequestMessage.RequestUri, storageAccountName),
+                      md5,
+                      string.Empty,
+                      httpRequestMessage.Content?.Headers.ContentType?.ToString() ?? string.Empty);
 
             // Now turn it into a byte array.
-            byte[] SignatureBytes = Encoding.UTF8.GetBytes(MessageSignature);
+            var signatureBytes = Encoding.UTF8.GetBytes(messageSignature);
 
             // Create the HMACSHA256 version of the storage key.
-            HMACSHA256 SHA256 = new HMACSHA256(Convert.FromBase64String(storageAccountKey));
+            var SHA256 = new HMACSHA256(Convert.FromBase64String(storageAccountKey));
 
             // Compute the hash of the SignatureBytes and convert it to a base64 string.
-            string signature = Convert.ToBase64String(SHA256.ComputeHash(SignatureBytes));
+            var signature = Convert.ToBase64String(SHA256.ComputeHash(signatureBytes));
 
             // This is the actual header that will be added to the list of request headers.
             // You can stop the code here and look at the value of 'authHV' before it is returned.
-            AuthenticationHeaderValue authHV = new AuthenticationHeaderValue("SharedKey",
-                storageAccountName + ":" + Convert.ToBase64String(SHA256.ComputeHash(SignatureBytes)));
+            var authHV = new AuthenticationHeaderValue("SharedKey",
+                storageAccountName + ":" + signature);
             return authHV;
         }
 
@@ -65,7 +88,7 @@ namespace Files.CloudFileStorage
         /// </summary>
         /// <param name="httpRequestMessage">The request that will be made to the storage service.</param>
         /// <returns>Error message; blank if okay.</returns>
-        private string GetCanonicalizedHeaders_Old(HttpRequestMessage httpRequestMessage)
+        private static string GetCanonicalizedHeaders(HttpRequestMessage httpRequestMessage)
         {
             var headers = from kvp in httpRequestMessage.Headers
                           where kvp.Key.StartsWith("x-ms-", StringComparison.OrdinalIgnoreCase)
@@ -105,7 +128,7 @@ namespace Files.CloudFileStorage
         /// <param name="address">The URI of the storage service.</param>
         /// <param name="accountName">The storage account name.</param>
         /// <returns>String representing the canonicalized resource.</returns>
-        private string GetCanonicalizedResource_Old(Uri address, string storageAccountName)
+        private static string GetCanonicalizedResource(Uri address, string storageAccountName)
         {
             // The absolute path is "/" because for we're getting a list of containers.
             StringBuilder sb = new StringBuilder("/").Append(storageAccountName).Append(address.AbsolutePath);
@@ -120,7 +143,7 @@ namespace Files.CloudFileStorage
                 sb.Append('\n').Append(item).Append(':').Append(values[item]);
             }
 
-            return sb.ToString().ToLower();
+            return sb.ToString();
 
         }
     }

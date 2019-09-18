@@ -37,7 +37,15 @@ namespace Files
 
         public async Task Add(IFile file)
         {
-
+            // If only the directory is defined then create the DIR //
+            if (string.IsNullOrEmpty(file.Name) && !string.IsNullOrEmpty(file.Directory))
+            {
+                await fileReader.CreateDirectory(file.Directory);
+            }
+            else
+            {
+                await fileReader.AddFile(file);
+            }
         }
         
         #endregion

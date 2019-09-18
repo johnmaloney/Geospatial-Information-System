@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Files.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -13,15 +14,16 @@ namespace Files.CloudFileStorage
     /// <summary>
     /// Access to the Azure File Service Rest API.
     /// https://docs.microsoft.com/en-us/azure/storage/common/storage-rest-api-auth
+    /// Credit also to this Repo: https://github.com/mstaples84/azurefileserviceauth
+    /// 
     /// </summary>
-    public class AzureFileReader
+    public class AzureFileReader : IFileReader
     {
         #region Fields
         
         private readonly string storageAccountName;
         private readonly string storageAccountKey;
         private readonly string rootDirectory;
-        private readonly AzureStorageAuthenticationHelper authorizationUtility;
 
         #endregion
 
@@ -38,10 +40,9 @@ namespace Files.CloudFileStorage
             this.storageAccountName = storageAccountName;
             this.storageAccountKey = storageAccountKey;
             this.rootDirectory = rootDirectory;
-            this.authorizationUtility = new AzureStorageAuthenticationHelper();
         }
 
-        private async Task<IEnumerable<File>> ListAll(CancellationToken cancellationToken)
+        public async Task<IEnumerable<IFileMetadata>> ListAll()
         {
 
             // Construct the URI. This will look like this:
@@ -59,17 +60,16 @@ namespace Files.CloudFileStorage
 
                 // Add the request headers for x-ms-date and x-ms-version.
                 DateTime now = DateTime.UtcNow;
-                httpRequestMessage.Headers.Add("x-ms-date", now.ToString("R", CultureInfo.InvariantCulture));
-                httpRequestMessage.Headers.Add("x-ms-version", "2017-04-17");
+                SetDefaultHeaders(httpRequestMessage, now);
                 // If you need any additional headers, add them here before creating
                 //   the authorization header. 
 
                 // Add the authorization header.
-                httpRequestMessage.Headers.Authorization = authorizationUtility.GetAuthorizationHeader(
+                httpRequestMessage.Headers.Authorization = AzureStorageAuthenticationHelper.GetAuthorizationHeader(
                    storageAccountName, storageAccountKey, now, httpRequestMessage);
 
                 // Send the request.
-                using (HttpResponseMessage httpResponseMessage = await new HttpClient().SendAsync(httpRequestMessage, cancellationToken))
+                using (HttpResponseMessage httpResponseMessage = await new HttpClient().SendAsync(httpRequestMessage))
                 {
                     // If successful (status code = 200), 
                     //   parse the XML response for the container names.
@@ -87,28 +87,27 @@ namespace Files.CloudFileStorage
             }
         }
 
-        private async Task CreateDirectory(string directoryName, CancellationToken cancellationToken)
+        public async Task CreateDirectory(string directoryName)
         {
             // Construct the URI. This will look like this:
             //   https://myaccount.blob.core.windows.net/resource
-            String uri = $"https://{storageAccountName}.file.core.windows.net/{rootDirectory}/{directoryName}";
+            String uri = $"https://{storageAccountName}.file.core.windows.net/{rootDirectory}/{directoryName}?restype=directory";
 
             //Instantiate the request message with a null payload.
             using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, uri))
             {
                 // Add the request headers for x-ms-date and x-ms-version.
                 DateTime now = DateTime.UtcNow;
-                httpRequestMessage.Headers.Add("x-ms-date", now.ToString("R", CultureInfo.InvariantCulture));
-                httpRequestMessage.Headers.Add("x-ms-version", "2017-04-17");
+                SetDefaultHeaders(httpRequestMessage, now);
                 // If you need any additional headers, add them here before creating
                 //   the authorization header. 
 
                 // Add the authorization header.
-                httpRequestMessage.Headers.Authorization = authorizationUtility.GetAuthorizationHeader(
+                httpRequestMessage.Headers.Authorization = AzureStorageAuthenticationHelper.GetAuthorizationHeader(
                    storageAccountName, storageAccountKey, now, httpRequestMessage);
 
                 // Send the request.
-                using (HttpResponseMessage httpResponseMessage = await new HttpClient().SendAsync(httpRequestMessage, cancellationToken))
+                using (HttpResponseMessage httpResponseMessage = await new HttpClient().SendAsync(httpRequestMessage))
                 {
                     // If successful (status code = 200), 
                     //   parse the XML response for the container names.
@@ -123,6 +122,108 @@ namespace Files.CloudFileStorage
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Put the file spec into Azure then upon sucess write the bytes to the file
+        /// </summary>
+        /// <param name="file"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task AddFile(IFile file)
+        {
+            var fileBytes = Encoding.UTF8.GetBytes(file.TextContents);
+
+            // Construct the URI. This will look like this:
+            //   https://myaccount.blob.core.windows.net/resource
+            String uri = $"https://{storageAccountName}.file.core.windows.net/{rootDirectory}/{file.Directory}/{file.Name}";
+
+            var successfullyCreated = await CreateFileAsync(uri, fileBytes.Length);
+
+            if(successfullyCreated)
+            {
+                await PutRangeAsync(new Uri($"{uri}?comp=range"), fileBytes);
+            }
+        }
+
+        public async Task<bool> CreateFileAsync(string storageUri, int contentLength)
+        {
+            //Instantiate the request message with a empty payload.
+            using (var httpRequestMessage =
+                new HttpRequestMessage(HttpMethod.Put, storageUri)
+                { Content = new StringContent("") })
+            {
+                var now = DateTime.UtcNow;
+
+                SetDefaultHeaders(httpRequestMessage, now);
+                // Required. This header specifies the maximum size for the file, up to 1 TiB.
+                httpRequestMessage.Headers.Add("x-ms-content-length", contentLength.ToString());
+                httpRequestMessage.Headers.Add("x-ms-type", "file");
+
+                // If you need any additional headers, add them here before creating
+                //   the authorization header. 
+
+                // Add the authorization header.
+                httpRequestMessage.Headers.Authorization = AzureStorageAuthenticationHelper.GetAuthorizationHeader(
+                   storageAccountName, storageAccountKey, now, httpRequestMessage);
+
+                using (HttpResponseMessage httpResponseMessage = await new HttpClient().SendAsync(httpRequestMessage))
+                {
+                    if (httpResponseMessage.StatusCode == HttpStatusCode.Created)
+                    {
+                        var response = await httpResponseMessage.Content.ReadAsStringAsync();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Put Range Request
+        /// </summary>
+        /// <returns></returns>
+        public async Task PutRangeAsync(Uri storageUri, byte[] bytes, int startBytes = 0, string writeMode = "Update")
+        {
+            if (string.IsNullOrEmpty(storageUri.Query) || !storageUri.Query.Contains("comp=range")) throw new Exception("Missing Query String comp=range");
+
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Put, storageUri))
+            {
+                httpRequestMessage.Content = new ByteArrayContent(bytes);
+
+                var contentlength = httpRequestMessage.Content.Headers.ContentLength - 1;
+
+                var now = DateTime.UtcNow;
+                SetDefaultHeaders(httpRequestMessage, now);
+
+                httpRequestMessage.Headers.Add("x-ms-range", $"bytes={startBytes}-{contentlength.ToString()}");
+                httpRequestMessage.Headers.Add("x-ms-write", writeMode);
+
+                // Add the authorization header.
+                httpRequestMessage.Headers.Authorization = AzureStorageAuthenticationHelper.GetAuthorizationHeader(
+                    storageAccountName, storageAccountKey, now, httpRequestMessage);
+
+                using (HttpResponseMessage httpResponseMessage = await new HttpClient().SendAsync(httpRequestMessage))
+                {
+                    if (httpResponseMessage.StatusCode == HttpStatusCode.Created)
+                    {
+                        var response = await httpResponseMessage.Content.ReadAsStringAsync();
+                        
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Set the default headers which are mandatory in all requests
+        /// </summary>
+        /// <param name="httpRequestMessage"></param>
+        /// <param name="now"></param>
+        private void SetDefaultHeaders(HttpRequestMessage httpRequestMessage, DateTime now)
+        {
+            httpRequestMessage.Headers.Add("x-ms-date", now.ToString("R", CultureInfo.InvariantCulture));
+            httpRequestMessage.Headers.Add("x-ms-version", "2018-03-28");
         }
 
         #endregion
