@@ -1,23 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Universal.Contracts.Files;
 
 namespace Files
 {
-    public interface IFileMetadata
-    {
-        string Directory { get; set; }
-        string Name { get; set; }
-        int ContentLength { get; set; }
-        IList<IFileMetadata> Files { get; set; }
-    }
-
-    public interface IFile : IFileMetadata
-    {
-        string TextContents { get; set; }
-        byte[] DataContents { get; set; }
-    }
-
     public class FileMetadata 
     {
     }

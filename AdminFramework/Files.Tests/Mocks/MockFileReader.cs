@@ -1,4 +1,4 @@
-﻿using Files.Interfaces;
+﻿using Universal.Contracts.Files;
 using System;
 using System.Collections.Generic;
 using System.Linq;

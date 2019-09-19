@@ -3,6 +3,7 @@ using Files.CloudFileStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using System;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace FileAccessConsole
@@ -28,10 +29,27 @@ namespace FileAccessConsole
                 line = Console.ReadLine();
                 if (line != null)
                 {
-                    var startIndex = line.IndexOf(':') == -1 ? 0 : line.IndexOf(':');
-                    switch (line.ToLower().Substring(startIndex))
+                    // Get the command to the left of the : //
+                    var command = Regex.Match(line, @"^.*?(?=:)").Value;
+
+                    // GETS fileNameArg FROM file:fileNameArg //
+                    var argument = Regex.IsMatch(line, @"(?<=:)(.*)(?=/)") 
+                        ? Regex.Match(line, @"(?<=:)(.*)(?=/)").Value
+                        : string.Empty;
+
+                    // GETS fileName FROM file:directory/fileName //
+                    var secondArg = Regex.IsMatch(line, @"[^/]+$")
+                        ? Regex.Match(line, @"[^/]+$").Value
+                        : string.Empty;
+
+                    switch (command.ToLower())
                     {
-                        case "list":
+                        case "get":
+                            {
+                                Task.Run(() => repository.Get(argument ?? home, secondArg));
+                                break;
+                            }
+                        case "list": 
                             {
                                 Task.Run(() => repository.GetDirectory(home));
                                 break;
@@ -40,8 +58,8 @@ namespace FileAccessConsole
                             {
                                 var f = new File()
                                 {
-                                    Name = "Unprojected_data.geojson",
-                                    Directory = home,
+                                    Name = secondArg ?? "data.geojson",
+                                    Directory = argument ?? home,
                                     TextContents = FileSampleContent()
                                 };
                                 Task.Run(()=> repository.Add(f));
@@ -51,7 +69,7 @@ namespace FileAccessConsole
                             {
                                 var f = new File()
                                 {
-                                    Directory = home
+                                    Directory = argument ?? home
                                 };
                                 Task.Run(() => repository.Add(f));
                                 break;

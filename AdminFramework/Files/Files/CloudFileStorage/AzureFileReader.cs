@@ -1,4 +1,4 @@
-﻿using Files.Interfaces;
+﻿using Universal.Contracts.Files;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -44,7 +44,6 @@ namespace Files.CloudFileStorage
 
         public async Task<IEnumerable<IFileMetadata>> ListAll()
         {
-
             // Construct the URI. This will look like this:
             //   https://myaccount.blob.core.windows.net/resource
             String uri = string.Format("https://{0}.file.core.windows.net?comp=list", storageAccountName);
@@ -81,6 +80,50 @@ namespace Files.CloudFileStorage
                         {
                             
                         }
+                    }
+                }
+                return null;
+            }
+        }
+
+        public async Task<IFile> GetFile(string directory, string fileName)
+        {
+            // Construct the URI. This will look like this:
+            //   https://myaccount.blob.core.windows.net/resource
+            String uri = $"https://{storageAccountName}.file.core.windows.net/{rootDirectory}/{directory}/{fileName}";
+
+            // Set this to whatever payload you desire. Ours is null because 
+            //   we're not passing anything in.
+            Byte[] responsePayload = null;
+
+            //Instantiate the request message with a null payload.
+            using (var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri))
+            {
+                // Add the request headers for x-ms-date and x-ms-version.
+                DateTime now = DateTime.UtcNow;
+                SetDefaultHeaders(httpRequestMessage, now);
+                // If you need any additional headers, add them here before creating
+                //   the authorization header. 
+
+                // Add the authorization header.
+                httpRequestMessage.Headers.Authorization = AzureStorageAuthenticationHelper.GetAuthorizationHeader(
+                   storageAccountName, storageAccountKey, now, httpRequestMessage);
+
+                // Send the request.
+                using (HttpResponseMessage httpResponseMessage = await new HttpClient().SendAsync(httpRequestMessage))
+                {
+                    // If successful (status code = 200), 
+                    //   parse the XML response for the container names.
+                    if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
+                    {
+                        var file = await httpResponseMessage.Content.ReadAsByteArrayAsync();
+                        return new File
+                        {
+                            DataContents = file,
+                            Directory = directory,
+                            Name = fileName,
+                            ContentLength = file.Length
+                        };
                     }
                 }
                 return null;
@@ -213,8 +256,7 @@ namespace Files.CloudFileStorage
                 }
             }
         }
-
-
+        
         /// <summary>
         /// Set the default headers which are mandatory in all requests
         /// </summary>

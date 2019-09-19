@@ -4,4 +4,8 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Universal.Contracts" Version="250.0.0" />
+  </ItemGroup>
+
 </Project>

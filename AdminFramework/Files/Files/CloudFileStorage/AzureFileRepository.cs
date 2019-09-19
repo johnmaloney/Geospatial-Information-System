@@ -1,5 +1,5 @@
 ﻿using Files.CloudFileStorage;
-using Files.Interfaces;
+using Universal.Contracts.Files;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -27,12 +27,12 @@ namespace Files
         
         public async Task<IEnumerable<IFileMetadata>> GetDirectory(string directory)
         {
-            throw new NotImplementedException();
+            return await fileReader.ListAll();
         }
 
         public async Task<IFile> Get(string directoryPath, string fileName)
         {
-            return null;
+            return await fileReader.GetFile(directoryPath, fileName);
         }
 
         public async Task Add(IFile file)
