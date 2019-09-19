@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Universal.Contracts.Files
 {
-    interface IFIleRepository
+    interface IFileRepository
     { 
          Task<IEnumerable<IFileMetadata>> GetDirectory(string directory);
         Task<IFile> Get(string directoryPath, string fileName);
