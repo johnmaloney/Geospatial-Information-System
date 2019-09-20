@@ -2,13 +2,15 @@
 let submitJobEntry = async () => {
 
     var form = document.getElementById("jobEntryForm");
+    var fileInput = document.querySelector('#file-input-field input[type=file]');
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
 
     var json = {
         message : form[0].value,
         jobType: form[1].value,
         fileName : form[2].value
     };
-
 
     const options = {
         method: 'POST',
@@ -95,7 +97,7 @@ let JobEntry = {
                 const fileName = document.querySelector('#file-input-field .file-name');
                 fileName.textContent = fileInput.files[0].name;
             }
-        }
+        };
     }
 };
 

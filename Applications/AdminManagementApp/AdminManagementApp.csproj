@@ -11,14 +11,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Logging" Version="233.0.0" />
-    <PackageReference Include="Messaging" Version="239.0.0" />
+    <PackageReference Include="Logging" Version="1.0.260" />
+    <PackageReference Include="Messaging" Version="1.0.259" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Language" Version="2.2.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.7.12" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
-    <PackageReference Include="Universal.Contracts" Version="238.0.0" />
+    <PackageReference Include="Universal.Contracts" Version="1.0.262" />
   </ItemGroup>
 
 </Project>
