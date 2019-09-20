@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Universal.Contracts" Version="237.0.0" />
+    <PackageReference Include="Universal.Contracts" Version="1.0.273" />
   </ItemGroup>
 
   <ItemGroup>
