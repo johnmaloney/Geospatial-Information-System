@@ -9,5 +9,6 @@ namespace Universal.Contracts.Messaging
     public interface IQueueObserverClient
     {
         void RegisterForNotificationOf<TMessage>(Func<IMessage, Task> messageHandler);
+        Task Close();
     }
 }

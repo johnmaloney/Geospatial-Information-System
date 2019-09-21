@@ -8,5 +8,6 @@ namespace Universal.Contracts.Messaging
     public interface ITopicObserverClient
     {
         void RegisterForNotificationOf<TMessage>(Func<IMessage, Task> messageHandler);
+        Task Close();
     }
 }
