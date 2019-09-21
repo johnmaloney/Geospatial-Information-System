@@ -33,5 +33,10 @@ namespace Universal.Tests.Messaging
                 }
             }
         }
+
+        public Task Close()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
