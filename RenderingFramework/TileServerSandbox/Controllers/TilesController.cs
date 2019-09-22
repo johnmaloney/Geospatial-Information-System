@@ -57,12 +57,12 @@ namespace TileServerSandbox.Controllers
         public TilesController(ITileCacheStorage<ITile> tileCache, 
             ITileCacheStorage<ITransformedTile> transformedCache, 
             ITileContext tileContext, 
-            IFileProvider files)
+            ILayerInitializationService layerService)
         {
             this.tileContext = tileContext;
             this.files = files;
 
-            var generator = new Generator(tileContext, tileCache, new LayerInitializationFileService(files));
+            var generator = new Generator(tileContext, tileCache, layerService);
             tileRetrieverService = new TileRetrieverService(transformedCache, tileContext, generator);
         }
     }

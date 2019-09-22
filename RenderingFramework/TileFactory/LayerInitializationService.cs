@@ -40,20 +40,22 @@ namespace TileFactory
 
         #region Methods
 
-        public LayerInitializationFileService(IFileProvider fileProvider)
+        public LayerInitializationFileService(IFileProvider fileProvider, string serverIP)
         {
             this.fileProvider = fileProvider;
             var models = new List<LayerInformationModel>();
             foreach(var item in this.fileProvider.GetDirectoryContents("/"))
             {
+                var name = Path.GetFileNameWithoutExtension(item.PhysicalPath);
                 var layerInformation = new LayerInformationModel()
                 {
                     Identifier = Guid.NewGuid(),
-                    Name = Path.GetFileNameWithoutExtension(item.PhysicalPath),
+                    Name = name,
                     Path = item.PhysicalPath,
                     Properties = new Property[]
                     {
-                        new Property{ Name = "FileExtension", Value = Path.GetExtension(item.PhysicalPath), ValueType = typeof(string) }
+                        new Property { Name = "FileExtension", Value = Path.GetExtension(item.PhysicalPath), ValueType = typeof(string) },
+                        new Property { Name = "TileAccessTemplate", Value = serverIP + "/v1/tiles/"+ name +"/{z}/{x}/{y}.vector.pbf?access_token={token}"}
                     }
                 };
 

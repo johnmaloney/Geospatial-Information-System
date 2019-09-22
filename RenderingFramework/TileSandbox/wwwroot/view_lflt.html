@@ -35,11 +35,12 @@
         
         var mapboxPbfLayer = L.vectorGrid.protobuf(mapboxUrl, mapboxVectorTileOptions);
         
-        map.setView({ lat: 47.040182144806664, lng: 9.667968750000002 }, 0);
+        map.setView({ lat: 39.73, lng: -104.99 }, 10);
 
         L.control.layers({
             "MapBox Vector Tiles": mapboxPbfLayer
         }, {}, { collapsed: false }).addTo(map);
+
 
         var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'

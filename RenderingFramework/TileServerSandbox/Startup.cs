@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -31,8 +32,7 @@ namespace TileServerSandbox
         {
             var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/layers"));
 
-            services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider));
-
+            services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider, "https://localhost:44379"));
             services.AddSingleton<IFileProvider>(fileProvider);
 
             services.AddSingleton<ITileCacheStorage<ITile>>(new SimpleTileCacheStorage<ITile>());
