@@ -36,7 +36,12 @@ namespace Files.Tests.Mocks
             return Task.FromResult(true);
         }
 
-        public async Task<IEnumerable<IFileMetadata>> ListAll()
+        public Task<IFile> GetFile(string directory, string fileName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<IFileMetadata>> ListAll(string directory = "")
         {
             return await Task.FromResult(files.Select(kvp => kvp.Value as IFileMetadata));
         }
