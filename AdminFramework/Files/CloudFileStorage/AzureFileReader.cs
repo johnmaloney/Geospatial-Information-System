@@ -84,7 +84,7 @@ namespace Files.CloudFileStorage
                         {
                             foreach (XElement dir in container.Elements("Directory"))
                             {
-                                var name = container.Value;
+                                var name = dir.Value;
                                 items.Add(new File { Directory = name });
                             }
 
