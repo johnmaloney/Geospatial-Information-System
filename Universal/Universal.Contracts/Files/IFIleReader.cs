@@ -7,8 +7,9 @@ namespace Universal.Contracts.Files
 {
     public interface IFileReader
     {
-        Task<IEnumerable<IFileMetadata>> ListAll();
+        Task<IEnumerable<IFileMetadata>> ListAll(string directory = "");
         Task CreateDirectory(string directoryName);
         Task AddFile(IFile file);
+        Task<IFile> GetFile(string directory, string fileName);
     }
 }
