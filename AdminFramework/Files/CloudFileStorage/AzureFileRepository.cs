@@ -27,7 +27,7 @@ namespace Files
         
         public async Task<IEnumerable<IFileMetadata>> GetDirectory(string directory)
         {
-            return await fileReader.ListAll();
+            return await fileReader.ListAll(directory);
         }
 
         public async Task<IFile> Get(string directoryPath, string fileName)

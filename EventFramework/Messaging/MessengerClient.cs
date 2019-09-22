@@ -66,6 +66,7 @@ namespace Messaging
                 qMessage.ContentType = messageType.AssemblyQualifiedName;
                 qMessage.Label = message.Version.ToString();
                 qMessage.CorrelationId = message.Id.ToString();
+                
                 await sender.SendAsync(qMessage);
             }
             catch (Exception)

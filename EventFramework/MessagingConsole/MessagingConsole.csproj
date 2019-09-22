@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Universal.Contracts" Version="1.0.273" />
+    <PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.0.0" />
+    <PackageReference Include="Universal.Contracts" Version="1.0.281" />
   </ItemGroup>
 
   <ItemGroup>

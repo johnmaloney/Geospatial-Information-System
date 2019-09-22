@@ -42,6 +42,8 @@ namespace FileAccessConsole
                         ? Regex.Match(line, @"[^/]+$").Value
                         : string.Empty;
 
+                    var directory = string.IsNullOrEmpty(argument) ? home : argument;
+
                     switch (command.ToLower())
                     {
                         case "get":
@@ -51,7 +53,12 @@ namespace FileAccessConsole
                             }
                         case "list": 
                             {
-                                Task.Run(() => repository.GetDirectory(home));
+                                Task.Run(async () => 
+                                {
+                                    var items = await repository.GetDirectory(directory);
+                                    foreach (var d in items)
+                                        Console.WriteLine(d.Directory);
+                                });
                                 break;
                             }
                         case "file":
@@ -59,7 +66,7 @@ namespace FileAccessConsole
                                 var f = new File()
                                 {
                                     Name = secondArg ?? "data.geojson",
-                                    Directory = argument ?? home,
+                                    Directory = directory,
                                     TextContents = FileSampleContent()
                                 };
                                 Task.Run(()=> repository.Add(f));
@@ -69,7 +76,7 @@ namespace FileAccessConsole
                             {
                                 var f = new File()
                                 {
-                                    Directory = argument ?? home
+                                    Directory = directory
                                 };
                                 Task.Run(() => repository.Add(f));
                                 break;

@@ -14,6 +14,7 @@ namespace Files.CloudFileStorage
     /// <summary>
     /// Access to the Azure File Service Rest API.
     /// https://docs.microsoft.com/en-us/azure/storage/common/storage-rest-api-auth
+    /// https://docs.microsoft.com/en-us/rest/api/storageservices/file-service-rest-api
     /// Credit also to this Repo: https://github.com/mstaples84/azurefileserviceauth
     /// 
     /// </summary>
@@ -42,11 +43,14 @@ namespace Files.CloudFileStorage
             this.rootDirectory = rootDirectory;
         }
 
-        public async Task<IEnumerable<IFileMetadata>> ListAll()
+        public async Task<IEnumerable<IFileMetadata>> ListAll(string directory = "")
         {
+            var items = new List<IFile>();
+
+            string subDirectory = !string.IsNullOrEmpty(directory) ? $"/{directory}" : string.Empty;
             // Construct the URI. This will look like this:
             //   https://myaccount.blob.core.windows.net/resource
-            String uri = string.Format("https://{0}.file.core.windows.net?comp=list", storageAccountName);
+            String uri = $"https://{storageAccountName}.file.core.windows.net/{rootDirectory}{subDirectory}?restype=directory&comp=list";
 
             // Set this to whatever payload you desire. Ours is null because 
             //   we're not passing anything in.
@@ -76,14 +80,25 @@ namespace Files.CloudFileStorage
                     {
                         String xmlString = await httpResponseMessage.Content.ReadAsStringAsync();
                         XElement x = XElement.Parse(xmlString);
-                        foreach (XElement container in x.Element("Shares").Elements("Share"))
+                        foreach (XElement container in x.Elements("Entries"))
                         {
-                            
+                            foreach (XElement dir in container.Elements("Directory"))
+                            {
+                                var name = container.Value;
+                                items.Add(new File { Directory = name });
+                            }
+
+                            foreach(XElement file in container.Elements("File"))
+                            {
+                                var name = file.Value;
+                                items.Add(new File { Directory = directory, Name = name });
+                            }
                         }
                     }
                 }
-                return null;
             }
+
+            return items;
         }
 
         public async Task<IFile> GetFile(string directory, string fileName)
