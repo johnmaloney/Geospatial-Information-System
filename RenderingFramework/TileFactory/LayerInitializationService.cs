@@ -40,7 +40,7 @@ namespace TileFactory
 
         #region Methods
 
-        public LayerInitializationFileService(IFileProvider fileProvider, string serverIP)
+        public LayerInitializationFileService(IFileProvider fileProvider, string serverIP = "")
         {
             this.fileProvider = fileProvider;
             var models = new List<LayerInformationModel>();
