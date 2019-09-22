@@ -32,8 +32,7 @@ namespace TileProcessingApp.Observers
             {
                 // This will be the function that receives a command from the event framework //
                 // and processes the command into a valid data conversion //
-                await messenger.Send(new TopicMessage { Message = $"Tile Processing request started for {gCommand.Command}" });
-
+                await messenger.Send(new TopicMessage { Message = $"Tile Processing request started for {gCommand.Command}, for ID:{gCommand.Id.ToString()}" });
             }
         }
 

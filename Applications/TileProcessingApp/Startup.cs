@@ -23,6 +23,7 @@ namespace TileProcessingApp
     public class Startup
     {
         const string ServiceBusConnectionString = "Endpoint=sb://aetosmessaging.servicebus.windows.net/;SharedAccessKeyName=Publisher;SharedAccessKey=knJ9TZyB9kf8kdv/cCcTW4b9/sPCTP5tcX2G9zU1QUE=";
+        const string subscriberConnectionString = "Endpoint=sb://aetosmessaging.servicebus.windows.net/;SharedAccessKeyName=Subscriber;SharedAccessKey=AADc5dQr/zv+4s6lbDlaKrdDMq6h38VBKksFHOBPWZY=";
         private Universal.Contracts.Logging.ILogger logger;
 
         public Startup(IConfiguration configuration)
@@ -43,9 +44,10 @@ namespace TileProcessingApp
             services.AddTransient<IQueueMessengerClient>(sp =>
                 new MessengerClient(serviceBus));
 
+            var qObserver = new QueueClient(subscriberConnectionString, Queues.GeneralCommand);
             services.AddTransient<IQueueObserverClient>(sp =>
             {
-                var observer = new ObserverClient(serviceBus);
+                var observer = new ObserverClient(qObserver);
                 observer.RegisterForLogNotifications(LogProcessor);
                 return observer;
             });
@@ -65,8 +67,9 @@ namespace TileProcessingApp
             services.AddSingleton<ProcessingService>();
 
             var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/layers"));
+            var serverIp = Configuration["ServerAddress:Https"];
 
-            services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider));
+            services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider, serverIp));
 
             services.AddSingleton<IFileProvider>(fileProvider);
 
@@ -84,7 +87,7 @@ namespace TileProcessingApp
             });
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
+                        
             // Adding Cross Origin Request requires the AddCors() call in the ConfigureServices, from this: //
             // https://docs.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-2.2
             services.AddCors(options =>
@@ -92,7 +95,7 @@ namespace TileProcessingApp
                 options.AddDefaultPolicy(
                    builder =>
                    {
-                       builder.AllowAnyOrigin();
+                       builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                    });
             });
 
