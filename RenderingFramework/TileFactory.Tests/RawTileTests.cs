@@ -13,6 +13,7 @@ using System.Linq;
 using TileFactory.Utility;
 using TileFactory.Tests.Mocks;
 using Microsoft.Extensions.FileProviders;
+using TileFactory.Layers;
 
 namespace TileFactory.Tests
 {
@@ -24,12 +25,12 @@ namespace TileFactory.Tests
         public async Task given_feature_in_projected_coords_process_into_basic_tile()
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
+            var accessor = new LayerTileCacheAccessor(()=> null, () => new MockRawCacheStorage());
 
-            var raw = new MockRawCacheStorage();
-            var generator = new Generator(context, raw, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var generator = new Generator(context, accessor, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
             await generator.GenerateTile(0, 0, 0);
 
-            var tile = raw.GetBy(0);
+            var tile = accessor.GetRawTile(context.Identifier, 0, 0, 0);
             Assert.AreEqual(0d, tile.X);
             Assert.AreEqual(0d, tile.Y);
             Assert.AreEqual(1d, tile.ZoomSquared);
@@ -46,13 +47,13 @@ namespace TileFactory.Tests
             var coloradoFeature = Container.GetService<IConfigurationStrategy>().Into<List<Feature>>("colorado_outline_projected");
             context.TileFeatures = coloradoFeature;
 
-            var raw = new MockRawCacheStorage();
-            var generator = new Generator(context, raw, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var accessor = new LayerTileCacheAccessor(()=> null, () => new MockRawCacheStorage());
+            var generator = new Generator(context, accessor, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
 
             generator.SplitTile(context.TileFeatures.ToArray(), zoom: 0, x: 0, y: 0, currentZoom: 1, currentX: 0, currentY: 0);
             generator.SplitTile(context.TileFeatures.ToArray(), zoom: 1, x: 0, y: 0, currentZoom: 2, currentX: 0, currentY: 1);
             generator.SplitTile(context.TileFeatures.ToArray(), zoom: 2, x: 0, y: 1, currentZoom: 3, currentX: 1, currentY: 3);
-            var tile = raw.GetBy(0);
+            var tile = accessor.GetRawTile(context.Identifier, 0, 0, 0);
             Assert.AreEqual(0d, tile.X);
             Assert.AreEqual(0d, tile.Y);
             Assert.AreEqual(1d, tile.ZoomSquared);
@@ -69,10 +70,10 @@ namespace TileFactory.Tests
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
 
             context.TileFeatures = multiLinestring;
-            var raw = new MockRawCacheStorage();
-            var generator = new Generator(context, raw, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
-            var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetrieverService(transformed, context, generator);
+            var accessor = new LayerTileCacheAccessor(()=> new MockTransformedCacheStorage(), () => new MockRawCacheStorage());
+            var generator = new Generator(context, accessor, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+
+            var retriever = new TileRetrieverService(accessor, context, generator);
 
             var tile = await retriever.GetTile(1, 0, 0);
 
@@ -93,8 +94,8 @@ namespace TileFactory.Tests
                 { 'item1' : 0.20502623888888888, 'item2' : 0.3749348317775085,  'item3' : 1} ]";
             var ring = Container.GetService<IConfigurationStrategy>().FromInto<List<(double X, double Y, double Z)>>(ringJSON);
 
-            var raw = new MockRawCacheStorage();
-            var generator = new Generator(new MockTileContext(),raw,new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var accessor = new LayerTileCacheAccessor(()=> null, () => new MockRawCacheStorage());
+            var generator = new Generator(new MockTileContext(),accessor,new LayerInitializationFileService(Container.GetService<IFileProvider>()));
             generator.Rewind(ring, true);
 
             Assert.AreEqual(0.20502623888888888d, ring[0].X);

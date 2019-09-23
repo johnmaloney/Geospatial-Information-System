@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using TileFactory.Models;
 using TileFactory.Transforms;
 using TileFactory.Utility;
@@ -21,8 +22,8 @@ namespace TileFactory
     {
         #region Fields
 
-        private readonly ITileCacheStorage<ITransformedTile> transformedCache;
         private readonly Generator tileGenerator;
+        private readonly LayerTileCacheAccessor cacheAccessor;
         private readonly ITileContext tileContext;
         private readonly Transform tileTransform;
 
@@ -33,11 +34,12 @@ namespace TileFactory
 
         #region Methods
 
-        public TileRetrieverService(ITileCacheStorage<ITransformedTile> transformedCache, 
+        public TileRetrieverService(
+            LayerTileCacheAccessor cacheAccessor,
             ITileContext context, Generator tileGenerator)
         {
-            this.transformedCache = transformedCache;
             this.tileGenerator = tileGenerator;
+            this.cacheAccessor = cacheAccessor;
             this.tileContext = context;
             this.tileTransform = new Transform(context.Extent, context.Buffer);
 
@@ -50,8 +52,8 @@ namespace TileFactory
             var zoomSqr = 1 << zoomLevel;
             var xDenom = ((x % zoomSqr) + zoomSqr) % zoomSqr;
 
-            var id = Identifier.ToId(zoomLevel, (int)xDenom, (int)y);
-            var transformedTile = transformedCache.GetBy(id);
+            var transformedTile = cacheAccessor.GetTransformedTile(
+                tileContext.Identifier, zoomLevel, (int)xDenom, (int)y);
             if (transformedTile != null)
                 return transformedTile;
             
@@ -63,7 +65,8 @@ namespace TileFactory
             if (geoTile != null)
             {
                 transformedTile = tileTransform.ProcessTile(geoTile);
-                transformedCache.StoreBy(id, transformedTile);
+                cacheAccessor.StoreTransformedTile(
+                    tileContext.Identifier, zoomLevel, (int)xDenom, (int)y, transformedTile);
                 return transformedTile;
             }
             return null;

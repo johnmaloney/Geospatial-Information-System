@@ -10,6 +10,7 @@ using TileFactory.Transforms;
 using TileFactory.Tests.Mocks;
 using Microsoft.Extensions.FileProviders;
 using System.Threading.Tasks;
+using TileFactory.Layers;
 
 namespace TileFactory.Tests
 {
@@ -50,12 +51,11 @@ namespace TileFactory.Tests
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("base", out MockTileContext context);
                         
-            var raw = new MockRawCacheStorage();
+            var raw = new LayerTileCacheAccessor(()=> new MockTransformedCacheStorage(), () => new MockRawCacheStorage());
             var generator = new Generator(context, raw, 
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
 
-            var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetrieverService(transformed, context, generator);
+            var retriever = new TileRetrieverService(raw, context, generator);
 
             var tile = await retriever.GetTile(0, 0, 0);
             Assert.IsNotNull(tile);
@@ -66,12 +66,11 @@ namespace TileFactory.Tests
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("simple_points", out MockTileContext context);
 
-            var raw = new MockRawCacheStorage();
+            var raw = new LayerTileCacheAccessor(()=> new MockTransformedCacheStorage(), () => new MockRawCacheStorage());
             var generator = new Generator(context, raw,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
 
-            var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetrieverService(transformed, context, generator);
+            var retriever = new TileRetrieverService(raw, context, generator);
 
             var tile = await retriever.GetTile(0, 0, 0);
             Assert.IsNotNull(tile);

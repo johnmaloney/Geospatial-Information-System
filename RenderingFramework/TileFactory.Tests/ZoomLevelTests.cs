@@ -11,6 +11,7 @@ using TileFactory.Tests.Mocks;
 using TileFactory.Interfaces;
 using Microsoft.Extensions.FileProviders;
 using System.Threading.Tasks;
+using TileFactory.Layers;
 
 namespace TileFactory.Tests
 {
@@ -18,8 +19,9 @@ namespace TileFactory.Tests
     public class ZoomLevelTests : ATest
     {
         private static MockTileContext TileContext;
-        private static ITileCacheStorage<ITransformedTile> TransformedCache = new MockTransformedCacheStorage();
-        private static ITileCacheStorage<ITile> RawCache = new MockRawCacheStorage();
+        private static LayerTileCacheAccessor CacheAccessor = new LayerTileCacheAccessor(
+            () => new MockTransformedCacheStorage(), 
+            () => new MockRawCacheStorage()); 
 
         public ZoomLevelTests()
         {
@@ -32,8 +34,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_ZERO_level_expect_proper_extent_coodinates()
         {
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
 
             var transformed = await retriever.GetTile(0, 0, 0);
 
@@ -61,10 +63,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_ONE_level_expect_proper_extent_coodinates()
         {
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
 
             var transformed = await retriever.GetTile(1, 0, 0);
 
@@ -92,10 +92,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_TWO_level_expect_proper_extent_coodinates()
         {
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
 
             var transformed = await retriever.GetTile(2, 0, 1);
 
@@ -123,10 +121,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_THREE_level_expect_proper_extent_coodinates()
         {
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
             var transformed = await retriever.GetTile(3, 1, 3);
 
             // These values represent the screen conversion from web mercator //
@@ -153,10 +149,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_FOUR_level_expect_proper_extent_coodinates()
         {
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
 
             var transformed = await retriever.GetTile(4, 3, 6);
 
@@ -187,10 +181,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_FIVE_level_expect_proper_extent_coodinates()
         {
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
             var transformed = await retriever.GetTile(5, 6, 12);
 
             // These values represent the screen conversion from web mercator //
@@ -232,10 +224,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_SIX_level_expect_proper_extent_coodinates()
         {
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
             var transformed = await retriever.GetTile(6, 13, 24);
 
             // These values represent the screen conversion from web mercator //
@@ -280,10 +270,8 @@ namespace TileFactory.Tests
         [TestMethod]
         public async Task at_zoom_SEVEN_level_expect_proper_extent_coodinates()
         {
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var generator = new Generator(TileContext, CacheAccessor, new LayerInitializationFileService(Container.GetService<IFileProvider>())); ;
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
             var transformed = await retriever.GetTile(7, 26, 48);
 
             // These values represent the screen conversion from web mercator //
@@ -320,11 +308,10 @@ namespace TileFactory.Tests
         public async Task with_many_tiled_requests_ensure_the_cache_built()
         {
             Container.GetService<MockContextRepository>().TryGetAs("simple_points", out TileContext);
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator = new Generator(TileContext, RawCache,
+
+            var generator = new Generator(TileContext, CacheAccessor,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
             var transformedWorking = await retriever.GetTile(14, 16145, 9998);
             var transformedNonWorking = await retriever.GetTile(14, 16146, 9998);
         }
@@ -334,35 +321,31 @@ namespace TileFactory.Tests
         {
             // Case 1 - Two points : Denver, US and Auckland New Zealand, only the Auckland point is returned //
             Container.GetService<MockContextRepository>().TryGetAs("simple_points_two", out MockTileContext TileContext);
-            TransformedCache.Clear();
-            RawCache.Clear();
 
             // Is this the answer from line 144 in Generator //
             TileContext.MaxAllowablePoints = 100;
 
-            var generator = new Generator(TileContext, RawCache,
+            var generator = new Generator(TileContext, CacheAccessor,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
             var NotWorking_Denver = await retriever.GetTile(7, 26, 48);
             var aucklandAt7 = await retriever.GetTile(7, 126, 78);
             var aucklandAt3 = await retriever.GetTile(3, 7, 4);
 
             Container.GetService<MockContextRepository>().TryGetAs("simple_points_denver", out MockTileContext TileContext1);
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator1 = new Generator(TileContext1, RawCache,
+
+            var generator1 = new Generator(TileContext1, CacheAccessor,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
-            var retriever1 = new TileRetrieverService(TransformedCache, TileContext1, generator1);
+            var retriever1 = new TileRetrieverService(CacheAccessor, TileContext1, generator1);
             var Working_Denver2 = await retriever1.GetTile(7, 26, 48);
             var NotWorking_aucklandAt7 = await retriever1.GetTile(7, 126, 78);
             var NotWorking_aucklandAt3 = await retriever1.GetTile(3, 7, 4);
 
             Container.GetService<MockContextRepository>().TryGetAs("simple_points_US", out MockTileContext TileContext2);
-            TransformedCache.Clear();
-            RawCache.Clear();
-            var generator2 = new Generator(TileContext2, RawCache,
+
+            var generator2 = new Generator(TileContext2, CacheAccessor,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
-            var retriever2 = new TileRetrieverService(TransformedCache, TileContext2, generator2);
+            var retriever2 = new TileRetrieverService(CacheAccessor, TileContext2, generator2);
             var Working_Denver3 = await retriever2.GetTile(7, 26, 48);
             var Working_Chicago = await retriever2.GetTile(7, 26, 48);
             var NotWorking_aucklandAt7_2 = await retriever2.GetTile(7, 126, 78);
@@ -373,12 +356,11 @@ namespace TileFactory.Tests
         public async Task drill_down_from_ZERO_to_SEVEN_expect_sequential_caching()
         {
             Container.GetService<MockContextRepository>().TryGetAs("simple_points_US", out MockTileContext TileContext);
-            TransformedCache.Clear();
-            RawCache.Clear();
 
-            var generator = new Generator(TileContext, RawCache,
+
+            var generator = new Generator(TileContext, CacheAccessor,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
-            var retriever = new TileRetrieverService(TransformedCache, TileContext, generator);
+            var retriever = new TileRetrieverService(CacheAccessor, TileContext, generator);
             await retriever.GetTile(0, 0, 0);
 
             // Drill down to the Denver point //

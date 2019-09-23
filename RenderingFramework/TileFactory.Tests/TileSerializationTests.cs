@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using TileFactory;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using TileFactory.Serialization;
 using TileFactory.Tests.Mocks;
 using TileFactory.Tests.Utility;
@@ -39,12 +40,11 @@ namespace TileFactory.Tests
         {
             Container.GetService<MockContextRepository>().TryGetAs<MockTileContext>("simple_points", out MockTileContext context);
 
-            var raw = new MockRawCacheStorage();
-            var generator = new Generator(context, raw,
+            var accessor = new LayerTileCacheAccessor(()=> new MockTransformedCacheStorage(), () => new MockRawCacheStorage());
+            var generator = new Generator(context, accessor,
                 new LayerInitializationFileService(Container.GetService<IFileProvider>()));
 
-            var transformed = new MockTransformedCacheStorage();
-            var retriever = new TileRetrieverService(transformed, context, generator);
+            var retriever = new TileRetrieverService(accessor, context, generator);
 
             var tile = await retriever.GetTile(0, 0, 0);
             var factory = new ProtoBufSerializationFactory();

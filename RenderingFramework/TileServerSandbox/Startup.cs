@@ -15,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using TileFactory;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using TileFactory.Models;
 
 namespace TileServerSandbox
@@ -35,8 +36,10 @@ namespace TileServerSandbox
             services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider, "https://localhost:44379"));
             services.AddSingleton<IFileProvider>(fileProvider);
 
-            services.AddSingleton<ITileCacheStorage<ITile>>(new SimpleTileCacheStorage<ITile>());
-            services.AddSingleton<ITileCacheStorage<ITransformedTile>>(new SimpleTileCacheStorage<ITransformedTile>());
+            services.AddSingleton<LayerTileCacheAccessor>(new LayerTileCacheAccessor(
+                () => new SimpleTileCacheStorage<ITransformedTile>(), 
+                () => new SimpleTileCacheStorage<ITile>()));
+
             services.AddTransient<ITileContext>((sp)=>
             {
                 return new SimpleTileContext()

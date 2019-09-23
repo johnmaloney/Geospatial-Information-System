@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using TileFactory.Models;
 using TileFactory.Transforms;
 using TileFactory.Utility;
@@ -14,7 +15,7 @@ namespace TileFactory
     {
         #region Fields
 
-        private readonly ITileCacheStorage<ITile> rawCache;
+        private readonly LayerTileCacheAccessor cacheAccessor;
         private readonly ITileContext tileContext;
         private readonly Transform transform;
         public readonly ILayerInitializationService tileInitService;
@@ -27,10 +28,10 @@ namespace TileFactory
         #region Methods
 
         public Generator(ITileContext context, 
-            ITileCacheStorage<ITile> rawCache, 
+            LayerTileCacheAccessor cacheAccessor, 
             ILayerInitializationService initService)
         {
-            this.rawCache = rawCache;
+            this.cacheAccessor = cacheAccessor;
             this.tileContext = context;
             this.transform = new Transform(context.Extent, context.Buffer);
             this.tileInitService = initService;
@@ -41,7 +42,6 @@ namespace TileFactory
 
         public async Task<ITile> GenerateTile(int zoomLevel = 0, double x = 0, double y = 0)
         {
-
             if (tileContext.TileFeatures == null)
             {
                 tileContext.TileFeatures = await tileInitService.InitializeLayer(tileContext.Identifier);
@@ -58,8 +58,7 @@ namespace TileFactory
             if (xDenom != x)   
                 throw new NotSupportedException($"The value for X (current value:{x}) was not properly calculated.");
             
-            var id = Identifier.ToId(zoomLevel, (int)x, (int)y);
-            var tile = rawCache.GetBy(id);
+            var tile = cacheAccessor.GetRawTile(tileContext.Identifier, zoomLevel, x, y);
             if (tile != null)
                 return tile;
 
@@ -74,8 +73,7 @@ namespace TileFactory
                 x0 = Math.Floor(x0 / 2);
                 y0 = Math.Floor(y0 / 2);
 
-                int identifier = Identifier.ToId(z0, (int)x0, (int)y0);
-                parent = rawCache.GetBy(identifier);
+                parent = cacheAccessor.GetRawTile(tileContext.Identifier, z0, x0, y0);
             }
 
             if (parent == null || parent.Source == null) return null;
@@ -85,13 +83,16 @@ namespace TileFactory
 
             var solid = SplitTile(parent.Source.ToArray(), z0, (int)x0, (int)y0, zoomLevel, (int)x, (int)y);
 
+            ITile currentTile = null;
             if (solid.HasValue)
             {
                 var m = 1 << (zoomLevel - solid);
-                id = Identifier.ToId(solid.Value, (int)Math.Floor((double)(x / m)), (int)Math.Floor((double)(y / m)));
+                currentTile = cacheAccessor.GetRawTile(tileContext.Identifier,
+                    solid.Value, (int)Math.Floor((double)(x / m)), (int)Math.Floor((double)(y / m)));
             }
+            else
+                currentTile = cacheAccessor.GetRawTile(tileContext.Identifier, zoomLevel, x, y);
 
-            var currentTile = rawCache.GetBy(id);
             return currentTile;
         }
         /// <summary>
@@ -123,15 +124,15 @@ namespace TileFactory
                 y = (int)tileStack.Pop();
                 
                 var zoomSqr = 1 << zoom;
-                var id = Identifier.ToId(zoom, x, y);
-                var tileTolerance = zoom == tileContext.MaxZoom ? 0 : tileContext.Tolerance / (zoomSqr * tileContext.Extent);
-
-                ITile currentTile = rawCache.GetBy(id);
+                var tileTolerance = zoom == 
+                    tileContext.MaxZoom ? 0 : tileContext.Tolerance / (zoomSqr * tileContext.Extent);
+                
+                ITile currentTile = cacheAccessor.GetRawTile(tileContext.Identifier, zoom, x, y);
                 // If the tile is null then this is a creation of a tile //
                 if (currentTile == null)
                 {
                     currentTile = CreateTile(features, zoomSqr, x, y, tileTolerance, zoom != tileContext.MaxZoom);
-                    rawCache.StoreBy(id, currentTile);
+                    cacheAccessor.StoreRawTile(tileContext.Identifier, zoom, x, y, currentTile);
                 }
 
                 // TO-DO: figure out if this can be moved to the interals of currentTile //

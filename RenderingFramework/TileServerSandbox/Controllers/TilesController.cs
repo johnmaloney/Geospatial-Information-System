@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using TileFactory;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using TileFactory.Serialization;
 
 namespace TileServerSandbox.Controllers
@@ -54,16 +55,14 @@ namespace TileServerSandbox.Controllers
             //return File(memStream, "application/octet-stream", "tile.pbf");
         }
 
-        public TilesController(ITileCacheStorage<ITile> tileCache, 
-            ITileCacheStorage<ITransformedTile> transformedCache, 
+        public TilesController(LayerTileCacheAccessor cacheAccessor, 
             ITileContext tileContext, 
             ILayerInitializationService layerService)
         {
             this.tileContext = tileContext;
-            this.files = files;
 
-            var generator = new Generator(tileContext, tileCache, layerService);
-            tileRetrieverService = new TileRetrieverService(transformedCache, tileContext, generator);
+            var generator = new Generator(tileContext, cacheAccessor, layerService);
+            tileRetrieverService = new TileRetrieverService(cacheAccessor, tileContext, generator);
         }
     }
 }
