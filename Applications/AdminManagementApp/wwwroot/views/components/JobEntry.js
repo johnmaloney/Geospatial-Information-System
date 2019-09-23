@@ -2,37 +2,51 @@
 let submitJobEntry = async () => {
 
     var form = document.getElementById("jobEntryForm");
+    var selector = document.getElementById("sessionSelect");
+    var session = selector.options[selector.selectedIndex].value;
     var fileInput = document.querySelector('#file-input-field input[type=file]');
+
     var reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(fileInput.files[0]);
+    reader.onload = async function () {
 
-    var json = {
-        message : form[0].value,
-        jobType: form[1].value,
-        fileName : form[2].value
-    };
+        // First upload the file and store it //
+        let bytes = Array.from(new Uint8Array(reader.result));
 
-    const options = {
-        method: 'POST',
-        body: JSON.stringify(json),
-        headers: {
-            'Content-Type': 'application/json'
-            // 'Content-Type': 'application/x-www-form-urlencoded',
+        //if you want the base64encoded file you would use the below line:
+        let base64StringFile = btoa(bytes.map((item) => String.fromCharCode(item)).join(""));
+
+        var json = {
+
+            message: form[0].value,
+            jobType: form[1].value,
+            fileName: fileInput.files[0].name,
+            fileContent: base64StringFile, 
+            sessionId: session
+        };
+
+        const options = {
+            method: 'POST',
+            body: JSON.stringify(json),
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        };
+        try {
+            const response = await fetch(`api/message`, options);
+            const json = await response.json();
+            return json;
+        } catch (err) {
+            console.log('Error submitting job.', err);
         }
-    };
-    try {
-        const response = await fetch(`api/message`, options);
-        const json = await response.json();
-        return json;
-    } catch (err) {
-        console.log('Error submitting job.', err);
-    }
+    };    
 };
 
 let JobEntry = {
     render: async () => {
         let view = /*html form*/`
-             <form id="jobEntryForm">
+             <form id="jobEntryForm" style="width:100%">
                 <div class="field">
                     <label class="label">Message</label>
                     <div class="control">

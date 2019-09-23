@@ -1,7 +1,6 @@
 // --------------------------------
 //  Define Data Sources
 // --------------------------------
-
 let getMessageList = async () => {
     const options = {
         method: 'GET',
@@ -23,19 +22,30 @@ let Home = {
     render: async () => {
         let messages = await getMessageList();
         let view =  /*html*/`
-            <section class="section">
+            <section class="section" style="height:50px;overflow-y:scroll">
                 <h1> Home </h1>
                 <ul>
                     ${ messages.map(m =>
-                        /*html*/`<li><a href="#/p/${m.id}">${m.type}</a></li>`
-        ).join('\n ')
-            }
+                        /*html*/`<li><a href="#/p/${m.id}">${m.message}</a></li>`
+                    ).join('\n ')
+                }
                 </ul>
+            </section>
+            <section class="section">
+                <button class="button is-link" id="refreshMessages">Refresh</button>
             </section>
         `;
         return view;
     }
     , after_render: async () => {
+        var form = document.getElementById("refreshMessages");
+        form.addEventListener("click", function (event) {
+            //event.preventDefault();
+            Home.render().then(function (view) {
+
+                document.getElementById('page_container').innerHTML = view;
+            });
+        });
     }
 
 };

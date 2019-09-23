@@ -16,6 +16,7 @@ namespace AdminManagementApp.Services
 
         private readonly ITopicMessengerClient topicMessenger;
         private readonly ITopicObserverClient topicObserver;
+        private readonly FileService fileService;
         private readonly MessageRepository repository;
         private readonly IQueueMessengerClient commandMessenger;
 
@@ -39,8 +40,7 @@ namespace AdminManagementApp.Services
             
             this.topicMessenger = topicMessenger;
             this.topicObserver = topicObserver;
-            this.topicObserver.RegisterForNotificationOf<GeneralMessage>(MessageReceiver);
-
+            this.topicObserver.RegisterForNotificationOf<TopicMessage>(MessageReceiver);
         }
 
         public IEnumerable<IMessage> CurrentMessages()
@@ -65,9 +65,10 @@ namespace AdminManagementApp.Services
                             Command = request.JobType,
                             CommandDataCollection = new List<ICommandData>
                             {
+                                new CommandData { Data = request.SessionId, DataType = "sessionId" },
                                 new CommandData { Data = request.FileName, DataType = "filename" }
                             },
-                            Id = Guid.NewGuid()
+                            Id = Guid.TryParse(request.SessionId, out Guid sessionId) ? sessionId : Guid.NewGuid()
                         };
                         break;
                     }
@@ -96,9 +97,9 @@ namespace AdminManagementApp.Services
             return false;
         }
 
-        public Task MessageReceiver(IMessage message)
+        public async Task MessageReceiver(IMessage message)
         {
-            if (message is GeneralMessage gMessage)
+            if (message is TopicMessage gMessage)
             {
                 var existingMessage = this.repository.Get(gMessage.Id);
                 if (existingMessage == null)
@@ -106,8 +107,7 @@ namespace AdminManagementApp.Services
                     this.repository.Add(gMessage);
                 }
             }
-            
-            return Task.FromResult(true);
+            await Task.FromResult(true);
         }
 
         #endregion

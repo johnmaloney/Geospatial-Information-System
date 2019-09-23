@@ -6,6 +6,9 @@ import Home from './views/pages/Home.js';
 import About from './views/pages/About.js';
 import JobEntry from './views/components/JobEntry.js';
 import LogEntry from './views/components/LogEntry.js';
+import Session from './views/components/Session.js';
+import Map from './views/components/Map.js';
+import Layer from './views/components/Layer.js';
 import Error404 from './views/pages/Error404.js';
 import PostShow from './views/pages/PostShow.js';
 import Register from './views/pages/Register.js';
@@ -23,6 +26,7 @@ const routes = {
     , '/register': Register
 };
 
+let SessionIdentifier = "Unknown";
 
 // The router code. Takes a URL, checks against the list of supported routes and then renders the corresponding content page.
 const router = async () => {
@@ -30,8 +34,10 @@ const router = async () => {
     // Lazy load view element:
     const header = null || document.getElementById('header_container');
     const content = null || document.getElementById('page_container');
-    const logEntryForm = null || document.getElementById('logentry_container');
+    const sessionForm = null || document.getElementById('session_container');
     const jobEntryForm = null || document.getElementById('jobentry_container');
+    const layerSets = null || document.getElementById('layer_container');    
+    const map = null || document.getElementById('map_container');
     const footer = null || document.getElementById('footer_container');
     
     // Render the Header and footer of the page
@@ -51,11 +57,17 @@ const router = async () => {
     let page = routes[parsedURL] ? routes[parsedURL] : Error404;
     content.innerHTML = await page.render();
 
+    map.innerHTML = await Map.render();
+    await Map.after_render();
+
     jobEntryForm.innerHTML = await JobEntry.render();
     await JobEntry.after_render();
 
-    logEntryForm.innerHTML = await LogEntry.render();
-    await LogEntry.after_render();
+    layerSets.innerHTML = await Layer.render();
+    await Layer.after_render();
+    
+    sessionForm.innerHTML = await Session.render();
+    await Session.after_render();
 
     await page.after_render();
   
@@ -66,4 +78,8 @@ window.addEventListener('hashchange', router);
 
 // Listen on page load:
 window.addEventListener('load', router);
+
+L.Map.addInitHook(function () {
+    mapsPlaceholder.push(this); // Use whatever global scope variable you like.
+});
 

@@ -17,10 +17,12 @@ namespace AdminManagementApp.Controllers
     public class MessageController : ControllerBase
     {
         private readonly MessagingService service;
+        private readonly FileService fileService;
 
-        public MessageController(MessagingService service)
+        public MessageController(MessagingService service, FileService fileService)
         {
             this.service = service;
+            this.fileService = fileService;
         }
 
         // GET api/values
@@ -39,9 +41,15 @@ namespace AdminManagementApp.Controllers
 
         // POST api/values
         [HttpPost]
-        public async Task Post([FromBody] JobRequest request)
+        public async Task<ActionResult> Post([FromBody] JobRequest request)
         {
-            await service.Generate(request);
+            // FIRST upload and verify the file is in the CLOUD //
+            var fileCreated = await fileService.CreateDirectoryAndFile(request);
+
+            if (fileCreated)
+                await service.Generate(request);
+
+            return CreatedAtAction("POST", new { message = "Document uploaded and Job Queueud" });
         }
 
         // PUT api/values/5
