@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TileProcessingApp.Models;
 using Universal.Contracts.Messaging;
 
 namespace TileProcessingApp.Observers
@@ -12,6 +13,7 @@ namespace TileProcessingApp.Observers
         #region Fields
 
         private readonly ITopicMessengerClient messenger;
+        private readonly MessageRepository messageRepository;
 
         #endregion
 
@@ -21,9 +23,10 @@ namespace TileProcessingApp.Observers
 
         #region Methods
 
-        public ProjectedDataObserver(ITopicMessengerClient messenger)
+        public ProjectedDataObserver(ITopicMessengerClient messenger, MessageRepository messageRepository)
         {
             this.messenger = messenger;
+            this.messageRepository = messageRepository;
         }
 
         internal async Task CommandReceiver(IMessage message)
@@ -32,7 +35,9 @@ namespace TileProcessingApp.Observers
             {
                 // This will be the function that receives a command from the event framework //
                 // and processes the command into a valid data conversion //
-                await messenger.Send(new TopicMessage { Message = $"Tile Processing request started for {gCommand.Command}, for ID:{gCommand.Id.ToString()}" });
+                var topic = new TopicMessage { Message = $"Tile Processing request started for {gCommand.Command}, for ID:{gCommand.Id.ToString()}" };
+                messageRepository.AddMessage(topic);
+                await messenger.Send(topic);
             }
         }
 

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using TileFactory;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using TileFactory.Serialization;
 
 namespace TileProcessingApp.Controllers
@@ -46,16 +47,15 @@ namespace TileProcessingApp.Controllers
                 return new EmptyResult();
         }
 
-        public TilesController(ITileCacheStorage<ITile> tileCache,
-            ITileCacheStorage<ITransformedTile> transformedCache,
+        public TilesController(LayerTileCacheAccessor cacheAccessor,
             ITileContext tileContext,
             IFileProvider files)
         {
             this.tileContext = tileContext;
             this.files = files;
 
-            var generator = new Generator(tileContext, tileCache, new LayerInitializationFileService(files));
-            tileRetrieverService = new TileRetrieverService(transformedCache, tileContext, generator);
+            var generator = new Generator(tileContext, cacheAccessor, new LayerInitializationFileService(files));
+            tileRetrieverService = new TileRetrieverService(cacheAccessor, tileContext, generator);
         }
     }
 }

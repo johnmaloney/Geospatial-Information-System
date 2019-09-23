@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TileProcessingApp.Observers;
 using Universal.Contracts.Messaging;
 using Universal.Contracts.Logging;
+using TileProcessingApp.Models;
 
 namespace TileProcessingApp.Services
 {
@@ -43,9 +44,9 @@ namespace TileProcessingApp.Services
             this.logger = logger;
         }
 
-        public void RegisterNotificationHandlers()
+        public void RegisterNotificationHandlers(MessageRepository messages)
         {
-            var executor = new ProjectedDataObserver(messenger);
+            var executor = new ProjectedDataObserver(messenger, messages);
             queueObserver.RegisterForNotificationOf<GeneralCommand>(executor.CommandReceiver);
         }
         

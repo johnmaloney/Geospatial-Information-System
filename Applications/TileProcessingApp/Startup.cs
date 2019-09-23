@@ -12,6 +12,7 @@ using System.IO;
 using System.Threading.Tasks;
 using TileFactory;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using TileFactory.Models;
 using TileProcessingApp.Models;
 using TileProcessingApp.Services;
@@ -64,7 +65,12 @@ namespace TileProcessingApp
                 return observer;
             });
 
+            services.AddSingleton<LayerTileCacheAccessor>(new LayerTileCacheAccessor(
+               () => new SimpleTileCacheStorage<ITransformedTile>(),
+               () => new SimpleTileCacheStorage<ITile>()));
+
             services.AddSingleton<ProcessingService>();
+            services.AddSingleton<MessageRepository>(new MessageRepository());
 
             var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/layers"));
             var serverIp = Configuration["ServerAddress:Https"];
@@ -102,7 +108,7 @@ namespace TileProcessingApp
             // Build the container //
             var container = services.BuildServiceProvider();
             var processing = container.GetService<ProcessingService>();
-            processing.RegisterNotificationHandlers();
+            processing.RegisterNotificationHandlers(container.GetService<MessageRepository>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

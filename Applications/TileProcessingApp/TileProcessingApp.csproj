@@ -18,7 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.7.12" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
-    <PackageReference Include="TileFactory" Version="1.0.296" />
+    <PackageReference Include="TileFactory" Version="1.0.301" />
     <PackageReference Include="Universal.Contracts" Version="1.0.291" />
   </ItemGroup>
 
