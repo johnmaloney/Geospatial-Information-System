@@ -82,10 +82,16 @@ namespace TileFactory
         /// <returns></returns>
         public async Task InitializeTile(ITileContext tileContext)
         {
+            var generator = new Generator(tileContext, cacheAccessor, null);
+
             // This is only called at the beginning //
-            tileGenerator.SplitTile(tileContext.TileFeatures.ToArray(),
+            generator.SplitTile(tileContext.TileFeatures.ToArray(),
                 zoom: 0, x: 0, y: 0, currentZoom: null, currentX: null, currentY: null);
-            var geoTile = await tileGenerator.GenerateTile();
+
+            var geoTile = await generator.GenerateTile();
+
+            if (geoTile == null)
+                throw new NotSupportedException($"The tile with id: {tileContext.Identifier} could not be initialized.");
         }
 
         #endregion

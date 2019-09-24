@@ -27,6 +27,16 @@ namespace TileFactory
 
         #region Methods
 
+        /// <summary>
+        /// Sometime the generator is needed for in-memory features.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="cacheAccessor"></param>
+        internal Generator(ITileContext context,
+            LayerTileCacheAccessor cacheAccessor)
+           : this(context, cacheAccessor, null)
+        { }
+
         public Generator(ITileContext context, 
             LayerTileCacheAccessor cacheAccessor, 
             ILayerInitializationService initService)
@@ -44,6 +54,9 @@ namespace TileFactory
         {
             if (tileContext.TileFeatures == null)
             {
+                if (tileInitService == null)
+                    throw new NotSupportedException("The Features were null and the Generator attempted to initialize a layer with a null LayerInitializer.");
+
                 tileContext.TileFeatures = await tileInitService.InitializeLayer(tileContext.Identifier);
 
                 // This is only called at the beginning //

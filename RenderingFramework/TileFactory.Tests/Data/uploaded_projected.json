@@ -1,0 +1,119 @@
+{
+  "originalData": "{\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"id\": \"400001\",\r\n      \"properties\": {\r\n        \"stop_id\": \"400001\",\r\n        \"stop_name\": \"4 AV/E 9 ST\"\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [\r\n          -73.99044,\r\n          40.73064\r\n        ]\r\n      }\r\n    },\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"id\": \"400002\",\r\n      \"properties\": {\r\n        \"stop_id\": \"400002\",\r\n        \"stop_name\": \"4 AV/E 12 ST\"\r\n      },\r\n      \"geometry\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [\r\n          -73.98996,\r\n          40.732609\r\n        ]\r\n      }\r\n    }\r\n  ]\r\n}",
+  "features": {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "id": "400001",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.99044,
+            40.73064
+          ]
+        },
+        "properties": {
+          "stop_id": "400001",
+          "stop_name": "4 AV/E 9 ST"
+        }
+      },
+      {
+        "type": "Feature",
+        "id": "400002",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [
+            -73.98996,
+            40.732609
+          ]
+        },
+        "properties": {
+          "stop_id": "400002",
+          "stop_name": "4 AV/E 12 ST"
+        }
+      }
+    ]
+  },
+  "geometry": null,
+  "maxZoom": 14,
+  "maxZoomIndex": 0,
+  "maxAllowablePoints": 0,
+  "solidChildren": false,
+  "extent": 4096.0,
+  "buffer": 64.0,
+  "logLevel": 0,
+  "tolerance": 3.0,
+  "extentTolerance": 4.4703483581542969E-08,
+  "identifier": "stops.geojson_3f45ec",
+  "tileFeatures": [
+    {
+      "id": "400001",
+      "type": 1,
+      "geometry": [
+        [
+          {
+            "item1": 0.294471,
+            "item2": 0.375915411794357,
+            "item3": 1.0
+          }
+        ]
+      ],
+      "tags": {
+        "stop_id": "400001",
+        "stop_name": "4 AV/E 9 ST"
+      },
+      "maxGeometry": {
+        "item1": 0.294471,
+        "item2": 0.375915411794357,
+        "item3": 0.0
+      },
+      "minGeometry": {
+        "item1": 0.294471,
+        "item2": 0.375915411794357,
+        "item3": 0.0
+      },
+      "area": [
+        0.0
+      ],
+      "distance": [
+        0.0
+      ],
+      "isOuter": true
+    },
+    {
+      "id": "400002",
+      "type": 1,
+      "geometry": [
+        [
+          {
+            "item1": 0.29447233333333334,
+            "item2": 0.37590819401923736,
+            "item3": 1.0
+          }
+        ]
+      ],
+      "tags": {
+        "stop_id": "400002",
+        "stop_name": "4 AV/E 12 ST"
+      },
+      "maxGeometry": {
+        "item1": 0.29447233333333334,
+        "item2": 0.37590819401923736,
+        "item3": 0.0
+      },
+      "minGeometry": {
+        "item1": 0.29447233333333334,
+        "item2": 0.37590819401923736,
+        "item3": 0.0
+      },
+      "area": [
+        0.0
+      ],
+      "distance": [
+        0.0
+      ],
+      "isOuter": true
+    }
+  ]
+}

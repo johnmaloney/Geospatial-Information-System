@@ -15,6 +15,8 @@ using TileFactory.Interfaces;
 using TileFactory.Layers;
 using TileFactory.Tests.Mocks;
 using Microsoft.Extensions.FileProviders;
+using TileFactory.Models;
+using Universal.Contracts.Serial;
 
 namespace TileFactory.Tests
 {
@@ -250,6 +252,46 @@ namespace TileFactory.Tests
             (int X, int Y) coordinates = transformed.TransformedFeatures.First().Coordinates.First();
             Assert.AreEqual(1707, coordinates.X);
             Assert.AreEqual(3109, coordinates.Y);
+        }
+
+        [TestMethod]
+        public async Task projected_into_features_initialize_layer_from_features_expect_cached_tile()
+        {
+            // Covers the case that the GeoJsonContext is not the context that initializes the TileRetrieverService //
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("populated_points_two_US");
+            var uniqueId = Guid.NewGuid().ToString().Substring(0, 6);
+            var context = new GeoJsonContext(geoJSON)
+            {
+                Identifier = uniqueId,
+                MaxZoom = 14,
+                Buffer = 64,
+                Extent = 4096,
+                Tolerance = 3
+            };
+
+            var tileContext = new SimpleTileContext()
+            {
+                MaxZoom = 14,
+                Buffer = 64,
+                Extent = 4096,
+                Tolerance = 3
+            };
+
+            var accessor = new LayerTileCacheAccessor(() => new MockTransformedCacheStorage(), () => new MockRawCacheStorage());
+            var generator = new Generator(tileContext, accessor, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var retriever = new TileRetrieverService(accessor, tileContext, generator);
+
+            var pipeline = new DetermineCollectionsTypePipeline()
+                .ExtendWith(new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem)))
+                .ExtendWith(new GeometricSimplification())
+                .ExtendWith(new InitializeProjectedFeatures(retriever)));
+
+            await pipeline.Process(context);
+
+            // Its important that this succeeded //
+            Assert.IsNotNull(context.Features);
         }
     }
 }
