@@ -32,9 +32,9 @@ let Session = {
                     <div class="control">
                         <div class="select">
                             <select id="sessionSelect">
-                            ${ `<option value=${session.newSessionId}">Start New</option>` }
+                            ${ `<option value=${session.newSessionId}>Start New</option>` }
                             ${ session.directories.map(s => 
-                                `<option value=${s.value}">${s.key}</option>`
+                                `<option value=${s.value}>${s.key}</option>`
                             )
                             }
                             </select>

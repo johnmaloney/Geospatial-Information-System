@@ -21,10 +21,10 @@ namespace TileProcessingApp.Models
         {
             if (message is TopicMessage topic)
             {
-                SentMessages.TryAdd(DateTime.Now.Millisecond.ToString(), topic.Message);
+                SentMessages.TryAdd(DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss"), $"Topic : {topic.Message}");
             }
             else
-                SentMessages.TryAdd(DateTime.Now.Millisecond.ToString(), $"A Message (Id:{message.Id}) of type {message.Type} was transferred.");
+                SentMessages.TryAdd(DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss"), $"A Message (Id:{message.Id}) of type {message.Type} was transferred.");
         }
     }
 }

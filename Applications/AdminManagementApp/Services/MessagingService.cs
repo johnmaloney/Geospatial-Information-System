@@ -55,39 +55,7 @@ namespace AdminManagementApp.Services
 
         public async Task<bool> Generate(JobRequest request)
         {
-            IMessage message = null;
-            switch (request.JobType)
-            {
-                case "projectData":
-                    {
-                        message = new GeneralCommand
-                        {
-                            Command = request.JobType,
-                            CommandDataCollection = new List<ICommandData>
-                            {
-                                new CommandData { Data = request.SessionId, DataType = "sessionId" },
-                                new CommandData { Data = request.FileName, DataType = "filename" }
-                            },
-                            Id = Guid.TryParse(request.SessionId, out Guid sessionId) ? sessionId : Guid.NewGuid()
-                        };
-                        break;
-                    }
-                case "generateTiles":
-                    {
-                        message = new GeneralCommand
-                        {
-                            Command = request.JobType,
-                            CommandDataCollection = new List<ICommandData>
-                            {
-                                new CommandData { Data = request.FileName, DataType = "filename" }
-                            },
-                            Id = Guid.NewGuid()
-                        };
-                        break;
-                    }
-                default:
-                    break;
-            }
+            var message = request.GenerateMessage();           
 
             if (message != null)
             {
