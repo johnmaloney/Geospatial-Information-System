@@ -72,6 +72,22 @@ namespace TileFactory
             return null;
         }
 
+
+        /// <summary>
+        /// Initializes a set of features into the cache system.
+        /// To be used when features are already loaded into the context. 
+        /// This might occur when projecting data from a file on the server.
+        /// </summary>
+        /// <param name="tileContext"></param>
+        /// <returns></returns>
+        public async Task InitializeTile(ITileContext tileContext)
+        {
+            // This is only called at the beginning //
+            tileGenerator.SplitTile(tileContext.TileFeatures.ToArray(),
+                zoom: 0, x: 0, y: 0, currentZoom: null, currentX: null, currentY: null);
+            var geoTile = await tileGenerator.GenerateTile();
+        }
+
         #endregion
     }
 }

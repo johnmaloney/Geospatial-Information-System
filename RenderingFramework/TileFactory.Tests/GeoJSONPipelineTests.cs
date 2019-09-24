@@ -12,6 +12,9 @@ using TileFactory.DataPipeline.GeoJson;
 using System.Linq;
 using TileFactory.Utility;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
+using TileFactory.Tests.Mocks;
+using Microsoft.Extensions.FileProviders;
 
 namespace TileFactory.Tests
 {
@@ -210,6 +213,43 @@ namespace TileFactory.Tests
             Assert.AreEqual(4.4107437134344174E-06, feature.Distance[3]);
             Assert.AreEqual(GeometryType.MultiLineString, feature.Type);
             Assert.AreEqual(4, geometry.Length);
+        }
+
+        [TestMethod]
+        public async Task project_raw_points_into_features_initialize_layer_from_features_expect_cached_tile()
+        {
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("populated_points_two_US");
+            var uniqueId = Guid.NewGuid().ToString().Substring(0, 6);
+            var context = new GeoJsonContext(geoJSON)
+            {
+                Identifier = uniqueId,
+                MaxZoom = 14,
+                Buffer = 64,
+                Extent = 4096,
+                Tolerance = 3
+            };
+
+            var accessor = new LayerTileCacheAccessor(() => new MockTransformedCacheStorage(), () => new MockRawCacheStorage());
+            var generator = new Generator(context, accessor, new LayerInitializationFileService(Container.GetService<IFileProvider>()));
+            var retriever = new TileRetrieverService(accessor, context, generator);
+                      
+            var pipeline = new DetermineCollectionsTypePipeline()
+                .ExtendWith(new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem)))
+                .ExtendWith(new GeometricSimplification())
+                .ExtendWith(new InitializeProjectedFeatures(retriever)));
+
+            await pipeline.Process(context);
+
+            var tile = await retriever.GetTile(1, 0, 0);
+
+            Assert.IsNotNull(tile);
+            var transformed = tile as ITransformedTile;
+            var featue = transformed.TransformedFeatures.First();
+            (int X, int Y) coordinates = transformed.TransformedFeatures.First().Coordinates.First();
+            Assert.AreEqual(1707, coordinates.X);
+            Assert.AreEqual(3109, coordinates.Y);
         }
     }
 }
