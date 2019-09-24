@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Files" Version="1.0.292" />
     <PackageReference Include="Logging" Version="1.0.278" />
     <PackageReference Include="Messaging" Version="1.0.284" />
     <PackageReference Include="Microsoft.AspNetCore.App" />

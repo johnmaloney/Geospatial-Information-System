@@ -80,6 +80,10 @@ namespace Files.CloudFileStorage
                     {
                         String xmlString = await httpResponseMessage.Content.ReadAsStringAsync();
                         XElement x = XElement.Parse(xmlString);
+
+                        if (x.Attribute("DirectoryPath") != null)
+                            items.Add(new File { Directory = x.Attribute("DirectoryPath").Value });
+
                         foreach (XElement container in x.Elements("Entries"))
                         {
                             foreach (XElement dir in container.Elements("Directory"))
@@ -190,7 +194,13 @@ namespace Files.CloudFileStorage
         /// <returns></returns>
         public async Task AddFile(IFile file)
         {
-            var fileBytes = Encoding.UTF8.GetBytes(file.TextContents);
+            byte[] fileBytes;
+            if (!string.IsNullOrEmpty(file.TextContents))
+                fileBytes = Encoding.UTF8.GetBytes(file.TextContents);
+            else if (file.DataContents != null)
+                fileBytes = file.DataContents;
+            else
+                fileBytes = Encoding.UTF8.GetBytes("No Content Uploaded With File");
 
             // Construct the URI. This will look like this:
             //   https://myaccount.blob.core.windows.net/resource

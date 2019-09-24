@@ -1,4 +1,6 @@
-﻿using Logging;
+﻿using Files;
+using Files.CloudFileStorage;
+using Logging;
 using Messaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,6 +18,7 @@ using TileFactory.Layers;
 using TileFactory.Models;
 using TileProcessingApp.Models;
 using TileProcessingApp.Services;
+using Universal.Contracts.Files;
 using Universal.Contracts.Logging;
 using Universal.Contracts.Messaging;
 
@@ -79,6 +82,15 @@ namespace TileProcessingApp
 
             services.AddSingleton<IFileProvider>(fileProvider);
 
+            services.AddSingleton<IFileRepository>(fr =>
+            {
+                return new AzureFileRepository(
+                    new AzureFileReader(
+                        Configuration["AzureFileStorage:UploadStorageAcctName"],
+                        Configuration["AzureFileStorage:StorageAccountKey"],
+                        Configuration["AzureFileStorage:FileStoreName"]));
+            });
+
             services.AddSingleton<ITileCacheStorage<ITile>>(new SimpleTileCacheStorage<ITile>());
             services.AddSingleton<ITileCacheStorage<ITransformedTile>>(new SimpleTileCacheStorage<ITransformedTile>());
             services.AddTransient<ITileContext>((sp) =>
@@ -105,10 +117,10 @@ namespace TileProcessingApp
                    });
             });
 
-            // Build the container //
+            // Build the container to allow for the registration of message receivers //
             var container = services.BuildServiceProvider();
             var processing = container.GetService<ProcessingService>();
-            processing.RegisterNotificationHandlers(container.GetService<MessageRepository>());
+            processing.RegisterNotificationHandlers(container.GetService<MessageRepository>(), container.GetService<IFileRepository>());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,7 +7,12 @@ namespace Universal.Contracts.Files
 {
     public interface IFile : IFileMetadata
     {
-        string TextContents { get; set; }
-        byte[] DataContents { get; set; }
+        string TextContents { get; }
+        byte[] DataContents { get; }
+
+        void AddTextContent(string textFile);
+        void AddDataContent(byte[] dataFile);
+
+        string GetDataContentsAsString(Encoding encoding);
     }
 }
