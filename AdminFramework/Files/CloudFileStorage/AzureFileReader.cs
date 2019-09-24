@@ -135,14 +135,15 @@ namespace Files.CloudFileStorage
                     //   parse the XML response for the container names.
                     if (httpResponseMessage.StatusCode == HttpStatusCode.OK)
                     {
-                        var file = await httpResponseMessage.Content.ReadAsByteArrayAsync();
-                        return new File
+                        var fileContent = await httpResponseMessage.Content.ReadAsByteArrayAsync();
+                        var file =  new File
                         {
-                            DataContents = file,
                             Directory = directory,
                             Name = fileName,
-                            ContentLength = file.Length
+                            ContentLength = fileContent.Length
                         };
+                        file.AddDataContent(fileContent);
+                        return file;
                     }
                 }
                 return null;

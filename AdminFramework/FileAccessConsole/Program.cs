@@ -66,9 +66,9 @@ namespace FileAccessConsole
                                 var f = new File()
                                 {
                                     Name = secondArg ?? "data.geojson",
-                                    Directory = directory,
-                                    TextContents = FileSampleContent()
+                                    Directory = directory                                    
                                 };
+                                f.AddTextContent(FileSampleContent());
                                 Task.Run(()=> repository.Add(f));
                                 break;
                             }
