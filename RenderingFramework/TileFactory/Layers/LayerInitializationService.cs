@@ -23,6 +23,7 @@ namespace TileFactory
         #region Fields
 
         private readonly IFileProvider fileProvider;
+        private List<LayerInformationModel> models = new List<LayerInformationModel>();
         private readonly Dictionary<string, string> files = new Dictionary<string, string>();
         private object fileLock = new object();
 
@@ -30,7 +31,7 @@ namespace TileFactory
 
         #region Properties
 
-        public IEnumerable<LayerInformationModel> Models { get; private set; }
+        public IEnumerable<LayerInformationModel> Models { get { return models; } }
 
         #endregion
 
@@ -39,8 +40,8 @@ namespace TileFactory
         public LayerInitializationFileService(IFileProvider fileProvider, string serverIP = "")
         {
             this.fileProvider = fileProvider;
-            var models = new List<LayerInformationModel>();
-            foreach(var item in this.fileProvider.GetDirectoryContents("/"))
+
+            foreach (var item in this.fileProvider.GetDirectoryContents("/"))
             {
                 var name = Path.GetFileNameWithoutExtension(item.PhysicalPath);
                 var layerInformation = new LayerInformationModel()
@@ -56,10 +57,9 @@ namespace TileFactory
                 };
 
                 models.Add(layerInformation);
-                
+
                 files.Add(item.Name, item.PhysicalPath);
             }
-            this.Models = models;
         }
 
         /// <summary>
@@ -94,9 +94,9 @@ namespace TileFactory
             return GetFeatures(model.GetPropertyValueAs<string>("FileExtension"), await GetText(model.Path));
         }
 
-        public async Task AddLayer(LayerInformationModel model)
+        public void AddLayer(LayerInformationModel model)
         {
-
+            models.Add(model);
         }
 
         private IEnumerable<IGeometryItem> GetFeatures(string extension, string text)
