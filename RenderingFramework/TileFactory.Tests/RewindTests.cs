@@ -6,6 +6,7 @@ using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Utility;
 using TileFactory.Utility.Obsolete;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Tests
 {

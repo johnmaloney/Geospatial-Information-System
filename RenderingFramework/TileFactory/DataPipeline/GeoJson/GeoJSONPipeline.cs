@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TileFactory.Interfaces;
 using TileFactory.Utility;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.DataPipeline.GeoJson
 {

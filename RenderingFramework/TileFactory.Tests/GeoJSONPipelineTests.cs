@@ -17,6 +17,7 @@ using TileFactory.Tests.Mocks;
 using Microsoft.Extensions.FileProviders;
 using TileFactory.Models;
 using Universal.Contracts.Serial;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Tests
 {
@@ -70,16 +71,15 @@ namespace TileFactory.Tests
 
             Assert.AreEqual(2, context.TileFeatures.Count());
 
-            var feature1 = context.TileFeatures.FirstOrDefault(f => f.Id == "400001");
+            var feature1 = context.TileFeatures.FirstOrDefault(f => ((Feature)f).Id == "400001") as Feature;
             Assert.AreEqual("400001", feature1.Id);
             Assert.AreEqual("400001", feature1.Tags["stop_id"].ToString());
             Assert.AreEqual("4 AV/E 9 ST", feature1.Tags["stop_name"].ToString());
             Assert.AreEqual(0.294471d, feature1.Geometry[0][0].X);
             Assert.AreEqual(0.375915411794357d, feature1.Geometry[0][0].Y);
             Assert.AreEqual(0, feature1.Geometry[0][0].Z);
-
-
-            var feature2 = context.TileFeatures.FirstOrDefault(f => f.Id == "400002");
+            
+            var feature2 = context.TileFeatures.FirstOrDefault(f => ((Feature)f).Id == "400002") as Feature;
             Assert.AreEqual("400002", feature2.Id);
             Assert.AreEqual("400002", feature2.Tags["stop_id"].ToString());
             Assert.AreEqual("4 AV/E 12 ST", feature2.Tags["stop_name"].ToString());
@@ -131,7 +131,7 @@ namespace TileFactory.Tests
 
             pipeline.Process(context);
 
-            var feature = context.TileFeatures.Single();
+            var feature = context.TileFeatures.Single() as Feature;
             Assert.IsNotNull(feature);
 
             Assert.AreEqual(386, feature.Geometry[0].Length);
@@ -141,7 +141,7 @@ namespace TileFactory.Tests
             Assert.AreEqual(0.38925641237479158d, feature.MaxGeometry.Y);
             Assert.AreEqual(0.19705485277777779d, feature.MinGeometry.X);
             Assert.AreEqual(0.374913347992747d, feature.MinGeometry.Y);
-            Assert.AreEqual(Interfaces.GeometryType.Polygon, feature.Type);
+            Assert.AreEqual(GeometryType.Polygon, feature.Type);
             Assert.AreEqual(5, feature.Tags.Count);
         }
 
@@ -191,7 +191,7 @@ namespace TileFactory.Tests
 
             await pipeline.Process(context);
 
-            var feature = context.TileFeatures.First();
+            var feature = context.TileFeatures.First() as Feature;
             var geometry = feature.Geometry.First();
             Assert.AreEqual(5.2325351872911652E-07, feature.Area[0]);
             Assert.AreEqual(5.066394805852692E-06, feature.Distance[0]);

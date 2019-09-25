@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using TileFactory.Tests.Utility;
 using Microsoft.Extensions.DependencyInjection;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Tests
 {
@@ -13,7 +14,7 @@ namespace TileFactory.Tests
         [TestMethod]
         public void initialize_single_geometric_feature_expect_bounding_box_calc()
         {
-            var feature = new Feature(Interfaces.GeometryType.Point)
+            var feature = new Feature(GeometryType.Point)
             {
                 Geometry = Container.GetService<IConfigurationStrategy>().FromInto<(double X, double Y, double Z)[][]>(simplifiedPointData()),
                 Id = "777",
@@ -29,7 +30,7 @@ namespace TileFactory.Tests
         [TestMethod]
         public void initialize_single_geometric_feature_expect_area()
         {
-            var feature = new Feature(Interfaces.GeometryType.Point)
+            var feature = new Feature(GeometryType.Point)
             {
                 Geometry = Container.GetService<IConfigurationStrategy>().FromInto<(double X, double Y, double Z)[][]>(simplifiedPointData()),
                 Id = "777",
@@ -42,7 +43,7 @@ namespace TileFactory.Tests
         [TestMethod]
         public void initialize_single_geometric_feature_expect_distance()
         {
-            var feature = new Feature(Interfaces.GeometryType.Point)
+            var feature = new Feature(GeometryType.Point)
             {
                 Geometry = Container.GetService<IConfigurationStrategy>().FromInto<(double X, double Y, double Z)[][]>(simplifiedPointData()),
                 Id = "777",

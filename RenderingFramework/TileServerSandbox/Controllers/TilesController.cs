@@ -10,6 +10,8 @@ using TileFactory;
 using TileFactory.Interfaces;
 using TileFactory.Layers;
 using TileFactory.Serialization;
+using Universal.Contracts.Layers;
+using Universal.Contracts.Tiles;
 
 namespace TileServerSandbox.Controllers
 {

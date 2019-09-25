@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using TileFactory.Interfaces;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Transforms
 {

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Utility;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Layers
 {

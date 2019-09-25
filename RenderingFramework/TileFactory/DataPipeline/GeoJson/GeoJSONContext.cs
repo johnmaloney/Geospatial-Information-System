@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TileFactory.Interfaces;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.DataPipeline.GeoJson
 {

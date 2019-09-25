@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using TileFactory.Commands;
 using TileFactory.Interfaces;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Serialization
 {

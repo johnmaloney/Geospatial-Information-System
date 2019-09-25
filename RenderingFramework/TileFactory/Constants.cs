@@ -19,6 +19,5 @@ namespace TileFactory
             None = 3, 
             Rejected = 4
         }
-
     }
 }

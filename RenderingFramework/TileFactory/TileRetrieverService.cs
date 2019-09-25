@@ -9,6 +9,7 @@ using TileFactory.Layers;
 using TileFactory.Models;
 using TileFactory.Transforms;
 using TileFactory.Utility;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory
 {

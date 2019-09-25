@@ -17,6 +17,8 @@ using TileFactory;
 using TileFactory.Interfaces;
 using TileFactory.Layers;
 using TileFactory.Models;
+using Universal.Contracts.Layers;
+using Universal.Contracts.Tiles;
 
 namespace TileServerSandbox
 {

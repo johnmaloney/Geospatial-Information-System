@@ -8,6 +8,7 @@ using TileFactory.Interfaces;
 using TileFactory.Utility;
 using TileFactory.Utility.Obsolete;
 using TileFactory.Tests.Utility;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Tests
 {
@@ -82,7 +83,7 @@ namespace TileFactory.Tests
 
         private Feature[] getSimplePointFeatures()
         {
-            var feature1 = new Feature(Interfaces.GeometryType.Point)
+            var feature1 = new Feature(GeometryType.Point)
             {
                 Geometry = new(double X, double Y, double Z)[][]
                {
@@ -94,7 +95,7 @@ namespace TileFactory.Tests
                 Id = "777"
             };
 
-            var feature2 = new Feature(Interfaces.GeometryType.Point)
+            var feature2 = new Feature(GeometryType.Point)
             {
                 Geometry = new(double X, double Y, double Z)[][]
                {

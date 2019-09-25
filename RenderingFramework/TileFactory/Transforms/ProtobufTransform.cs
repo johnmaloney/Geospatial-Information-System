@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Serialization;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Transforms
 {

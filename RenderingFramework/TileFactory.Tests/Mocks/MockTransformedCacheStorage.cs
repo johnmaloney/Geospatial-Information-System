@@ -5,6 +5,7 @@ using System.Text;
 using TileFactory.Interfaces;
 using TileFactory.Serialization;
 using TileFactory.Transforms;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory.Tests.Mocks
 {

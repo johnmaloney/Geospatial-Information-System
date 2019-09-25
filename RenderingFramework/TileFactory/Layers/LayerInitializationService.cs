@@ -6,18 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TileFactory.Interfaces;
+using Universal.Contracts.Layers;
 using Universal.Contracts.Models;
 using Universal.Contracts.Serial;
+using Universal.Contracts.Tiles;
 
 namespace TileFactory
 {
-    public interface ILayerInitializationService
-    {
-        IEnumerable<LayerInformationModel> Models { get; }
-        Task<IEnumerable<Feature>> InitializeLayer(string name);
-        Task<IEnumerable<Feature>> InitializeLayer(Guid identifier);
-    }
-
     /// <summary>
     /// This class will build up the information that is required to return tiles to the 
     /// client. It uses the FileProvider
@@ -72,7 +68,7 @@ namespace TileFactory
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Feature>> InitializeLayer(string name)
+        public async Task<IEnumerable<IGeometryItem>> InitializeLayer(string name)
         {
             if (!Models.Any(m => m.Name.ToLower() == name.ToLower()))
                 throw new NotSupportedException($"The Layer named {name} was not found in the Models collection");
@@ -88,7 +84,7 @@ namespace TileFactory
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Feature>> InitializeLayer(Guid identifier)
+        public async Task<IEnumerable<IGeometryItem>> InitializeLayer(Guid identifier)
         {
             if (!Models.Any(m => m.Identifier == identifier))
                 throw new NotSupportedException($"The Layer with Id: {identifier} was not found in the Models collection");
@@ -98,7 +94,12 @@ namespace TileFactory
             return GetFeatures(model.GetPropertyValueAs<string>("FileExtension"), await GetText(model.Path));
         }
 
-        private IEnumerable<Feature> GetFeatures(string extension, string text)
+        public async Task AddLayer(LayerInformationModel model)
+        {
+
+        }
+
+        private IEnumerable<IGeometryItem> GetFeatures(string extension, string text)
         {
             switch (extension)
             {

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using TileFactory;
+using Universal.Contracts.Layers;
 
 namespace TileServerSandbox.Controllers
 {
