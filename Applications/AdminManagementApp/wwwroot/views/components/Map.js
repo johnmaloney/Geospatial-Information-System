@@ -47,11 +47,7 @@ let Map = {
         var baseLayers = {
             "World Streets": Esri_WorldImagery 
         };
-
-        var overlays = {
-            "Tile One" : controlLayers[0]
-        };
-
+        
         //L.control.layers(baseLayers, { collapsed: false }).addTo(map);  
     }
 
