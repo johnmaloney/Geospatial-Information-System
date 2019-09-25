@@ -62,7 +62,8 @@ let Layer = {
         // get the layers from the server //
         layers = await getLayers();
 
-        let view =  /*html*/`
+        if (layers) {
+            let view =  /*html*/`
             <form id ="layersForm">
                 <div class="field">
                     <label class="label">Available Layers</label>
@@ -70,9 +71,9 @@ let Layer = {
                         <div class="select">
                             <select id="layerSelect">
                             ${ layers.map(l =>
-                                `<option value=${l.identifier}>${l.name}</option>`
-                            )
-                            }
+                `<option value=${l.identifier}>${l.name}</option>`
+            )
+                }
                             </select>
                         </div>
                     </div>
@@ -83,17 +84,22 @@ let Layer = {
                     </div>
                 </div>
             </form>`;
-        return view;
+            return view;
+        }
+        else {
+            return "<label>Invalid layers retrieval...</label>";
+        }
+        
     }
     , after_render: async () => {
 
         var form = document.getElementById("layersForm");
-        form.addEventListener("submit", function (event) {
-            event.preventDefault();
-            loadLayer();
-        });
-     
-
+        if (form) {
+            form.addEventListener("submit", function (event) {
+                event.preventDefault();
+                loadLayer();
+            });
+        }
     }
 
 };
