@@ -23,6 +23,7 @@ namespace TileFactory
         #region Fields
 
         private readonly IFileProvider fileProvider;
+        private readonly string serverIP;
         private List<LayerInformationModel> models = new List<LayerInformationModel>();
         private readonly Dictionary<string, string> files = new Dictionary<string, string>();
         private object fileLock = new object();
@@ -40,7 +41,7 @@ namespace TileFactory
         public LayerInitializationFileService(IFileProvider fileProvider, string serverIP = "")
         {
             this.fileProvider = fileProvider;
-
+            this.serverIP = serverIP;
             foreach (var item in this.fileProvider.GetDirectoryContents("/"))
             {
                 var name = Path.GetFileNameWithoutExtension(item.PhysicalPath);
@@ -96,6 +97,30 @@ namespace TileFactory
 
         public void AddLayer(LayerInformationModel model)
         {
+            var properties = new List<Property>();
+            properties.AddRange(model.Properties);
+
+            if (!model.Properties.Any(p => p.Name.ToLower() == "tileaccesstemplate"))
+            {
+                properties.Add(
+                    new Property
+                    {
+                        Name = "TileAccessTemplate",
+                        Value = serverIP + "/v1/tiles/" + model.Name + "/{z}/{x}/{y}.vector.pbf?access_token={token}"
+                    });
+            }
+            if (string.IsNullOrEmpty(model.Path) && !model.Properties.Any(p=> p.Name.ToLower() == "fileExtension"))
+            {
+                properties.Add(
+                    new Property
+                    {
+                        Name = "FileExtension",
+                        Value = Path.GetExtension(model.Path),
+                        ValueType = typeof(string)
+                    });
+            }
+            model.Properties = properties.ToArray();
+             
             models.Add(model);
         }
 
