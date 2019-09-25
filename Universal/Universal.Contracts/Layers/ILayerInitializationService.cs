@@ -12,6 +12,6 @@ namespace Universal.Contracts.Layers
         IEnumerable<LayerInformationModel> Models { get; }
         Task<IEnumerable<IGeometryItem>> InitializeLayer(string name);
         Task<IEnumerable<IGeometryItem>> InitializeLayer(Guid identifier);
-        Task AddLayer(LayerInformationModel model);
+        void AddLayer(LayerInformationModel model);
     }
 }
