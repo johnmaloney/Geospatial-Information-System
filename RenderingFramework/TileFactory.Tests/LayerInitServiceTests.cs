@@ -11,6 +11,8 @@ using TileFactory.Tests.Mocks;
 using Microsoft.Extensions.FileProviders;
 using System.Linq;
 using System.Threading.Tasks;
+using Universal.Contracts.Models;
+using System.IO;
 
 namespace TileFactory.Tests
 {
@@ -28,6 +30,49 @@ namespace TileFactory.Tests
             Assert.AreEqual(1, features.Count());
             Assert.IsNotNull(features.FirstOrDefault(), "The deserialized feature must be populated.");
             Assert.AreEqual(386, features.First().Geometry.First().Count());
+        }
+
+        [TestMethod]
+        public void add_new_model_to_the_layer_collection_expect_entry()
+        {
+            var service = new LayerInitializationFileService(Container.GetService<IFileProvider>());
+
+            int beginningCount = service.Models.Count();
+
+            var newLayer = new LayerInformationModel
+            {
+                Identifier = Guid.NewGuid(),
+                Name = Guid.NewGuid().ToString().Substring(0, 6)
+            };
+            service.AddLayer(newLayer);
+
+            Assert.AreEqual(beginningCount + 1, service.Models.Count());
+        }
+
+        [TestMethod]
+        public void add_new_model_with_properties_to_the_layer_collection_expect_entry()
+        {
+            var service = new LayerInitializationFileService(Container.GetService<IFileProvider>());
+
+            int beginningCount = service.Models.Count();
+
+            var newLayer = new LayerInformationModel
+            {
+                Identifier = Guid.NewGuid(),
+                Name = Guid.NewGuid().ToString().Substring(0, 6), 
+                Properties = new Property[]
+                {
+                    new Property { Name = "FileExtension", Value = "json", ValueType = typeof(string) },
+                    new Property { Name = "TileAccessTemplate", Value = "http://Server/v1/tiles/tileName/{z}/{x}/{y}.vector.pbf?access_token={token}"}
+                }
+            };
+            service.AddLayer(newLayer);
+
+            Assert.AreEqual(beginningCount + 1, service.Models.Count());
+            Assert.AreEqual("json", newLayer.Properties.First(p => p.Name == "FileExtension").Value);
+            Assert.AreEqual(
+                "http://Server/v1/tiles/tileName/{z}/{x}/{y}.vector.pbf?access_token={token}", 
+                newLayer.Properties.First(p => p.Name == "TileAccessTemplate").Value);
         }
     }
 }

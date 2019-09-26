@@ -98,29 +98,41 @@ namespace TileFactory
         public void AddLayer(LayerInformationModel model)
         {
             var properties = new List<Property>();
-            properties.AddRange(model.Properties);
+            
+            var tileTemplate = new Property
+            {
+                Name = "TileAccessTemplate",
+                Value = serverIP + "/v1/tiles/" + model.Name + "/{z}/{x}/{y}.vector.pbf?access_token={token}"
+            };
 
-            if (!model.Properties.Any(p => p.Name.ToLower() == "tileaccesstemplate"))
+            var fileExtension = new Property
             {
-                properties.Add(
-                    new Property
-                    {
-                        Name = "TileAccessTemplate",
-                        Value = serverIP + "/v1/tiles/" + model.Name + "/{z}/{x}/{y}.vector.pbf?access_token={token}"
-                    });
-            }
-            if (string.IsNullOrEmpty(model.Path) && !model.Properties.Any(p=> p.Name.ToLower() == "fileExtension"))
+                Name = "FileExtension",
+                Value = !string.IsNullOrEmpty(model.Path) ? Path.GetExtension(model.Path) : string.Empty,
+                ValueType = typeof(string)
+            };
+
+
+            if (model.Properties != null)
             {
-                properties.Add(
-                    new Property
-                    {
-                        Name = "FileExtension",
-                        Value = Path.GetExtension(model.Path),
-                        ValueType = typeof(string)
-                    });
+                properties.AddRange(model.Properties);
+
+                if (!model.Properties.Any(p => p.Name.ToLower() == "tileaccesstemplate"))
+                {
+                    properties.Add(tileTemplate);
+                }
+                if (!model.Properties.Any(p => p.Name.ToLower() == "fileextension"))
+                {
+                    properties.Add(fileExtension);
+                }
+            }  
+            else
+            {
+                properties.Add(tileTemplate);
+                properties.Add(fileExtension);
             }
+
             model.Properties = properties.ToArray();
-             
             models.Add(model);
         }
 
