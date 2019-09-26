@@ -19,8 +19,10 @@ using TileFactory.Models;
 using TileProcessingApp.Models;
 using TileProcessingApp.Services;
 using Universal.Contracts.Files;
+using Universal.Contracts.Layers;
 using Universal.Contracts.Logging;
 using Universal.Contracts.Messaging;
+using Universal.Contracts.Tiles;
 
 namespace TileProcessingApp
 {
@@ -80,6 +82,10 @@ namespace TileProcessingApp
 
             services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider, serverIp));
 
+            services.AddTransient<Generator>();
+
+            services.AddTransient<TileRetrieverService>();
+
             services.AddSingleton<IFileProvider>(fileProvider);
 
             services.AddSingleton<IFileRepository>(fr =>
@@ -119,6 +125,7 @@ namespace TileProcessingApp
 
             // Build the container to allow for the registration of message receivers //
             var container = services.BuildServiceProvider();
+
             var processing = container.GetService<ProcessingService>();
             processing.RegisterNotificationHandlers(container.GetService<MessageRepository>(), container.GetService<IFileRepository>());
         }

@@ -10,6 +10,11 @@ using TileProcessingApp.Models;
 using Universal.Contracts.Files;
 using Universal.Contracts.Messaging;
 using Universal.Contracts.Logging;
+using System.Text;
+using TileFactory;
+using Universal.Contracts.Layers;
+using Universal.Contracts.Models;
+using Universal.Contracts.Tiles;
 
 namespace TileProcessingApp.Observers
 {
@@ -20,6 +25,8 @@ namespace TileProcessingApp.Observers
         private readonly ITopicMessengerClient messenger;
         private readonly MessageRepository messageRepository;
         private readonly IFileRepository fileRepository;
+        private readonly TileRetrieverService tileService;
+        private readonly ILayerInitializationService layerService;
         private readonly ILogger logger;
 
         #endregion
@@ -32,11 +39,15 @@ namespace TileProcessingApp.Observers
 
         public ProjectedDataObserver(ITopicMessengerClient messenger, 
             MessageRepository messageRepository, IFileRepository fileRepository,
+            TileRetrieverService tileService,
+            ILayerInitializationService layerService,
             ILogger logger)
         {
             this.messenger = messenger;
             this.messageRepository = messageRepository;
             this.fileRepository = fileRepository;
+            this.tileService = tileService;
+            this.layerService = layerService;
             this.logger = logger;
         }
 
@@ -56,9 +67,11 @@ namespace TileProcessingApp.Observers
                     var fileName = gCommand.CommandDataCollection.FirstOrDefault(cd => cd.DataType == "filename")?.Data?.ToString();
                     var uploadedFile = await fileRepository.Get(gCommand.Id.ToString(), fileName);
 
-                    string converted = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                    string converted = uploadedFile.GetDataContentsAsString(Encoding.UTF8);
+                    string uniqueId = GenerateUniqueId(gCommand.Id);
                     var context = new GeoJsonContext(uploadedFile.TextContents)
                     {
+                        Identifier = fileName + $"_{uniqueId}",
                         MaxZoom = 14,
                         Buffer = 64,
                         Extent = 4096,
@@ -69,9 +82,21 @@ namespace TileProcessingApp.Observers
                         .ExtendWith(new ParseGeoJsonToFeatures()
                             .IterateWith(new ProjectGeoJSONToGeometric(
                                 (geoItem) => new WebMercatorProcessor(geoItem)))
-                            .ExtendWith(new GeometricSimplification()));
+                            .ExtendWith(new GeometricSimplification())
+                        .ExtendWith(new InitializeProjectedFeatures(tileService))); 
 
                     await pipeline.Process(context);
+
+                    var layerModel = new LayerInformationModel
+                    {
+                        Identifier = gCommand.Id,
+                        Name = context.Identifier, 
+                        Properties = new Property[]
+                        {
+                            new Property { Name = "features", Value = context.TileFeatures, ValueType = typeof(List<IGeometryItem>) }
+                        }
+                    };
+                    layerService.AddLayer(layerModel);
                 }
                 catch (Exception ex)
                 {
@@ -83,8 +108,15 @@ namespace TileProcessingApp.Observers
                         MessageBody = ex.StackTrace
                     });
                 }
-
             }
+        }
+
+        private string GenerateUniqueId(Guid messageId)
+        {
+            if (messageId != Guid.Empty)
+                return messageId.ToString().Substring(0, 6);
+            else
+                return DateTime.Now.Ticks.ToString();
         }
 
         #endregion

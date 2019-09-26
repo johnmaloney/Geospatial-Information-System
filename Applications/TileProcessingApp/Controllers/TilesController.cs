@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.FileProviders;
 using TileFactory;
-using TileFactory.Interfaces;
 using TileFactory.Layers;
 using TileFactory.Serialization;
+using Universal.Contracts.Layers;
+using Universal.Contracts.Tiles;
 
 namespace TileProcessingApp.Controllers
 {
@@ -48,13 +49,12 @@ namespace TileProcessingApp.Controllers
         }
 
         public TilesController(LayerTileCacheAccessor cacheAccessor,
-            ITileContext tileContext,
-            IFileProvider files)
+            ILayerInitializationService layerService,
+            ITileContext tileContext)
         {
             this.tileContext = tileContext;
-            this.files = files;
 
-            var generator = new Generator(tileContext, cacheAccessor, new LayerInitializationFileService(files));
+            var generator = new Generator(tileContext, cacheAccessor, layerService);
             tileRetrieverService = new TileRetrieverService(cacheAccessor, tileContext, generator);
         }
     }

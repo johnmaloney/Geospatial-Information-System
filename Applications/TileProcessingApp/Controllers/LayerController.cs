@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TileFactory;
+using Universal.Contracts.Layers;
 using Universal.Contracts.Models;
 
 namespace TileProcessingApp.Controllers
@@ -20,6 +21,7 @@ namespace TileProcessingApp.Controllers
         [EnableCors]
         public ActionResult<IEnumerable<LayerInformationModel>> Get()
         {
+
             return new ObjectResult(layerService.Models);
         }
 
