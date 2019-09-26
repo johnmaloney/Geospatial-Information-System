@@ -96,6 +96,8 @@ namespace TileFactory.Tests
             };
             layerService.AddLayer(newLayer);
 
+            // the Add layer method removes the features and replaces it with a count //
+            Assert.AreEqual(2, newLayer.Properties.First(p => p.Name == LayerProperties.Features).Value);
 
             // NOW try to retrieve the tile from memory //
             var context = new SimpleTileContext()

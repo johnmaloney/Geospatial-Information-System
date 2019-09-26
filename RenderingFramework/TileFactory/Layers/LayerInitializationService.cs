@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TileFactory.Interfaces;
 using TileFactory.Layers;
+using TileFactory.Models;
 using Universal.Contracts.Layers;
 using Universal.Contracts.Models;
 using Universal.Contracts.Serial;
@@ -27,6 +28,7 @@ namespace TileFactory
         private readonly string serverIP;
         private List<LayerInformationModel> models = new List<LayerInformationModel>();
         private readonly Dictionary<string, string> files = new Dictionary<string, string>();
+        private readonly ICacheStorage<Guid, IEnumerable<IGeometryItem>> featureCache =new SimpleFeaturesCache();
         private object fileLock = new object();
 
         #endregion
@@ -85,7 +87,7 @@ namespace TileFactory
             {
                 // this is loading from memory //
                 var features = model.Properties.First(p => p.Name == LayerProperties.Features);
-                return (IEnumerable<IGeometryItem>)features.Value;
+                return featureCache.GetBy(model.Identifier);
             }
             else
                 throw new NotSupportedException($"The features of the requested layer with name: {name}, could not be found.");
@@ -112,7 +114,7 @@ namespace TileFactory
             {
                 // this is loading from memory //
                 var features = model.Properties.First(p => p.Name == LayerProperties.Features);
-                return (IEnumerable<IGeometryItem>)features.Value;
+                return featureCache.GetBy(model.Identifier);
             }
             else
                 throw new NotSupportedException($"The features of the requested layer with Guid: {identifier}, could not be found.");
@@ -146,6 +148,22 @@ namespace TileFactory
                 if (!model.Properties.Any(p => p.Name.ToLower() == LayerProperties.FileExt))
                 {
                     properties.Add(fileExtension);
+                }
+                if (model.Properties.Any(p => p.Name.ToLower() == LayerProperties.Features))
+                {
+                    var featuresProperty = model.Properties.First(p => p.Name.ToLower() == LayerProperties.Features);
+                    try
+                    {
+                        var features = (IEnumerable<IGeometryItem>)featuresProperty.Value;
+                        featureCache.StoreBy(model.Identifier, features);
+                        featuresProperty.Value = features.Count();
+                    }
+                    catch (Exception ex)
+                    {
+                        featuresProperty.Value = $"An error occurred while attempting to access/overwrite the features. {ex.Message} : {ex.StackTrace}";
+                    }
+                    properties.Remove(properties.First(p => p.Name.ToLower() == LayerProperties.Features));
+                    properties.Add(featuresProperty);
                 }
             }  
             else
