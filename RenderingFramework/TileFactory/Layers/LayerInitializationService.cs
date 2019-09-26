@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TileFactory.Interfaces;
+using TileFactory.Layers;
 using Universal.Contracts.Layers;
 using Universal.Contracts.Models;
 using Universal.Contracts.Serial;
@@ -52,8 +53,8 @@ namespace TileFactory
                     Path = item.PhysicalPath,
                     Properties = new Property[]
                     {
-                        new Property { Name = "FileExtension", Value = Path.GetExtension(item.PhysicalPath), ValueType = typeof(string) },
-                        new Property { Name = "TileAccessTemplate", Value = serverIP + "/v1/tiles/"+ name +"/{z}/{x}/{y}.vector.pbf?access_token={token}"}
+                        new Property { Name = LayerProperties.FileExt, Value = Path.GetExtension(item.PhysicalPath), ValueType = typeof(string) },
+                        new Property { Name = LayerProperties.TileAccessTemplate, Value = serverIP + "/v1/tiles/"+ name +"/{z}/{x}/{y}.vector.pbf?access_token={token}"}
                     }
                 };
 
@@ -76,7 +77,18 @@ namespace TileFactory
 
             var model = Models.First(m => m.Name.ToLower() == name.ToLower());
 
-            return GetFeatures(model.GetPropertyValueAs<string>("FileExtension"), await GetText(model.Path));
+            if (model.Properties.Any(p => p.Name.ToLower() == LayerProperties.FileExt && p.Value != null && !string.IsNullOrEmpty(p.Value.ToString())))
+            {
+                return GetFeatures(model.GetPropertyValueAs<string>(LayerProperties.FileExt), await GetText(model.Path));
+            }
+            else if (model.Properties.Any(p => p.Name == LayerProperties.Features))
+            {
+                // this is loading from memory //
+                var features = model.Properties.First(p => p.Name == LayerProperties.Features);
+                return (IEnumerable<IGeometryItem>)features.Value;
+            }
+            else
+                throw new NotSupportedException($"The features of the requested layer with name: {name}, could not be found.");
         }
 
         /// <summary>
@@ -91,8 +103,19 @@ namespace TileFactory
                 throw new NotSupportedException($"The Layer with Id: {identifier} was not found in the Models collection");
 
             var model = Models.First(m => m.Identifier == identifier);
-
-            return GetFeatures(model.GetPropertyValueAs<string>("FileExtension"), await GetText(model.Path));
+                       
+            if (model.Properties.Any(p => p.Name.ToLower() == LayerProperties.FileExt && p.Value != null && !string.IsNullOrEmpty(p.Value.ToString())))
+            {
+                return GetFeatures(model.GetPropertyValueAs<string>(LayerProperties.FileExt), await GetText(model.Path));
+            }
+            else if (model.Properties.Any(p => p.Name == LayerProperties.Features))
+            {
+                // this is loading from memory //
+                var features = model.Properties.First(p => p.Name == LayerProperties.Features);
+                return (IEnumerable<IGeometryItem>)features.Value;
+            }
+            else
+                throw new NotSupportedException($"The features of the requested layer with Guid: {identifier}, could not be found.");
         }
 
         public void AddLayer(LayerInformationModel model)
@@ -101,27 +124,26 @@ namespace TileFactory
             
             var tileTemplate = new Property
             {
-                Name = "TileAccessTemplate",
+                Name = LayerProperties.TileAccessTemplate,
                 Value = serverIP + "/v1/tiles/" + model.Name + "/{z}/{x}/{y}.vector.pbf?access_token={token}"
             };
 
             var fileExtension = new Property
             {
-                Name = "FileExtension",
+                Name = LayerProperties.FileExt,
                 Value = !string.IsNullOrEmpty(model.Path) ? Path.GetExtension(model.Path) : string.Empty,
                 ValueType = typeof(string)
             };
-
-
+            
             if (model.Properties != null)
             {
                 properties.AddRange(model.Properties);
 
-                if (!model.Properties.Any(p => p.Name.ToLower() == "tileaccesstemplate"))
+                if (!model.Properties.Any(p => p.Name.ToLower() == LayerProperties.TileAccessTemplate))
                 {
                     properties.Add(tileTemplate);
                 }
-                if (!model.Properties.Any(p => p.Name.ToLower() == "fileextension"))
+                if (!model.Properties.Any(p => p.Name.ToLower() == LayerProperties.FileExt))
                 {
                     properties.Add(fileExtension);
                 }
