@@ -10,7 +10,7 @@ let loadLayer = async () => {
         return element.identifier === layerName;
     });
     var url = selectedLayer.properties.find(function(element) {
-        return element.name === "TileAccessTemplate";
+        return element.name === "tile_access_template";
     });
 
     var mapboxUrl = url.value;
