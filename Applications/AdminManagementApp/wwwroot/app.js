@@ -6,8 +6,9 @@ import Home from './views/pages/Home.js';
 import About from './views/pages/About.js';
 import JobEntry from './views/components/JobEntry.js';
 import LogEntry from './views/components/LogEntry.js';
-import Session from './views/components/Session.js';
+import Utility from './views/components/Utility.js';
 import Map from './views/components/Map.js';
+import Messages from './views/components/Messages.js';
 import Layer from './views/components/Layer.js';
 import Error404 from './views/pages/Error404.js';
 import PostShow from './views/pages/PostShow.js';
@@ -33,11 +34,14 @@ const router = async () => {
 
     // Lazy load view element:
     const header = null || document.getElementById('header_container');
-    const content = null || document.getElementById('page_container');
-    const sessionForm = null || document.getElementById('session_container');
+    //const content = null || document.getElementById('page_container');
+    const utilityItems = null || document.getElementById('utility_container');
     const jobEntryForm = null || document.getElementById('jobentry_container');
-    const layerSets = null || document.getElementById('layer_container');    
+    const layerSets = null || document.getElementById('layer_container');
+
     const map = null || document.getElementById('map_container');
+    const messages = null || document.getElementById('message_container');  
+    
     const footer = null || document.getElementById('footer_container');
     
     // Render the Header and footer of the page
@@ -54,11 +58,17 @@ const router = async () => {
     
     // Get the page from our hash of supported routes.
     // If the parsed URL is not in our list of supported routes, select the 404 page instead
-    let page = routes[parsedURL] ? routes[parsedURL] : Error404;
-    content.innerHTML = await page.render();
+    //let page = routes[parsedURL] ? routes[parsedURL] : Error404;
+    //content.innerHTML = await page.render();
+
+    utilityItems.innerHTML = await Utility.render();
+    await Utility.after_render();
 
     map.innerHTML = await Map.render();
     await Map.after_render();
+
+    messages.innerHTML = await Messages.render();
+    await Messages.after_render();
 
     jobEntryForm.innerHTML = await JobEntry.render();
     await JobEntry.after_render();
@@ -66,11 +76,8 @@ const router = async () => {
     layerSets.innerHTML = await Layer.render();
     await Layer.after_render();
     
-    sessionForm.innerHTML = await Session.render();
-    await Session.after_render();
 
-    await page.after_render();
-  
+    //await page.after_render();
 }
 
 // Listen on hash change:

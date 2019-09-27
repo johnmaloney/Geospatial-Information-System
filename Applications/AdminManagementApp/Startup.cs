@@ -1,4 +1,5 @@
 ﻿using AdminManagementApp.Data;
+using AdminManagementApp.Hubs;
 using AdminManagementApp.Services;
 using Files;
 using Files.CloudFileStorage;
@@ -77,6 +78,9 @@ namespace AdminManagementApp
             });
 
             services.AddSingleton<FileService>();
+
+            services.AddSingleton<MessageHub>();
+            services.AddSignalR();
         }  
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -107,7 +111,10 @@ namespace AdminManagementApp
             app.UseStaticFiles();
             app.UseHttpsRedirection();
             app.UseMvc();
-
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<MessageHub>("/ping");
+            });
         }
     }
 }

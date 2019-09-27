@@ -40,7 +40,7 @@ namespace AdminManagementApp.Services
             
             this.topicMessenger = topicMessenger;
             this.topicObserver = topicObserver;
-            this.topicObserver.RegisterForNotificationOf<TopicMessage>(MessageReceiver);
+            //this.topicObserver.RegisterForNotificationOf<TopicMessage>(MessageReceiver);
         }
 
         public IEnumerable<IMessage> CurrentMessages()

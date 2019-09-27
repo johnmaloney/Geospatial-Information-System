@@ -43,10 +43,43 @@ let submitJobEntry = async () => {
     };    
 };
 
+let getSessionId = async () => {
+
+    const options = {
+        method: 'GET'
+    };
+    try {
+        const response = await fetch(`api/session`, options);
+        return await response.json();
+    } catch (err) {
+        console.log('Error submitting log.', err);
+    }
+};
+
+
 let JobEntry = {
     render: async () => {
+
+
+        var session = await getSessionId();
+
         let view = /*html form*/`
              <form id="jobEntryForm" style="width:100%">
+                <div class="field">
+                    <label class="label">Select Session to Use</label>
+                    <div class="control">
+                        <div class="select">
+                            <select id="sessionSelect">
+                            ${ `<option value=${session.newSessionId}>Start New</option>`}
+                            ${ session.directories.map(s =>
+                                `<option value=${s.value}>${s.key}</option>`
+                            )
+                            }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="field">
                     <label class="label">Message</label>
                     <div class="control">

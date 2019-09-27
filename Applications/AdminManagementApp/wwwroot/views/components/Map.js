@@ -36,7 +36,7 @@ let Map = {
         var layers = await getLayers();
 
         var map = L.map('mapid');
-        map.setView({ lat: 40, lng: -104 }, 10); 
+        map.setView({ lat: 29.9511, lng: -90.0715}, 10); 
         
         var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'

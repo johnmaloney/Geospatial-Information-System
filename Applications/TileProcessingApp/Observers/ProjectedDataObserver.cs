@@ -97,6 +97,13 @@ namespace TileProcessingApp.Observers
                         }
                     };
                     layerService.AddLayer(layerModel);
+
+                    var topicFinished = new TopicMessage
+                    {
+                        Message = $"Tile Processing request FINISHED for {gCommand.Command}, for ID:{gCommand.Id.ToString()}"
+                    };
+                    messageRepository.AddMessage(topicFinished);
+                    await messenger.Send(topicFinished);
                 }
                 catch (Exception ex)
                 {
