@@ -293,5 +293,27 @@ namespace TileFactory.Tests
             // Its important that this succeeded //
             Assert.IsNotNull(context.Features);
         }
+
+        [TestMethod]
+        public async Task process_large_geojson_expect_points()
+        {
+            var geoJSON = Container.GetService<IConfigurationStrategy>().GetJson("nola_jazzhouses");
+
+            var context = new GeoJsonContext(geoJSON)
+            {
+                MaxZoom = 14,
+                Buffer = 64,
+                Extent = 4096,
+                Tolerance = 3
+            };
+
+            var pipeline = new DetermineCollectionsTypePipeline()
+                .ExtendWith(new ParseGeoJsonToFeatures()
+                    .IterateWith(new ProjectGeoJSONToGeometric(
+                        (geoItem) => new WebMercatorProcessor(geoItem)))
+                .ExtendWith(new GeometricSimplification()));
+
+            await pipeline.Process(context);
+        }
     }
 }

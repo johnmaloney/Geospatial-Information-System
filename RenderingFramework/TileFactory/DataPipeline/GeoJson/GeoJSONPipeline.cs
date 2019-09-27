@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TileFactory.Interfaces;
@@ -97,10 +98,10 @@ namespace TileFactory.DataPipeline.GeoJson
         {
             var processedFeatures = new List<Feature>();
             //Parallel.ForEach(featureCollection.Features, feature=>
-            foreach (var geospatialFeature in featureCollection.Features)
-            {
+            foreach (var geospatialFeature in featureCollection.Features.Where(f=> f.Geometry != null))
+            {                
                 var geometricFeature = CreateFeature(geospatialFeature);
-
+                
                 await this.Iterate(
                         new GeoJSONIterativeContext(
                             geospatialFeature,
