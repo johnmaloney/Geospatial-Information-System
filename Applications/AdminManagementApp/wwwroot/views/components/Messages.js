@@ -11,7 +11,7 @@ let Messages = {
         var connection = new signalR.HubConnectionBuilder()
             .withUrl('/ping')
             .build();
-
+        
         // Create a function that the hub can call to broadcast messages.
         connection.on('broadcastMessage', function (message) {
 
@@ -36,6 +36,8 @@ let Messages = {
                     // Call the Send method on the hub.
                     connection.invoke('ping', "Ping from the Admin App");
                 });
+                
+                connection.invoke('ping', "Start up ping...");
             })
             .catch(error => {
                 console.error(error.message);

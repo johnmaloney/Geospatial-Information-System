@@ -4,6 +4,7 @@ using Logging;
 using Messaging;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
@@ -65,7 +66,7 @@ namespace TileProcessingApp
             var subscriberBus = new SubscriptionClient(ServiceBusConnectionString, Topics.GeneralInfo, "gis");
             services.AddSingleton<ITopicObserverClient>(sp =>
             {
-                var observer = new ObserverClient(subscriberBus);
+                var observer = new ObserverClient(subscriberBus, false);
                 observer.RegisterForLogNotifications(LogProcessor);
                 return observer;
             });
@@ -77,7 +78,7 @@ namespace TileProcessingApp
             services.AddSingleton<ProcessingService>();
             services.AddSingleton<MessageRepository>(new MessageRepository());
 
-            var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/layers"));
+             var fileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/layers"));
             var serverIp = Configuration["ServerAddress:Https"];
 
             services.AddSingleton<ILayerInitializationService>(new LayerInitializationFileService(fileProvider, serverIp));

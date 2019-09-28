@@ -12,7 +12,9 @@ using Microsoft.Azure.ServiceBus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Universal.Contracts.Files;
 using Universal.Contracts.Logging;
 using Universal.Contracts.Messaging;
@@ -23,6 +25,7 @@ namespace AdminManagementApp
     {
         const string publisherConnectionString = "Endpoint=sb://aetosmessaging.servicebus.windows.net/;SharedAccessKeyName=Publisher;SharedAccessKey=knJ9TZyB9kf8kdv/cCcTW4b9/sPCTP5tcX2G9zU1QUE=";
         const string subscriberConnectionString = "Endpoint=sb://aetosmessaging.servicebus.windows.net/;SharedAccessKeyName=Subscriber;SharedAccessKey=AADc5dQr/zv+4s6lbDlaKrdDMq6h38VBKksFHOBPWZY=";
+        private Universal.Contracts.Logging.ILogger logger;
 
         public Startup(IConfiguration configuration)
         {
@@ -47,11 +50,15 @@ namespace AdminManagementApp
                 new MessengerClient(topicBus));
 
             var subscriberBus = new SubscriptionClient(subscriberConnectionString, Topics.GeneralInfo, "gis");
-            services.AddSingleton<ITopicObserverClient>(sp =>
-                new ObserverClient(subscriberBus));
+            services.AddSingleton<ITopicObserverClient>((sp) =>
+            {
+                var observer = new ObserverClient(subscriberBus, false);
+                observer.RegisterForLogNotifications(LogProcessor);
+                return observer;
+            });
             
             // START the Logger, connects to Kibana //
-            var logger = new LogManager(Configuration["ElasticConfiguration:Uri"]);
+            logger = new LogManager(Configuration["ElasticConfiguration:Uri"]);
             logger.Log(new LogEntry { Id = 1, Title = "Administration Management App initializing.", Type = LogType.Information.ToString() });
             services.AddSingleton<Universal.Contracts.Logging.ILogger>(logger);
 
@@ -115,6 +122,14 @@ namespace AdminManagementApp
             {
                 routes.MapHub<MessageHub>("/ping");
             });
+        }
+
+        internal async Task LogProcessor(IEnumerable<ILogEntry> entries)
+        {
+            foreach (var entry in entries)
+            {
+                await logger.Log(entry);
+            }
         }
     }
 }

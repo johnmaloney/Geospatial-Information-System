@@ -19,7 +19,7 @@ let submitJobEntry = async () => {
         var json = {
 
             message: form[0].value,
-            jobType: form[1].value,
+            jobType: form[2].value,
             fileName: fileInput.files[0].name,
             fileContent: base64StringFile, 
             sessionId: session

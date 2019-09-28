@@ -78,9 +78,13 @@ let Layer = {
                         </div>
                     </div>
                 </div>
+
                 <div class="field is-grouped">
                     <div class="control">
-                        <button class="button is-link">Load Layer</button>
+                        <button class="button is-link is-primary">Load Layer</button>
+                    </div>
+                    <div class="control">                        
+                        <a class="is-link" id="refreshLayers">Refresh Layers</a>
                     </div>
                 </div>
             </form>`;
@@ -99,6 +103,26 @@ let Layer = {
                 event.preventDefault();
                 loadLayer();
             });
+        }
+        var refresh = document.getElementById("refreshLayers");
+        if (refresh) {
+
+            refresh.addEventListener("click", async function (event) {
+                var newLayers = await getLayers();
+                var select = document.getElementById("layerSelect");
+                var i;
+                for (i = select.options.length - 1; i >= 0; i--) {
+                    select.remove(i);
+                }
+
+                newLayers.map(l => {
+                    var opt = document.createElement('option');
+                    opt.value = l.identifier;
+                    opt.innerHTML = l.name;
+                    select.appendChild(opt);
+                });
+            });
+            
         }
     }
 
