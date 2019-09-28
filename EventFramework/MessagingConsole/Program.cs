@@ -102,7 +102,7 @@ namespace MessagingConsole
                                 //});
 
                                 var topicObserver = new SubscriptionClient(subscriberConnectionString, "general-info", "gis");
-                                tObserver = new ObserverClient(topicObserver);
+                                tObserver = new ObserverClient(topicObserver, false);
 
                                 tObserver.RegisterForNotificationOf<TopicMessage>(async (m) =>
                                 {

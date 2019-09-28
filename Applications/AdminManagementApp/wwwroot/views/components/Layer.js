@@ -121,6 +121,8 @@ let Layer = {
                     opt.innerHTML = l.name;
                     select.appendChild(opt);
                 });
+
+                layers = newLayers;
             });
             
         }
