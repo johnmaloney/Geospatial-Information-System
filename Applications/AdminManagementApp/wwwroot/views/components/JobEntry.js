@@ -18,8 +18,8 @@ let submitJobEntry = async () => {
 
         var json = {
 
-            message: form[0].value,
-            jobType: form[2].value,
+            message: "Job request from the administration application.",
+            jobType: form[1].value,
             fileName: fileInput.files[0].name,
             fileContent: base64StringFile, 
             sessionId: session
@@ -81,20 +81,14 @@ let JobEntry = {
                 </div>
 
                 <div class="field">
-                    <label class="label">Message</label>
-                    <div class="control">
-                        <input class="input" type="text" name="message" id="message" placeholder="Text input">
-                    </div>
-                </div>
-
-                <div class="field">
+                    <label class="label">Select a task type</label>
                     <div class="control">
                         <div class="select">
                             <select>
                               <option value="projectData">Create Projected Data</option>
-                              <option value="generateTiles">Create Tiles</option>
-                              <option value="analyzeData">Produce Analysis</option>
-                            </select>
+                              <option value="generateTiles">Create Tiles (Not Supported Yet)</option>
+                              <option value="analyzeData">Produce Analysis (Not Supported Yet)</option>
+                            </select> 
                         </div>
                     </div>
                 </div>
