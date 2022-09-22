@@ -1,7 +1,7 @@
 # Geospatial Information System
 This repository hosts all of the documentation and source code for the GIS constructed as a capstone
  project. The GIS is architecturally designed to be hosted in a disconnected environment with 
-a publisher/subscriber pipeine that distributes event.
+a publisher/subscriber pipeline that distributes events.
 
 #### Applications
 The Admin site can communicate with the backend services, this application is
